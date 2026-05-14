@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background:   10 10 10;
+    --foreground:   255 255 255;
+    --wood-ocre:    196 136 42;
+    --wood-acajou:  107 45 45;
+  }
+
+  * {
+    @apply border-anthracite-700;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-anthracite-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-wood-dark rounded-full;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-wood-gradient text-white font-semibold px-6 py-3 rounded-lg
+           transition-all duration-300 hover:opacity-90 hover:scale-[1.02]
+           active:scale-[0.98] shadow-lg shadow-wood-acajou/20;
+  }
+
+  .btn-ghost {
+    @apply border border-anthracite-600 text-anthracite-400 px-6 py-3 rounded-lg
+           transition-all duration-300 hover:border-wood-ocre hover:text-wood-ocre;
+  }
+
+  .card-dark {
+    @apply bg-card-gradient border border-anthracite-700 rounded-xl
+           shadow-xl shadow-black/40 transition-all duration-300;
+  }
+
+  .card-premium {
+    @apply bg-anthracite-800/40 backdrop-blur-xl border border-white/10 rounded-2xl
+           shadow-2xl shadow-black/60 transition-all duration-500;
+  }
+
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+
+  .glow-border-ai {
+    @apply border border-ai-glow/30 shadow-[0_0_15px_rgba(0,240,255,0.2)];
+  }
+
+  .glow-text-ai {
+    @apply text-ai-glow drop-shadow-[0_0_8px_rgba(0,240,255,0.5)];
+  }
+
+  .section-title {
+    @apply font-display font-bold text-3xl md:text-5xl text-white tracking-tight;
+  }
+
+  .section-subtitle {
+    @apply text-anthracite-400 text-lg mt-4 max-w-2xl mx-auto leading-relaxed;
+  }
+
+  .wood-badge {
+    @apply inline-flex items-center gap-2 bg-wood-ocre/10 border border-wood-ocre/30
+           text-wood-ocre text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full;
+  }
+
+  .shimmer-bg {
+    background: linear-gradient(
+      90deg,
+      #0A0A0B 25%,
+      #1F1F23 50%,
+      #0A0A0B 75%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+}

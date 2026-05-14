@@ -1,4 +1,27 @@
+<<<<<<< HEAD
 import { RenderResult } from "@/types";
+=======
+import type { GenerationStep, RenderResult, UserProfile } from "@/types";
+
+export const MOCK_USER: UserProfile = {
+  uid:        "mock-uid-001",
+  email:      "contact@agence-batir.cm",
+  agencyName: "Agence Bâtir Cameroun",
+  logoUrl:    undefined,
+  credits:    12,
+  tier:       "agency-pro",
+  createdAt:  new Date("2024-01-15"),
+};
+
+export const GENERATION_STEPS: GenerationStep[] = [
+  { id: 1, label: "Analyse structurelle du plan...",     duration: 2000 },
+  { id: 2, label: "Détection des volumes et façades...", duration: 2500 },
+  { id: 3, label: "Application des textures BTP...",     duration: 3000 },
+  { id: 4, label: "Calcul de l'éclairage naturel...",    duration: 2000 },
+  { id: 5, label: "Rendu 4K en cours (IA)...",           duration: 3500 },
+  { id: 6, label: "Génération du rapport technique...",  duration: 1500 },
+];
+>>>>>>> 1623802 (Initial commit: Archi Cam AI Premium Infrastructure)
 
 export const MOCK_RENDER_RESULT: RenderResult = {
   id:          "render-mock-001",
@@ -65,8 +88,15 @@ Classe **B** selon référentiel RT-Tropicale. Potentiel d'optimisation vers cla
 };
 
 export const ARCHITECTURAL_STYLES = [
+<<<<<<< HEAD
   { value: "luxe-tropical",         label: "🌴 Luxe Tropical"           },
   { value: "moderne-minimaliste",   label: "🏙️ Moderne Minimaliste"      },
   { value: "industriel",            label: "🏗️ Industriel Urbain"        },
   { value: "africain-contemporain", label: "🌍 Africain Contemporain"   },
+=======
+  { value: "luxe-tropical",         label: "🌿 Luxe Tropical"           },
+  { value: "moderne-minimaliste",   label: "◼ Moderne Minimaliste"      },
+  { value: "industriel",            label: "⚙ Industriel Urbain"        },
+  { value: "africain-contemporain", label: "🏛 Africain Contemporain"   },
+>>>>>>> 1623802 (Initial commit: Archi Cam AI Premium Infrastructure)
 ] as const;
