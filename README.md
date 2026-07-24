@@ -1,94 +1,75 @@
-# 🏛️ Archi Cam AI — Plateforme IA & Ingénierie BIM 5D pour le BTP au Cameroun
+# 🏛️ Archi Cam AI — Suite IA Agentique & Ingénierie BIM 5D (BTP Cameroun)
 
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Firebase Genkit](https://img.shields.io/badge/Firebase_Genkit-Framework_Agentique-FFCA28?style=for-the-badge&logo=firebase)](https://firebase.google.com/docs/genkit)
 [![Gemma 4 12B QAT](https://img.shields.io/badge/LLM_Local-Gemma_4_12B_QAT-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev/gemma)
+[![MLflow / MLOps](https://img.shields.io/badge/MLOps-MLflow-0194E2?style=for-the-badge&logo=mlflow)](https://mlflow.org/)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/Docker-24.0-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com/)
 [![Neo4j](https://img.shields.io/badge/Neo4j-5.20-008CC1?style=for-the-badge&logo=neo4j)](https://neo4j.com/)
 [![Licence](https://img.shields.io/badge/Licence-Propriétaire-green?style=for-the-badge)](#licence)
 
-> **Archi Cam AI** est la toute première suite logicielle souveraine d'Intelligence Artificielle et d'Ingénierie BIM 5D conçue sur mesure pour l'architecture, la métrologie et le secteur du BTP au Cameroun et en Afrique Centrale.
+> **Archi Cam AI** est la suite logicielle souveraine d'Intelligence Artificielle Agentique et d'Ingénierie BIM 5D conçue pour le secteur du BTP au Cameroun et en Afrique Centrale.
 
 ---
 
-## 🌟 Piliers & Innovation Technique
+## 🌟 Piliers & Moteur de Devis Hybride (Tri-Moteur)
 
-* **🤖 LLM Hybride & Souveraineté (Gemma 4 12B QAT & Gemini 1.5)** : Utilisation locale du modèle **Google Gemma 4 (12B QAT)** via LM Studio pour un raisonnement et une confidentialité 100% hors-ligne des données de chantier, combinée à **Gemini 1.5 Pro/Flash** pour la vision multimodale.
-* **📐 Assainissement Altimétrique Z (Anti-Erreurs Archicad)** : Reclassification géométrique 3D automatique des objets mal attribués dans les calques d'implantation par analyse d'altitude $Z$.
-* **🖼️ Masquage ControlNet Anti-Hallucination** : Extraction d'un gabarit filaire 2D rigide (murs, portes, fenêtres) interdisant toute distorsion géométrique lors de la génération d'images.
-* **🎨 Agent Design & Rendus Photoréalistes (`@agent-design`)** : Génération de visualisations 3D (Google Imagen 3.0) et de plans 2D texturés style Photoshop mariant le modernisme et des touches d'artisanat d'art camerounais (bois d'iroko, motifs bamiléké).
-* **📊 Devis Déterministe Excel (Famille NDA - 6 Onglets)** : Extraction déterministe au millimètre près avec déductions nettes des baies $> 0.50\text{ m}^2$, classification **Uniclass 2015** et formules Excel automatiques.
-* **🕸️ GraphRAG & Mercuriale MINMAP 2026** : Ontologie Neo4j intégrant les prix mercuriales officiels du Ministère des Marchés Publics et les règles de dimensionnement du béton armé **BAEL 91**.
-* **🤖 Moteur REPL Python & Modèle MLOps ($R^2 = 0.9872$)** : Bac à sable Python sécurisé d'exécution mathématique et modèle de prédiction de coûts entraîné sur 400 projets réels BTP au Cameroun.
-
----
-
-## 🧱 Architecture du Système
+Archi Cam AI combine 3 technologies complémentaires pour générer des devis déterministes et estimatifs d'une précision inégalée :
 
 ```mermaid
 graph TD
-    Client[💻 App Web Next.js 14 / React 18] --> Router[🔀 Intelligent Agent Router]
+    Input[📄 PDF / Croquis / 📦 IFC 3D] --> Router[🔀 Orchestrateur Firebase Genkit]
     
-    Router -->|LLM Souverain Local| Gemma[🧠 Google Gemma 4 12B QAT - LM Studio Local]
-    Router -->|Vision Multimodale| GeminiEngine[👁️ Gemini 1.5 Pro / Imagen 3.0]
-    Router -->|Calculs Déterministes| REPL[🐍 Bac à Sable Python REPL Sandbox]
-    Router -->|Ontologie & Prix| Neo4j[🕸️ Neo4j 5.20 GraphRAG + Postgres pgvector]
+    Router -->|1. Maquette 3D IFC| BIM[📐 Moteur BIM 5D IfcOpenShell - Précision 100% mm]
+    Router -->|2. Plans 2D / PDF| ML[🔮 Modèle Machine Learning R²=0.9872 - 400 Projets BTP]
+    Router -->|3. Analyse & Regles| Graph[🕸️ GraphRAG Neo4j - Mercuriale MINMAP 2026 & BAEL 91]
     
-    REPL --> IfcEngine[📦 Moteur Geometry IfcOpenShell]
-    IfcEngine --> ExcelExport[📊 Export Excel 6 Onglets + IFC Sanitisé]
+    BIM & ML & Graph --> Excel[📊 Devis Excel Harmonisé 6 Onglets Famille NDA]
 ```
 
+1. **🤖 Orchestration Agentique Firebase Genkit** : Pilotage de 4 agents IA spécialisés (`@agent-metreur`, `@agent-devis`, `@agent-structure`, `@agent-design`) collaborant en parallèle.
+2. **🔮 MLOps & Machine Learning (MLflow Pipeline)** : Pré-devis estimatif instantané alimenté par un modèle Gradient Boosting ($R^2 = 0.9872$) entraîné sur 400 projets réels de construction au Cameroun.
+3. **🧠 LLM Hybride & Souveraineté (Gemma 4 12B QAT & Gemini 1.5)** : Modèle **Google Gemma 4 (12B QAT)** local via LM Studio pour le traitement ultra-confidentiel hors-ligne, couplé à **Gemini 1.5 Pro** (Vision) et **Imagen 3.0** (Rendus 3D).
+4. **📐 Assainissement Altimétrique Z & ControlNet** : Correcteur automatique des calques Archicad par altitude $Z$ et masque filaire rigide anti-hallucination.
+5. **📊 Devis Excel Harmonisé (Famille NDA - 6 Onglets)** : Export `.xlsx` complet avec formules automatiques reliées (Fondation, RDC, Étage, Second Œuvre, Récapitulatif DEVIS, Planning GANTT CPM/PERT).
+
 ---
 
-## 💻 Stack Technologique SOTA
+## 💻 Stack Technologique Complète
 
-### Intelligence Artificielle & LLM Hybride
-- **LLM Local Souverain** : **Google Gemma 4 (12B QAT)** via LM Studio (`http://127.0.0.1:1234/v1`) — Garantit la confidentialité absolue des données financières et techniques des projets BTP.
-- **Vision Multimodale & Photoréalisme** : Google Gemini 1.5 Pro / Flash & Google Imagen 3.0.
-- **Moteur Agentic Router** : Routage intelligent des requêtes vers `@agent-metreur`, `@agent-devis`, `@agent-structure`, `@agent-design`.
+### 🤖 Intelligence Artificielle & Framework Agentique
+- **Framework Agentique** : **Firebase Genkit** (`src/genkit/`) — Orchestration multi-agents type Crew.
+- **LLM Local Souverain** : **Google Gemma 4 (12B QAT)** via LM Studio (`http://127.0.0.1:1234/v1`).
+- **Vision & Photoréalisme** : Google Gemini 1.5 Pro / Flash & Google Imagen 3.0.
+- **MLOps & Pipeline ML** : **MLflow** & Scikit-Learn (`scripts/train_cost_predictor.py`).
 
-### Frontend & Visualisation 3D
-- **Framework** : Next.js 14 (App Router), React 18, TypeScript.
+### 🛠️ Frontend & Visualisation 3D BIM
+- **Frontend Framework** : Next.js 14 (App Router), React 18, TypeScript.
 - **Styling & UI** : TailwindCSS, Lucide Icons, Radix UI, Framer Motion.
-- **Rendu BIM 3D** : Three.js, `@thatopen/components` (Visualiseur IFC WebGL sur navigateur).
+- **Visualiseur 3D BIM** : Three.js & `@thatopen/components` (Web-IFC WebGL).
 
-### Backend, Calculs & Base de Données
-- **Calculs Déterministes** : Python 3.11, IfcOpenShell, Pandas, NumPy, Scikit-Learn.
-- **Docker Compose** : Neo4j 5.20 (GraphRAG / Ontologie BTP) & PostgreSQL 16 `pgvector`.
-- **Authentification & Stockage** : Supabase / Firebase Auth.
+### ⚙️ Backend, Bases de Données & Infra
+- **Calculs Déterministes BIM** : Python 3.11, IfcOpenShell, Pandas, NumPy, OpenPyXL.
+- **Bases de Données Conteneurisées (Docker)** :
+  - **Neo4j 5.20 GraphRAG** (Ontologie BTP, Mercuriale MINMAP 2026, BAEL 91).
+  - **PostgreSQL 16 `pgvector`** (Recherche documentaire vectorielle).
+- **Backend Storage & Auth** : Supabase & Firebase Auth.
 
 ---
 
-## 🚀 Guide d'Installation & Démarrage Rapide
+## 🚀 Démarrage Rapide
 
-### Préréquis
-* **Node.js** >= 18.x
-* **Python** >= 3.10
-* **Docker Desktop** (pour Neo4j et Postgres)
-* **LM Studio** (pour faire tourner le modèle local **Google Gemma 4 12B QAT**)
-
-### 1. Cloner le Dépôt
+### 1. Cloner & Installer
 ```bash
 git clone https://github.com/gervais-afk/archi-cam-ai.git
 cd archi-cam-ai
-```
-
-### 2. Configurer le Modèle Local (LM Studio)
-Chargez le modèle `google/gemma-4-12b-qat` dans LM Studio et démarrez le serveur local OpenAI-compatible sur le port `1234`.
-
-### 3. Installer les Dépendances Frontend & Backend
-```bash
-# Dépendances Node.js
 npm install
-
-# Dépendances Python
-python -m venv .venv
-source .venv/bin/activate  # Sur Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. Démarrer les Services & l'Application
+### 2. Démarrer les Services
 ```bash
 cp .env.example .env.local
 docker-compose up -d
@@ -97,16 +78,15 @@ npm run dev
 
 ---
 
-## 🔒 Sécurité & Protection des Données (DevSecOps)
+## 🔒 Sécurité & Protection (DevSecOps)
 
-Ce dépôt respecte les exigences strictes de sécurité et de conformité logicielle :
-* ❌ **Zero Secret Commit** : Aucune clé d'API, mot de passe ou jeton de service n'est commité dans le code source.
-* 🛡️ **Isolation des Données** : Les fichiers de configuration (`.env.local`), bases de données locales, logs et scripts d'expérimentation sont strictement exclus via `.gitignore`.
-* 🇨🇲 **Souveraineté des Données BTP** : Le traitement local par **Gemma 4 (12B QAT)** permet d'analyser les projets sensibles sans fuite de données vers des serveurs tiers.
+* ❌ **Zero Secret Commit** : Aucune clé d'API commité (vérifié par audit CI/CD).
+* 🛡️ **Isolation des Données** : `.env.local`, logs et scripts temporaires strictement ignorés par `.gitignore`.
+* 🇨🇲 **Souveraineté des Données** : Exécution locale par **Gemma 4 (12B QAT)** pour préserver la confidentialité des projets.
 
 ---
 
-## 📄 Licence & Droits d'Auteur
+## 📄 Licence
 
 Proprietary License — All Rights Reserved.
 Copyright (c) 2026 **Gervais KOA & Archi Cam AI**. Tous droits réservés.
