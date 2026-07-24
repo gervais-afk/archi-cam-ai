@@ -1,0 +1,68 @@
+# 1. Récupérer les détails d'un projet et ses lignes DQE
+query GetProjetDqe($id: UUID!) @auth(level: PUBLIC) {
+  projet(id: $id) {
+    id
+    nomProjet
+    localisation
+    description
+    fraisGenerauxPct
+    margeAleasPct
+    dateCreation
+    devisDqes_on_projet {
+      id
+      ifcGuid
+      niveauSpatial
+      quantiteIfcBrute
+      quantiteFacturable
+      quantiteExecutee
+      prixTotalHt
+      statutPrix
+      mercurialePrix {
+        codeArticle
+        nomMateriau
+        designation
+        unite
+        prixTotalUnitaire
+      }
+    }
+  }
+}
+
+# 2. Récupérer tous les projets
+query ListProjets @auth(level: PUBLIC) {
+  projets {
+    id
+    nomProjet
+    localisation
+    dateCreation
+  }
+}
+
+# 3. Récupérer la Mercuriale complète
+query GetMercuriale @auth(level: PUBLIC) {
+  mercurialePrixes {
+    codeArticle
+    nomMateriau
+    designation
+    unite
+    prixUnitaireFourniture
+    prixUnitaireMainOeuvre
+    prixTotalUnitaire
+    categorieLot
+  }
+}
+
+# 4. Rechercher un mapping BIM par code
+query GetMappingBim($macroCodeBim: String!) @auth(level: PUBLIC) {
+  mappingBimPrixes(where: { macroCodeBim: { eq: $macroCodeBim } }) {
+    id
+    macroCodeBim
+    ratioConversion
+    mercurialePrix {
+      codeArticle
+      nomMateriau
+      unite
+      prixTotalUnitaire
+    }
+  }
+}

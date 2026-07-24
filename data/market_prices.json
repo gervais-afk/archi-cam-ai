@@ -1,0 +1,15 @@
+{
+  "ciment": {
+    "Douala": { "price": 5100, "unit": "sac 50kg", "brand": "Dangote/CIMAF" },
+    "Yaounde": { "price": 5300, "unit": "sac 50kg", "brand": "Dangote/CIMAF" },
+    "Bafoussam": { "price": 5500, "unit": "sac 50kg", "brand": "Dangote/CIMAF" }
+  },
+  "sable": {
+    "Douala": { "price": 45000, "unit": "camion 10m3", "type": "Sanaga" },
+    "Yaounde": { "price": 65000, "unit": "camion 10m3", "type": "Sanaga" }
+  },
+  "fer_beton_10mm": {
+    "Douala": { "price": 4200, "unit": "barre 12m", "standard": "FE400" },
+    "Yaounde": { "price": 4400, "unit": "barre 12m", "standard": "FE400" }
+  }
+}

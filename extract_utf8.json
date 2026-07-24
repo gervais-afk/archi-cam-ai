@@ -1,0 +1,5233 @@
+﻿{
+    "project_info": {
+        "name": "(Construction de... )"
+    },
+    "elements": [
+        {
+            "id": "2eB9t2WXv5EPqDXLHbw7nr",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Struct. - Parpaing b\u00e9ton",
+            "niveau_spatial": "fondation",
+            "code_article": "SOUB-FON-20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3mYLDz2556TvJDxDwPsQmU",
+            "type": "IfcWall",
+            "name": "MurExt-006",
+            "material": "Struct. - Parpaing b\u00e9ton",
+            "niveau_spatial": "fondation",
+            "code_article": "SOUB-FON-20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3$ut4zWc9Dmx96i3S9LKBM",
+            "type": "IfcWall",
+            "name": "MurExt-002",
+            "material": "Struct. - Parpaing b\u00e9ton",
+            "niveau_spatial": "fondation",
+            "code_article": "SOUB-FON-20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0c7zWra3H3E9Pw$e5SMPsJ",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Struct. - Parpaing b\u00e9ton",
+            "niveau_spatial": "fondation",
+            "code_article": "SOUB-FON-20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1$8wPppVH5K8GbWkyecusG",
+            "type": "IfcWall",
+            "name": "MurExt-007",
+            "material": "Struct. - Parpaing b\u00e9ton",
+            "niveau_spatial": "fondation",
+            "code_article": "SOUB-FON-20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1Y8LHx9Tj72RjVU65y1Lsj",
+            "type": "IfcWall",
+            "name": "MurExt-008",
+            "material": "Struct. - Parpaing b\u00e9ton",
+            "niveau_spatial": "fondation",
+            "code_article": "SOUB-FON-20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2lgnayAOf2WO8zaDKk5RRg",
+            "type": "IfcWall",
+            "name": "MurExt-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1EZMt2gy17lPyeybuqxHmb",
+            "type": "IfcWall",
+            "name": "MurExt-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0uZXrtPijD8e41Wk3UpGBW",
+            "type": "IfcWall",
+            "name": "MurExt-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "20PX1FS4jBZ8EZe0vgvlIv",
+            "type": "IfcWall",
+            "name": "MurExt-004",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0U5TIt4rbFGezwGQAL01BW",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3M36ik3sjFCALMdWm6Rh$R",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1BAWz59jz5YPD3H3i0SfAC",
+            "type": "IfcWall",
+            "name": "Fen-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "FEN-RDC-70X60",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0gBtx7HM93dRdkuSwgcG7w",
+            "type": "IfcWall",
+            "name": "Fen-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "FEN-RDC-70X60",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0OrAb2Kw97zwktNupIKkzb",
+            "type": "IfcWall",
+            "name": "MurExt-004",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1Gh1tc13r7YAzBe2dvjnQw",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1gJHsJhcX46OuRbkPTeG0D",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "17kqa6xfLCBRMffX9PlZAI",
+            "type": "IfcWall",
+            "name": "MurExt-004",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0qXs0HTjfDxwIVWKZYilTR",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-INT-RDC-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1awspmoO9COB7ogOoKRRtR",
+            "type": "IfcWall",
+            "name": "MurExt-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0IFoppL7L8mO18xMV0GqhW",
+            "type": "IfcWall",
+            "name": "MurExt-006",
+            "material": "Struct. - Parpaing b\u00e9ton",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1xSV829559lwdC3CJ3I3ml",
+            "type": "IfcWall",
+            "name": "MurExt-007",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1LP6btx093ZvD9T1D1S0Xt",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-RDC-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1PtKfTyvL3ZfIhd7v7j5RU",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Struct. - Parpaing b\u00e9ton",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0z1YvzOOP578RbxfebDHq5",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "MUR-INT-RDC-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "37L6p_pFL9_hMYiszjtL6z",
+            "type": "IfcWall",
+            "name": "MurExt-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1skmNpDiH7lhB7de5hYDPT",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3nAHzCq5110hwHIk2ZUZJR",
+            "type": "IfcWall",
+            "name": "MurExt-004",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0ydctvmGb0Pu9OGHuH3Vx0",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3SBm7tvG135xPzJQOQCCoh",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2LjpgEFED35egPVksAjKb_",
+            "type": "IfcWall",
+            "name": "MurExt-004",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0kEz5NSyzD4gQcy0ZuRIdB",
+            "type": "IfcWall",
+            "name": "MurExt-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0nH9ILxB1DRu9Y7u_u_9HI",
+            "type": "IfcWall",
+            "name": "MurExt-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "33oiFxEOnFegkEcJVt6$Fj",
+            "type": "IfcWall",
+            "name": "MurExt-007",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "35ngEGSwrFUv_$xzD5idKL",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2wsoMZLD1FSBgs4HMYMnWq",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0_vZIYJPj3R814LSwDcOmu",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0stmn_Gn9FT8oc07sqzfT8",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2_fhNc1v13Bw4Fx0D368UN",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "10W1CEwr57$utUa8V536kv",
+            "type": "IfcWall",
+            "name": "MurExt-007",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1dCUii4KvBBQUNlG86pB6Z",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-INT-ETG-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1xY$vMJt99E8rcLPMsWOBi",
+            "type": "IfcWall",
+            "name": "MurExt-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3y$4HmqQj4hBM_kymh1zUM",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2$5HcKmmv4oPxEG$sk6euk",
+            "type": "IfcWall",
+            "name": "MurExt-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "MUR-ETG-15",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "17ymd_jaD8z8R6Q9MD2LBD",
+            "type": "IfcWall",
+            "name": "MurExt-007",
+            "material": "Volume - Etude",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "PIGNON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "20kwXh9SvB8hAPpGy1oLTE",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2v09Kze2DEG8XfgYhjWhFD",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3ZSmuTyx50AvfCCR5qBRoI",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0cl3FgUNX5SuOGo7nQjeda",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2S5dLtVKjDaOFsbwnD9zNk",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2$81WeXrP8$81jzF0jC38X",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0$QobwH4j6UgLeCWZtIM5e",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1CpSFtin15hR8yiDIx7FUB",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "23YuqLMrT4MuVlnkA2367W",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "30lWXf0F18QOCDCn$PGPWx",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0mhF4VgZb1$fvsnEj8NmMt",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0Rpx03HEDEHeKmx8WcOzEk",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "16utH1k9f3KB8Tbl9Abr9D",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2pCv_wPP57oeNtWVx_OeAI",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0aUD1IFwL1R8VuicTPfFRE",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1VQLXBiNPEOPPPTxdvWwa_",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "26LnVXYBn5kO1dufwJA1sS",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1BFAa6qO9EjAwtMs0corph",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2UmpZ4SnjEKvZRZgxeXy7W",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2wa948ecvFj87XqY_dBqR8",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0zfa$TVP9C$u4u3LK5Zk56",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0XiUVT9uLBhg_$Scdz6g4E",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2oAm_KCfb7duApgMjqUMty",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1qXfPBxOLDqwmDp8BcMzL3",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1zobfFcgfBIwH9KJmrJq83",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2NHPbiPgvAYBv7IDTrmGGi",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3tpSVUhjf1vhTcGzvuv5uH",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "36nNB1bcv828fItO1Z$Rvt",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0G_48RJ01DYxUDXOL9Cj9E",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2_CsepMS5CDuaLXPQK70IV",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3b_SFc75fBdRJa00neRGos",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B\u00e9ton maigre",
+            "niveau_spatial": "fondation",
+            "code_article": "BDP-FON-08",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1EMRbwD9zCEfoSVLZDH2IG",
+            "type": "IfcSlab",
+            "name": "Dalle-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "SEM-FON-ISOL",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2EhBwWimD9T9XcjPWsZvOE",
+            "type": "IfcSlab",
+            "name": "Dalle-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "DAL-RDC-10",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0X9NOSSpL33uaWgoS4SPQF",
+            "type": "IfcSlab",
+            "name": "Dalle-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "DAL-RDC-10",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0VlMcNRCT3HftVvu0oQLIG",
+            "type": "IfcSlab",
+            "name": "Dalle-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "DAL-ETG-16+4",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0lycaWgQP1$RsXCtulZBs1",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "02vhBA_ODBq8GyRuJYnupu",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1AmK$3JAnDiglbXCg4uQrI",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3Xfafxg$9CVPpoOMDiSXVQ",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2IWDJEeRjEFuSwq01GDaXd",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2ERd6_EFH7IeSSypaCKknf",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1fUSY0KXL7Cx4yQ$eakMky",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2dQXH92kvDKAUhR9QeYehP",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "11j5frJU12KOFZ0WmIUSuS",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3XQpcjTyf1cfjcMbb9O8CS",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3JIf9BoXP5nRer_mBXWu$K",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2WS9vQG_17RuEQckZ6na9V",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2qD9QBV2HEh9xyN7HwDdxf",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "28N8HKXcnAouBNNxIw6BGq",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1nKj0uhsbAluHShbyCLQC2",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2mK3gQH4D5CuZgCaImUcdb",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "AMO-FON-20X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2Acav7DzT1V9xN2y18xhR2",
+            "type": "IfcColumn",
+            "name": "Pot-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POT_AVANT",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "37hRkasLv0bf_pu4k0p5dn",
+            "type": "IfcColumn",
+            "name": "Pot-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POT_AVANT",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "02mwyHBALEdODnZZ97d9JX",
+            "type": "IfcColumn",
+            "name": "Pot-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POT_AVANT",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3rhHfZoQrDL98Aut77b7vw",
+            "type": "IfcColumn",
+            "name": "Pot-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POT_AVANT",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2iRxbQO9L3XOS27qXa$Puy",
+            "type": "IfcColumn",
+            "name": "Pot-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POT_AVANT",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1n6MDFYEbDSg4AduASi8Xo",
+            "type": "IfcColumn",
+            "name": "Pot-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POT_AVANT",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2NaOXUBFTEpQNBsSjP96dI",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3hbW1eYcL0ZQgztFyYkUMH",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "358$xTnp5A7O74lmZ7c5lB",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0iDngSKUP6_ulZrH2cLX8e",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3m6RWbuf9EhxaSfmtY8Lze",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1Ri1YnGEXAPgZQZ7nWlsH$",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0jnycZKVT9XxMXeKMOEPyQ",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3lT0eiHJz7pvaAPyeFUQRh",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2OU82yfxbFOxXSXh2WX_eM",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0jqGn$2tr27Afd3UQi7Vvj",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1qjONkpPnBX9tl9v7ejATM",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1Q4SRzj3r4Cfk1aKrNsQQO",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2MGc$lNnv2$wK3R5kpEI1s",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "16LpoUDU9AFxXL7IGUPHYj",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POT-RDC-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "171lq3g7z5nQ6TgpHxR7v_",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2i3eYGDA9F2BRwAwrhK_c4",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0zSaeuW318gw_nv5ch6EV8",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0$_ISv9P92nue_C3sSAiFz",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1n_r9DR3zA3AhDKJuGKEbF",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3ZBdAqr6jAPe2LC6fYo3NK",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "28BBpGaQn1ef1AsyPAS8iS",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3XfRA4E3n5lvIn83MZQoui",
+            "type": "IfcColumn",
+            "name": "Pot-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT_AVANT",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "35nxeyWuDE8wfJz_xpUD3v",
+            "type": "IfcColumn",
+            "name": "Pot-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT_AVANT",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2lLRwJ74554O3ASV_xGIuW",
+            "type": "IfcColumn",
+            "name": "Pot-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT_AVANT",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "32d5DNvs5ETBjXngqF40VM",
+            "type": "IfcColumn",
+            "name": "Pot-001",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT_AVANT",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3a4dBZ4PH5Ogh26F4ZnWBw",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1rmdS1x_96CQ4fksNNeQvM",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3CyvrfBI5ByOTwwJtg2x0$",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1d8LIEnqH0$uDjKOuvYlsZ",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2AdlFdj4D2jvZ_GA4axZ69",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2uC6XpdtvDNfcUaxwNbbiI",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2XJghg0xTCq9znYtaeB0Pu",
+            "type": "IfcColumn",
+            "name": "Pot-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POT-ETG-15X25",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0hvrTM2vLAwO7E4JDOaEHt",
+            "type": "IfcBeam",
+            "name": "Poutre-020",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2KncIOVqX4ceptdfqxZIfz",
+            "type": "IfcBeam",
+            "name": "Poutre-023",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0uT6onevXFqAB_bsdb4hIt",
+            "type": "IfcBeam",
+            "name": "Poutre-032",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3reKjg3Jb9DQzPTY7gDYqS",
+            "type": "IfcBeam",
+            "name": "Poutre-006",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2rRaRogtr5RRWGnBINkrpt",
+            "type": "IfcBeam",
+            "name": "Poutre-021",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0GyQkifUr3wAPnyPqfPGTU",
+            "type": "IfcBeam",
+            "name": "Poutre-022",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "10Ofy3bcrDnRcPc0jF_y36",
+            "type": "IfcBeam",
+            "name": "Poutre-029",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3dn24u9ED6MBFsfsbBTWuq",
+            "type": "IfcBeam",
+            "name": "Poutre-005",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2JVRqnUiH4G9M$JsKdpTTm",
+            "type": "IfcBeam",
+            "name": "Poutre-024",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3G6J_spNTDl9nbl2JsR6xb",
+            "type": "IfcBeam",
+            "name": "Poutre-007",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0KEKdl1QTCXfzANQNIKI_$",
+            "type": "IfcBeam",
+            "name": "Poutre-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0cIVQ7uGf89u9WTrR6F5dt",
+            "type": "IfcBeam",
+            "name": "Poutre-031",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2ax$jFo7j3nuMpMbMWVTFx",
+            "type": "IfcBeam",
+            "name": "Poutre-026",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0LW8WdJmP6KxHfHsH13IF7",
+            "type": "IfcBeam",
+            "name": "Poutre-028",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2vpK4elIv5QRyjT7emA$A1",
+            "type": "IfcBeam",
+            "name": "Poutre-027",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1FQm8Cynj8yvH2VbW9T2LZ",
+            "type": "IfcBeam",
+            "name": "Poutre-019",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "03SUyF0gnEf9F76PnACsCt",
+            "type": "IfcBeam",
+            "name": "Poutre-019",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "04neizB4n09xVePtG_j8$l",
+            "type": "IfcBeam",
+            "name": "Poutre-018",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2L78NWxjv6A9PdhuN9spA4",
+            "type": "IfcBeam",
+            "name": "Poutre-021",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "37QTt7r6jAb9Btugt_bzp3",
+            "type": "IfcBeam",
+            "name": "Poutre-008",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "22Hgp8iR52HOjBXP0kddkr",
+            "type": "IfcBeam",
+            "name": "Poutre-025",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "13q7XjMN904hynD8hjMEz2",
+            "type": "IfcBeam",
+            "name": "Poutre-016",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "12er3yxRDEFfLqrxre0sPJ",
+            "type": "IfcBeam",
+            "name": "Poutre-017",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3wk8gUU8PAHQMB5tpyE78v",
+            "type": "IfcBeam",
+            "name": "Poutre-002",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1hV81NthfFwQsJ3GNqhsmc",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0evG22Vk10YeJWzEoU889a",
+            "type": "IfcBeam",
+            "name": "Poutre-015",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0Q9EIRp_P04PKSc9wa1PxW",
+            "type": "IfcBeam",
+            "name": "Poutre-014",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "28YiCcPB99p9vUxhB1S8s1",
+            "type": "IfcBeam",
+            "name": "Poutre-013",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1yNM3LaDj7TRPNOAoNP_Af",
+            "type": "IfcBeam",
+            "name": "Poutre-012",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1_5hLAGsHAfhA3eu04Prls",
+            "type": "IfcBeam",
+            "name": "Poutre-004",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2OuVeB12vA6g5WzwpBTgGB",
+            "type": "IfcBeam",
+            "name": "Poutre-018",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3rO7YMa6T5rxY6gm$dOaJx",
+            "type": "IfcBeam",
+            "name": "Poutre-011",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2ASWSEV3L4yw0G7lc3Vo80",
+            "type": "IfcBeam",
+            "name": "Poutre-010",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0_tde9nTbEOhZhmkxepv55",
+            "type": "IfcBeam",
+            "name": "Poutre-009",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "fondation",
+            "code_article": "LON-FON-01",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1RnCQZMLr46xCEIuon4PXz",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau rdc",
+            "code_article": "LINT-RDC-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2fpESBvtT1NgfOw$jnRMcN",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau rdc",
+            "code_article": "LINT-RDC-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2aOW9XRhL348iOFOEh4OGC",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau rdc",
+            "code_article": "LINT-RDC-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3WgXjluQ98nvmkq5Qs9rxR",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau rdc",
+            "code_article": "LINT-RDC-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1mTIACKN9FahhAoV1P77rf",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau rdc",
+            "code_article": "LINT-RDC-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "15uISisNT0SPfS1mvYR40F",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau rdc",
+            "code_article": "LINT-RDC-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0QCsv70YH9Y8mXlwgaPHj3",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau rdc",
+            "code_article": "LINT-RDC-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3GHZLA9Lv349gj5mF4gS8l",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau rdc",
+            "code_article": "LINT-RDC-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2gDndZr8P3Ked_hCJpxSrw",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau rdc",
+            "code_article": "LINT-RDC-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1SqowW4mv2FAWQxqLJR7mE",
+            "type": "IfcBeam",
+            "name": "Poutre-038",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3ov_2f1P91HuQm6Svpzu3N",
+            "type": "IfcBeam",
+            "name": "Poutre-036",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "27$s5BzeT1Gx3kpsAAbtG2",
+            "type": "IfcBeam",
+            "name": "Poutre-010",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "38ek6OGsXFVOgOSMLO5CpS",
+            "type": "IfcBeam",
+            "name": "Poutre-015",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "216PuuMe18JAapz7fVy5Nv",
+            "type": "IfcBeam",
+            "name": "Poutre-008",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2DbjRW41fCU9ByHbglyTK2",
+            "type": "IfcBeam",
+            "name": "Poutre-007",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1NhlsVxb55XAhBlCrGL1bb",
+            "type": "IfcBeam",
+            "name": "Poutre-005",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "15PSaPxdT5mOPCe$vjUWEe",
+            "type": "IfcBeam",
+            "name": "Poutre-006",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0GyH$r5Xj0tgGzkw68urNe",
+            "type": "IfcBeam",
+            "name": "Poutre-004",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2prUcshePDuhO_AGX5rul4",
+            "type": "IfcBeam",
+            "name": "Poutre-033",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2Kb_TZmVzFxBHOrJ9iDA_$",
+            "type": "IfcBeam",
+            "name": "Poutre-004",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "023cz1f5j4T8fkkc3zR43w",
+            "type": "IfcBeam",
+            "name": "Poutre-035",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2ICHCRrVj0xACPuYgGgBaE",
+            "type": "IfcBeam",
+            "name": "Poutre-020",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1DXR5lhCf3BP6YtNB1a7PF",
+            "type": "IfcBeam",
+            "name": "Poutre-013",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "07ZGCEpGT4Afvqo12OVdvn",
+            "type": "IfcBeam",
+            "name": "Poutre-014",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0a6wr7dfbCgPHUm62K3JhD",
+            "type": "IfcBeam",
+            "name": "Poutre-025",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3QI2Pvq151xOxhkWjQ1vna",
+            "type": "IfcBeam",
+            "name": "Poutre-024",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "09wa4Gw3z9597Mp$KxeRTt",
+            "type": "IfcBeam",
+            "name": "Poutre-015",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1dgEiSCiz5Jw1qHlgJqW3d",
+            "type": "IfcBeam",
+            "name": "Poutre-031",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1Om0mQ_214pQief3I65JxQ",
+            "type": "IfcBeam",
+            "name": "Poutre-026",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3d5qjaU0fAufUPAe0rMV5J",
+            "type": "IfcBeam",
+            "name": "Poutre-016",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1JaTYdDT9AtO6pr4BeGBGM",
+            "type": "IfcBeam",
+            "name": "Poutre-034",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3qjio6jkHBkfjQkzPXfqi6",
+            "type": "IfcBeam",
+            "name": "Poutre-017",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2P5nbCtVfARvWaVcqF6gkA",
+            "type": "IfcBeam",
+            "name": "Poutre-029",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3bO7zLxV1ANPLFX_TISvvg",
+            "type": "IfcBeam",
+            "name": "Poutre-032",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3mTEQWq5H83fPQ7qPmGK0G",
+            "type": "IfcBeam",
+            "name": "Poutre-030",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2P7PylKA1E2vjfX7RBg1Si",
+            "type": "IfcBeam",
+            "name": "Poutre-021",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1ul2PE2Dn8q94EFBPyO3r9",
+            "type": "IfcBeam",
+            "name": "Poutre-020",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "13BMoyexn1jAwqLEyFPp2n",
+            "type": "IfcBeam",
+            "name": "Poutre-022",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2y3sCtGBj5x9UAnCuZILB$",
+            "type": "IfcBeam",
+            "name": "Poutre-023",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1mf99z0bL3SwI_yvvqypLg",
+            "type": "IfcBeam",
+            "name": "Poutre-024",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1XhIiPG0n0Dx_oTKUcQjPq",
+            "type": "IfcBeam",
+            "name": "Poutre-014",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1nT3c1IoL3Nxfz4ycHcuRQ",
+            "type": "IfcBeam",
+            "name": "Poutre-014",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0Xziw6sOrDeQhAInM25vHZ",
+            "type": "IfcBeam",
+            "name": "Poutre-015",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1dBDDwcMPBVRN1V4zY9Itv",
+            "type": "IfcBeam",
+            "name": "Poutre-013",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "coffrage rdc",
+            "code_article": "POU-RDC-15X35",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2Rl2hbqyDBsBt$cLn61Rnj",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2w1rQi_6fFfxP46iSV$gr6",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2NJWO$$xH9BfMOmi8WLPIB",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1yyk771OrAF8J5L6naG6OY",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "14div4TQrDGuleAV8CZNcd",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3ugG40Ldj0Uv9bGtU$2Sof",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2jWfAzbZDAgwBD$_JysewE",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2tP6czvv97K9MSLN1L3Q7p",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0pIbyRc9fAWhG0dqZmAZ3M",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0K02SKEADEkPdFB6xF6$y9",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "17wgDy67D5yRwF4e6Itl1b",
+            "type": "IfcBeam",
+            "name": "Poutre-003",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "linteau etage",
+            "code_article": "LINT-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2dGRXOUIHChwNq0gTaw36R",
+            "type": "IfcBeam",
+            "name": "Poutre-038",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0CHA$BXfL1BBO5Ueuk4Qt$",
+            "type": "IfcBeam",
+            "name": "Poutre-036",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0V3a_DcHP9LP07NvDf7Ldr",
+            "type": "IfcBeam",
+            "name": "Poutre-010",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "28RVXcOe57Z8kNvcVPuCsM",
+            "type": "IfcBeam",
+            "name": "Poutre-015",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "171Cq8JfvBTQ6w9mQm2fGT",
+            "type": "IfcBeam",
+            "name": "Poutre-008",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2jE40smbj0Ledq23YPeR_9",
+            "type": "IfcBeam",
+            "name": "Poutre-007",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2lpQxgLAn8DAJDqnpRdlFb",
+            "type": "IfcBeam",
+            "name": "Poutre-005",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3UyBdezOv1p97YRFulPhmy",
+            "type": "IfcBeam",
+            "name": "Poutre-006",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3NX9oPDcr0UftUmBraBAzm",
+            "type": "IfcBeam",
+            "name": "Poutre-004",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "38IXwY7onAxPfGXfVJoIx6",
+            "type": "IfcBeam",
+            "name": "Poutre-033",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3e2ti9DmrCBBwwRtA_ffy6",
+            "type": "IfcBeam",
+            "name": "Poutre-004",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0ch1NriTnFDPpi6_BOBU_D",
+            "type": "IfcBeam",
+            "name": "Poutre-035",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1JAs3Fs45Dqf8fOxi428iD",
+            "type": "IfcBeam",
+            "name": "Poutre-014",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0bSdk9ZY54HBUBmrCf_bEn",
+            "type": "IfcBeam",
+            "name": "Poutre-020",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1wnKJaC75BIgn61iUd3hJi",
+            "type": "IfcBeam",
+            "name": "Poutre-013",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3G0spXnPHAaA7QV9C$SXNg",
+            "type": "IfcBeam",
+            "name": "Poutre-025",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0Hv1pUXYPBswzhEFacvpW6",
+            "type": "IfcBeam",
+            "name": "Poutre-024",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1CMy5ackDFphD$nge6ewCe",
+            "type": "IfcBeam",
+            "name": "Poutre-015",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0cImNGKH1F5Q9UtICvuRKx",
+            "type": "IfcBeam",
+            "name": "Poutre-031",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0KcG4ZN$1C$ALtgSX1A1Fk",
+            "type": "IfcBeam",
+            "name": "Poutre-026",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3lUnKCtBX3pR9vzBbmEmTE",
+            "type": "IfcBeam",
+            "name": "Poutre-016",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0n21Ih0tjDYPsStCxGzxQq",
+            "type": "IfcBeam",
+            "name": "Poutre-034",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1vWmhEQvXDVP2RAWr42l4d",
+            "type": "IfcBeam",
+            "name": "Poutre-017",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "144K3Rx4L1TeaSXc1b1ZSV",
+            "type": "IfcBeam",
+            "name": "Poutre-029",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0LrfzmGur0egSLp9gYE2xV",
+            "type": "IfcBeam",
+            "name": "Poutre-032",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1YW0$cF158jB81rYYPKP2Z",
+            "type": "IfcBeam",
+            "name": "Poutre-030",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3ivPRk5iv2uP6cg5TU_ZEw",
+            "type": "IfcBeam",
+            "name": "Poutre-020",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0ryQYGL9D4cBFr8Y79IKjU",
+            "type": "IfcBeam",
+            "name": "Poutre-021",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2EN1uBImX0_ONaeEr5Hp0x",
+            "type": "IfcBeam",
+            "name": "Poutre-022",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1weUhmUmH6Uh0CukpJZ8eW",
+            "type": "IfcBeam",
+            "name": "Poutre-023",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0Ub_hNNUn4sQSWHCGcLVx7",
+            "type": "IfcBeam",
+            "name": "Poutre-024",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0KYWZlV2X0dQ_43FpwxelM",
+            "type": "IfcBeam",
+            "name": "Poutre-014",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0sZjamfl16YwOptKMdjtvP",
+            "type": "IfcBeam",
+            "name": "Poutre-014",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2f5K8wZ4H1MvGokmT9E9AV",
+            "type": "IfcBeam",
+            "name": "Poutre-013",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "05MmbkyK96BOOemGVoK21g",
+            "type": "IfcBeam",
+            "name": "Poutre-015",
+            "material": "Struct. - B.A. coul\u00e9",
+            "niveau_spatial": "chainage etage",
+            "code_article": "CHAIN-ETAG-15X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "00eZErb659kRC$6EJRYSFN",
+            "type": "IfcBeam",
+            "name": "Poutre-019",
+            "material": "M\u00e9tal - Aluminium",
+            "niveau_spatial": "Toiture",
+            "code_article": "BOIS-RIVE_0,02X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0QF$etEtT17gHr9uUMDxvn",
+            "type": "IfcBeam",
+            "name": "Poutre-018",
+            "material": "M\u00e9tal - Aluminium",
+            "niveau_spatial": "Toiture",
+            "code_article": "BOIS-RIVE_0,02X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1Lel2Z2wr9JPB6iGDVpYjk",
+            "type": "IfcBeam",
+            "name": "Poutre-017",
+            "material": "M\u00e9tal - Aluminium",
+            "niveau_spatial": "Toiture",
+            "code_article": "BOIS-RIVE_0,02X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1wri1LqA1Cv97xp7ixTslv",
+            "type": "IfcBeam",
+            "name": "Poutre-016",
+            "material": "M\u00e9tal - Aluminium",
+            "niveau_spatial": "Toiture",
+            "code_article": "BOIS-RIVE_0,02X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0JoyNBxC52Ug$dLegvMO1l",
+            "type": "IfcBeam",
+            "name": "Poutre-016",
+            "material": "M\u00e9tal - Aluminium",
+            "niveau_spatial": "Toiture",
+            "code_article": "BOIS-RIVE_0,02X20",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3mWntil9nCQRBVkE1zWVHe",
+            "type": "IfcMember",
+            "name": "Symb-0007",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2_F9JTIv10DQRQ5P0TEr7w",
+            "type": "IfcMember",
+            "name": "Symb-0008",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0D7veH2UnDrhM700rzx7H6",
+            "type": "IfcMember",
+            "name": "Symb-0009",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "18LEMwqSr2MRZiUG__Apj5",
+            "type": "IfcMember",
+            "name": "Symb-00011",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2jKJFkEUz3bhcX7Y2Okl67",
+            "type": "IfcMember",
+            "name": "Symb-00010",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2uJnNi7IH6QBAcWtL2TVpC",
+            "type": "IfcMember",
+            "name": "Symb-00012",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1jqp2aw493TvwPMoFTv4cU",
+            "type": "IfcMember",
+            "name": "Symb-00013",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "06SgZ850j8MBV0Vrd4mtDF",
+            "type": "IfcMember",
+            "name": "Symb-00014",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0i00o$hs58Y9vU6P5dFQxJ",
+            "type": "IfcMember",
+            "name": "Symb-00015",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1wgIcrHG56rOjdvnO3STQ3",
+            "type": "IfcMember",
+            "name": "Symb-00016",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2xgLkdvqb72RhogOHV8tsn",
+            "type": "IfcMember",
+            "name": "Symb-00017",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3E4WwD4HnEuRhaqKvCFtK6",
+            "type": "IfcMember",
+            "name": "Symb-00018",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2CR8ucHxL42AETvMhWyRc1",
+            "type": "IfcMember",
+            "name": "Symb-00020",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "043lUev79ChhVqYMRVFSy1",
+            "type": "IfcMember",
+            "name": "Symb-00019",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "34e5rryzz1hvoEbMq0AIbY",
+            "type": "IfcMember",
+            "name": "Symb-00021",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "12Pilgra50cv$QrGOcYsqi",
+            "type": "IfcMember",
+            "name": "Symb-00022",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3VfU4dQAj9Ufkrk4r32KlU",
+            "type": "IfcMember",
+            "name": "Symb-00023",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0reghURqj0GxWsRJ_s4Jfb",
+            "type": "IfcMember",
+            "name": "Symb-00024",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2Vb$WvSKX2q9i_rZt2_WFU",
+            "type": "IfcMember",
+            "name": "Symb-00025",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0cs62a3lT0ngEM3IICsEtA",
+            "type": "IfcMember",
+            "name": "Symb-00026",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0RZt0q1Wn7IBHs5cLOdX9E",
+            "type": "IfcMember",
+            "name": "Symb-00027",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2RXHp8EAvCQQe514rnlVLq",
+            "type": "IfcMember",
+            "name": "Symb-00028",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2HkZSaK9jB4ftUKndAlYdV",
+            "type": "IfcMember",
+            "name": "Symb-00029",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "16dQAN91f6kOCD6FLp9Zgd",
+            "type": "IfcMember",
+            "name": "Symb-00030",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0xFIZCL$XEQRBe9OksxnlD",
+            "type": "IfcMember",
+            "name": "Symb-00031",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "18t2bAoIrB8vDWXi21Nx3J",
+            "type": "IfcMember",
+            "name": "Symb-00032",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "07svD726zEKxApfNWePu60",
+            "type": "IfcMember",
+            "name": "Symb-00033",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3yckvemAjFSR3ounfPPU6J",
+            "type": "IfcMember",
+            "name": "Symb-00034",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0oO6_sTcP5eecNzBZqGlzL",
+            "type": "IfcMember",
+            "name": "Symb-00035",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1aWfwYFq5EyRLWHfb9mDH3",
+            "type": "IfcMember",
+            "name": "Symb-00037",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3_U$l9uC5DtPAhtPt7O5s6",
+            "type": "IfcMember",
+            "name": "Symb-00036",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1COmwQN4T7$8Q_mheWl9D7",
+            "type": "IfcMember",
+            "name": "Symb-00039",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0Uzr6divLAi8OoUsaq_34P",
+            "type": "IfcMember",
+            "name": "Symb-00038",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "35sdTjSIP5QR95MAQ783T_",
+            "type": "IfcMember",
+            "name": "Symb-00040",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3LRo$t$217s8Rwn43q6x8a",
+            "type": "IfcMember",
+            "name": "Symb-00041",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3TPRhZrRv2veDM9h_X0qOH",
+            "type": "IfcMember",
+            "name": "Symb-00042",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1qzT1o2Zn86uYIfvTmnFDa",
+            "type": "IfcMember",
+            "name": "Symb-00043",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "38yANWfN522Ruc3j1MZidb",
+            "type": "IfcMember",
+            "name": "Symb-00044",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0DPoCsn21Cz96qH8iZvdkD",
+            "type": "IfcMember",
+            "name": "Symb-00045",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1CHrKdhnT4qBSzrstsody4",
+            "type": "IfcMember",
+            "name": "Symb-00046",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2sA6YUut11puKBGJiWMq9g",
+            "type": "IfcMember",
+            "name": "Symb-00048",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "19EWCJRDL7lwqinbHCKZRs",
+            "type": "IfcMember",
+            "name": "Symb-00047",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0aW3wE$iP5RhwvXOnQZdVL",
+            "type": "IfcMember",
+            "name": "Symb-00049",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2TJTA0YlnEtPXJk7fPsZo6",
+            "type": "IfcMember",
+            "name": "Symb-00050",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0kosTgqyX2A95xITOnFWA_",
+            "type": "IfcMember",
+            "name": "Symb-00051",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2uu8ua$7jC1wMLGmKusWci",
+            "type": "IfcMember",
+            "name": "Symb-00052",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2TOydyGn94pe02Xos623tC",
+            "type": "IfcMember",
+            "name": "Symb-00053",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2X$JhQNLXBj9yF6WCmLILo",
+            "type": "IfcMember",
+            "name": "Symb-00054",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0Qx1F$j$bAbwNABmnBLKQD",
+            "type": "IfcMember",
+            "name": "Symb-00055",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0oSUUBG01BlRXmcI3XViFf",
+            "type": "IfcMember",
+            "name": "Symb-00056",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2ToTfjfMP4QR1RDGkreF$H",
+            "type": "IfcMember",
+            "name": "Symb-00057",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2zYP56bZ9Eg8SP$nbdr7OU",
+            "type": "IfcMember",
+            "name": "Symb-00058",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3b842Sz_zFxvBGd6$BzFrz",
+            "type": "IfcMember",
+            "name": "Symb-00059",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1BPjziSln52OPLExLqvGQy",
+            "type": "IfcMember",
+            "name": "Symb-00060",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "38R7Iyp9H38hKiBzkbe9pZ",
+            "type": "IfcMember",
+            "name": "Symb-00061",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0P2eEzbxP0kgMpp0SgM62t",
+            "type": "IfcMember",
+            "name": "Symb-00062",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0TxAy0WBr4zeS_4gOuBLNO",
+            "type": "IfcMember",
+            "name": "Symb-00063",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3gNUsW0kn00BYqeKKIbxqv",
+            "type": "IfcMember",
+            "name": "Symb-00064",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2tMZBZ0cLFN8kNXYnnjoRS",
+            "type": "IfcMember",
+            "name": "Symb-00065",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0nCsl0Ain9xPd25GPASprV",
+            "type": "IfcMember",
+            "name": "Symb-00067",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2mfGLDnBbCjQ8a6q6RG$p_",
+            "type": "IfcMember",
+            "name": "Symb-00068",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0sS1YsPJn9ivquov81ACjw",
+            "type": "IfcMember",
+            "name": "Symb-00066",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2ID_0SQZH9Wv1NM8t8NxhB",
+            "type": "IfcMember",
+            "name": "Symb-00069",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "27ZEW308H0FecUJ35x56_7",
+            "type": "IfcMember",
+            "name": "Symb-00073",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1Y9N6k3Oz3J83NAY1Qr87_",
+            "type": "IfcMember",
+            "name": "Symb-00071",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2UPNckrBjDaxxMXzcw5KNm",
+            "type": "IfcMember",
+            "name": "Symb-00072",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2qvzy9w6vEovUA0z7kZxGw",
+            "type": "IfcMember",
+            "name": "Symb-00070",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "12cykdJGL9GQUdmMmwGcPq",
+            "type": "IfcMember",
+            "name": "Symb-00075",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2c5od7rYPCKA_n$h7HXVlF",
+            "type": "IfcMember",
+            "name": "Symb-00074",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0KNqjlhEPAS8mR$tnEjMXM",
+            "type": "IfcMember",
+            "name": "Symb-00076",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3A_0vwYm1CCReFZloP0_ML",
+            "type": "IfcMember",
+            "name": "Symb-00078",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0pC1P7tsr9pPBbgtn0fJx4",
+            "type": "IfcMember",
+            "name": "Symb-00077",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "32pa7c$Z1Aghg6VTjVgx7y",
+            "type": "IfcMember",
+            "name": "Symb-00079",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0xVS1DXQL5tgPU4UEojtFI",
+            "type": "IfcMember",
+            "name": "Symb-00080",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1uCj9x2Bb5k8MqvBujj04l",
+            "type": "IfcMember",
+            "name": "Symb-00081",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0nAYwv3XLEBgRpH8koqJeb",
+            "type": "IfcMember",
+            "name": "Symb-00084",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1qrGvdu0bDZeiNsItKXnPy",
+            "type": "IfcMember",
+            "name": "Symb-00082",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1Qtu7mkuv8QeVsXm3SWGgW",
+            "type": "IfcMember",
+            "name": "Symb-00085",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3uCuJqvkL3MwaneFzLPJA3",
+            "type": "IfcMember",
+            "name": "Symb-00086",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0fdDRveZX1XPBNkc7eje_K",
+            "type": "IfcMember",
+            "name": "Symb-00083",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0c7cbcN$L2swz9IDj0CAQm",
+            "type": "IfcMember",
+            "name": "Symb-00088",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2l7NF5JBrDqPH_NAIlZDyB",
+            "type": "IfcMember",
+            "name": "Symb-00087",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-CHEVRON-BOIS-5X7",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0bB1stWwb2zAAkPCYhBAY9",
+            "type": "IfcMember",
+            "name": "Symb-00089",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2TBzP$fGLDHx9L4Nok403g",
+            "type": "IfcMember",
+            "name": "Symb-00090",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "29XKcENEj67xN04Uufc78K",
+            "type": "IfcMember",
+            "name": "Symb-00091",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2z4$bgHkfBcQ_0ItI$hxlH",
+            "type": "IfcMember",
+            "name": "Symb-00092",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1pylRGXU1AGw8yoHDLexXD",
+            "type": "IfcMember",
+            "name": "Symb-00093",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2jd$OtSqjAkvcLruXDifNy",
+            "type": "IfcMember",
+            "name": "Symb-00094",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "05otE3d3f7awT5l1UJaQWR",
+            "type": "IfcMember",
+            "name": "Symb-00095",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "TOI-PANNE-BOIS-8X15",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "19MsbAepTBif1ifo2OvDs7",
+            "type": "IfcFlowSegment",
+            "name": "Symb-0005",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2pgGugQur4$AR_iIa9Rhl$",
+            "type": "IfcFlowSegment",
+            "name": "Symb-0005",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "26J9ZSdvfFJvY48KET6ERo",
+            "type": "IfcFlowSegment",
+            "name": "Symb-0005",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1d9mBANY98s99_CzUt3eHn",
+            "type": "IfcFlowSegment",
+            "name": "Symb-0005",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0RGlHSbsb16AxeaUwEc$kI",
+            "type": "IfcFlowSegment",
+            "name": "Symb-0005",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3GTVcmJSb7_9K3QLNEWUV7",
+            "type": "IfcFlowSegment",
+            "name": "Symb-00095",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1nKVJhi9n9Mxo6ywUIXjLZ",
+            "type": "IfcFlowSegment",
+            "name": "Symb-00095",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0XYTHPSPX2sv1jbOX8po1Y",
+            "type": "IfcFlowSegment",
+            "name": "Symb-00095",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "19MsbAepTBif1ifo2OvDs7",
+            "type": "IfcDistributionElement",
+            "name": "Symb-0005",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2pgGugQur4$AR_iIa9Rhl$",
+            "type": "IfcDistributionElement",
+            "name": "Symb-0005",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "26J9ZSdvfFJvY48KET6ERo",
+            "type": "IfcDistributionElement",
+            "name": "Symb-0005",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1d9mBANY98s99_CzUt3eHn",
+            "type": "IfcDistributionElement",
+            "name": "Symb-0005",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0RGlHSbsb16AxeaUwEc$kI",
+            "type": "IfcDistributionElement",
+            "name": "Symb-0005",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3GTVcmJSb7_9K3QLNEWUV7",
+            "type": "IfcDistributionElement",
+            "name": "Symb-00095",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1nKVJhi9n9Mxo6ywUIXjLZ",
+            "type": "IfcDistributionElement",
+            "name": "Symb-00095",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0XYTHPSPX2sv1jbOX8po1Y",
+            "type": "IfcDistributionElement",
+            "name": "Symb-00095",
+            "material": "Inconnu",
+            "niveau_spatial": "Toiture",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {},
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3KbMRzx7H0YhgKjtIi03nk",
+            "type": "IfcRailing",
+            "name": "Symb-0002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "GDC-RDC",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3o6V0Ys8110hnib$urkHh5",
+            "type": "IfcRailing",
+            "name": "Symb-0002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "GDC-RDC",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3fGB6lDtT9PgY5Y3B_8lGq",
+            "type": "IfcRailing",
+            "name": "Symb-0002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "GDC-RDC",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3lTRqwly5Bbf_es2Bvo0Wh",
+            "type": "IfcRailing",
+            "name": "Symb-0002",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "GDC-ETG",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3EFsQSkZD9oOjRgBF3dolK",
+            "type": "IfcRailing",
+            "name": "Symb-0002",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "GDC-ETG",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0q$8zFwXXBCACw1XP3_PbS",
+            "type": "IfcRailing",
+            "name": "Symb-0002",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "GDC-ETG",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "21sUSctJj3mO699Zfd7Hnn",
+            "type": "IfcRailing",
+            "name": "Symb-0002",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "GDC-ETG",
+            "quantities": {
+                "quantite_lin\u00e9aire_ml": 0.0
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "043DfyNuL2qfHwFJsEhYeU",
+            "type": "IfcDoor",
+            "name": "Fen-007",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "FEN-RDC-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1GoKYgA9DEt9CpuZ_awLo3",
+            "type": "IfcDoor",
+            "name": "Por-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POR-RDC-90X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1lyWQi8JH5ruVN3OYR4nmD",
+            "type": "IfcDoor",
+            "name": "Fen-007",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "FEN-RDC-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0OqiCBTaTBWPMMYwnmyEQR",
+            "type": "IfcDoor",
+            "name": "Fen-004",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "FEN-RDC-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2BcD3Q$LjAhg2_4jgno_PQ",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POR-RDC-90X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2jexfYv699leSQjFy_DeV7",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POR-RDC-90X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "22bwupPLvF8e3C5WXo_uQM",
+            "type": "IfcDoor",
+            "name": "Fen-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "FEN-RDC-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "12ER31gHT9KvFNKl8iOeiK",
+            "type": "IfcDoor",
+            "name": "Fen-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "FEN-RDC-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0jHugnQiz6cwJyCu_Zn31n",
+            "type": "IfcDoor",
+            "name": "Por-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POR-RDC-90X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "39pvk5PNf4Jut7KJCOTE_K",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POR-RDC-120X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1rhlzuwXn8E82Q$UPf63h3",
+            "type": "IfcDoor",
+            "name": "Por-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "NON_RENSEIGNE",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3S5zGyVHjChwN6jj_FR_T2",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POR_COUL 125X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2zWRULKtPDRAJy73UCFxJV",
+            "type": "IfcDoor",
+            "name": "Por-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POR-RDC-90X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2ntZ2eiozFGPJ$VxE4Tv68",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POR-RDC-70X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0i9ZD$Etj0iuyVXXLTXM4s",
+            "type": "IfcDoor",
+            "name": "Fen-007",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "FEN-RDC-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2nrb8xqbzAg94vaBS9sFKW",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Rez-de-chauss\u00e9e",
+            "code_article": "POR-RDC-70X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3g6_MSCCX7u9ZG7NysU12a",
+            "type": "IfcDoor",
+            "name": "Fen-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "FEN-ETAG-70X60",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3F9Jrju9P3b9cWHkm9_8Kb",
+            "type": "IfcDoor",
+            "name": "Fen-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "FEN-ETAG-70X60",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2pfyHRojr2gBkTpc$ByLzT",
+            "type": "IfcDoor",
+            "name": "Fen-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "FEN-ETAG-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1SClQI7PP8Iutqcc9oK71l",
+            "type": "IfcDoor",
+            "name": "Fen-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "FEN-ETAG-70X60",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0lK7wGB2P2iucbXjjzOy83",
+            "type": "IfcDoor",
+            "name": "Fen-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "FEN-ETAG-70X60",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2vA9zHlS57jBfyTVHWfHei",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAGE 120X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1vhF5frznFwAFzB1$l83fN",
+            "type": "IfcDoor",
+            "name": "Por-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAG-90X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3f3f9lPef2PvUqLIgav0wE",
+            "type": "IfcDoor",
+            "name": "Por-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAG-90X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2ndF3W6nH6SxNam9c9VyMJ",
+            "type": "IfcDoor",
+            "name": "Fen-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "FEN-ETAG-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2rss$L64j9BgykB4LdXwID",
+            "type": "IfcDoor",
+            "name": "Fen-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "FEN-ETAG-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1GWdjShT54$eNLiVd165rS",
+            "type": "IfcDoor",
+            "name": "Por-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAG-90X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3HuQ94f6D9Au9uSw$G2Ker",
+            "type": "IfcDoor",
+            "name": "Por-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAG-70X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2ZJm6hwA91F8emt_Ass2_f",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAG-70X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1CP6hlhFfEFP9trhV9flBQ",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAG-90X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0UO_2G5OD80POB63$savBr",
+            "type": "IfcDoor",
+            "name": "Fen-006",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "FEN-ETAG-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0CNcrxL61Dqh3D573a5LVY",
+            "type": "IfcDoor",
+            "name": "Fen-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "FEN-ETAG-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "1Jq_Lr$MzCFhQ02$hvWE_J",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAG-70X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "3VoAAXcUr6N9iyYVlcHl1J",
+            "type": "IfcDoor",
+            "name": "Por-002",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAG-70X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2ci$MZV5X35ObGx5Nmguad",
+            "type": "IfcDoor",
+            "name": "Fen-005",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "FEN-ETAG-120X120",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "2kab7MUUjEWw92FVuzQtsh",
+            "type": "IfcDoor",
+            "name": "Por-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAG-90X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        },
+        {
+            "id": "0QFupJaAr2Mug30ZDgv98j",
+            "type": "IfcDoor",
+            "name": "Por-003",
+            "material": "Inconnu",
+            "niveau_spatial": "Etage 1er",
+            "code_article": "POR-ETAG-70X220",
+            "quantities": {
+                "quantite_unite": 1
+            },
+            "estimations": {
+                "ferraillage_kg": 0
+            }
+        }
+    ]
+}

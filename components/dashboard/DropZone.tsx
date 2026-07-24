@@ -27,25 +27,26 @@ import {
 import { cn } from "@/lib/utils";
 
 interface DropZoneProps {
+  file: File | null;
   onFileAccepted: (file: File) => void;
+  onFileRemoved: () => void;
   mode: "b2c" | "b2b";
 }
 
-export default function DropZone({ onFileAccepted, mode }: DropZoneProps) {
-  const [internalFile, setInternalFile] = useState<File | null>(null);
+export default function DropZone({ file, onFileAccepted, onFileRemoved, mode }: DropZoneProps) {
   const [error, setInternalError] = useState<string | null>(null);
 
   // Configuration des types de fichiers selon le mode
-  const accept = mode === "b2b" 
-    ? { "application/octet-stream": [".ifc"], "text/plain": [".ifc"] } // Les IFC sont souvent vus comme octet-stream
-    : { "application/pdf": [".pdf"], "image/*": [".png", ".jpg", ".jpeg"] };
+  const accept: import("react-dropzone").Accept = mode === "b2b" 
+    ? { "application/octet-stream": [".ifc"], "text/plain": [".ifc"] } 
+    : { "application/pdf": [".pdf"], "image/png": [".png"], "image/jpeg": [".jpg", ".jpeg"] };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
-      setInternalFile(acceptedFiles[0]);
+      onFileAccepted(acceptedFiles[0]);
       setInternalError(null);
     }
-  }, []);
+  }, [onFileAccepted]);
 
   const onDropRejected = useCallback(() => {
     setInternalError(
@@ -64,36 +65,32 @@ export default function DropZone({ onFileAccepted, mode }: DropZoneProps) {
   });
 
   const removeFile = () => {
-    setInternalFile(null);
+    onFileRemoved();
     setInternalError(null);
-  };
-
-  const handleStartScan = () => {
-    if (internalFile) {
-      onFileAccepted(internalFile);
-    }
   };
 
   return (
     <div className="w-full max-w-3xl mx-auto">
       <AnimatePresence mode="wait">
-        {!internalFile ? (
+        {!file ? (
           // ── ÉTAT : ZONE DE DROP ──────────────────────────────────────────
           <motion.div
             key="dropzone"
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.02 }}
-            {...getRootProps()}
-            className={cn(
-              "relative group cursor-pointer overflow-hidden rounded-[2.5rem] border-2 border-dashed transition-all duration-500",
-              "bg-white/[0.02] backdrop-blur-sm p-12 min-h-[340px] flex flex-col items-center justify-center text-center",
-              isDragActive 
-                ? "border-ai-glow bg-ai-glow/5 shadow-[0_0_40px_rgba(0,240,255,0.1)] scale-[1.02]" 
-                : "border-white/10 hover:border-white/20 hover:bg-white/[0.04]"
-            )}
           >
-            <input {...getInputProps()} />
+            <div
+              {...getRootProps()}
+              className={cn(
+                "relative group cursor-pointer overflow-hidden rounded-[2.5rem] border-2 border-dashed transition-all duration-500",
+                "bg-white/[0.02] backdrop-blur-sm p-12 min-h-[340px] flex flex-col items-center justify-center text-center",
+                isDragActive 
+                  ? "border-ai-glow bg-ai-glow/5 shadow-[0_0_40px_rgba(0,240,255,0.1)] scale-[1.02]" 
+                  : "border-white/10 hover:border-white/20 hover:bg-white/[0.04]"
+              )}
+            >
+              <input {...getInputProps()} />
 
             {/* Aura de fond subtile */}
             <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -148,6 +145,7 @@ export default function DropZone({ onFileAccepted, mode }: DropZoneProps) {
                 </motion.div>
               )}
             </AnimatePresence>
+            </div>
           </motion.div>
         ) : (
           // ── ÉTAT : FILE CARD (Fichier prêt) ─────────────────────────────
@@ -176,35 +174,20 @@ export default function DropZone({ onFileAccepted, mode }: DropZoneProps) {
 
               {/* File Meta */}
               <div className="text-center mb-10">
-                <h4 className="text-white font-black text-lg truncate max-w-xs">{internalFile.name}</h4>
+                <h4 className="text-white font-black text-lg truncate max-w-xs">{file.name}</h4>
                 <p className="text-anthracite-500 text-[10px] font-bold uppercase tracking-widest mt-1">
-                  {(internalFile.size / (1024 * 1024)).toFixed(2)} Mo • Fichier {mode === "b2b" ? "BIM" : "Architectural"}
+                  {(file.size / (1024 * 1024)).toFixed(2)} Mo • Fichier {mode === "b2b" ? "BIM" : "Architectural"}
                 </p>
               </div>
 
               {/* Actions */}
-              <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+              <div className="flex items-center justify-center w-full">
                 <button
                   onClick={removeFile}
-                  className="flex-1 w-full sm:w-auto px-8 py-4 rounded-2xl border border-white/10 text-anthracite-400 font-black text-[10px] uppercase tracking-widest hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-8 py-4 rounded-2xl border border-white/10 text-anthracite-400 font-black text-[10px] uppercase tracking-widest hover:bg-white/5 hover:text-white hover:border-red-500/30 hover:text-red-400 transition-all flex items-center justify-center gap-2"
                 >
-                  <X size={14} /> Annuler
+                  <X size={14} /> Annuler / Supprimer le fichier
                 </button>
-                
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleStartScan}
-                  className="flex-[2] w-full sm:w-auto relative group overflow-hidden px-8 py-4 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_20px_40px_-10px_rgba(255,255,255,0.2)]"
-                >
-                  {/* Shimmer Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                  
-                  <div className="flex items-center justify-center gap-3">
-                    <Zap size={14} className="fill-current" />
-                    Lancer le Scan IA
-                  </div>
-                </motion.button>
               </div>
             </div>
           </motion.div>

@@ -1,0 +1,77 @@
+# 1. Créer un nouveau projet
+mutation CreateProjet(
+  $nomProjet: String!
+  $localisation: String
+  $description: String
+  $fraisGenerauxPct: Float
+  $margeAleasPct: Float
+) @auth(level: PUBLIC) {
+  projet_insert(data: {
+    nomProjet: $nomProjet
+    localisation: $localisation
+    description: $description
+    fraisGenerauxPct: $fraisGenerauxPct
+    margeAleasPct: $margeAleasPct
+  })
+}
+
+# 2. Insérer ou mettre à jour un article de la mercuriale
+mutation UpsertMercurialePrix(
+  $codeArticle: String!
+  $nomMateriau: String!
+  $designation: String!
+  $unite: String!
+  $prixUnitaireFourniture: Float!
+  $prixUnitaireMainOeuvre: Float!
+  $categorieLot: String
+  $prixTotalUnitaire: Float
+) @auth(level: PUBLIC) {
+  mercurialePrix_upsert(data: {
+    codeArticle: $codeArticle
+    nomMateriau: $nomMateriau
+    designation: $designation
+    unite: $unite
+    prixUnitaireFourniture: $prixUnitaireFourniture
+    prixUnitaireMainOeuvre: $prixUnitaireMainOeuvre
+    categorieLot: $categorieLot
+    prixTotalUnitaire: $prixTotalUnitaire
+  })
+}
+
+# 3. Ajouter une ligne de DQE
+mutation CreateDevisDqe(
+  $projetId: UUID!
+  $codeArticle: String
+  $ifcGuid: String
+  $niveauSpatial: String
+  $quantiteIfcBrute: Float!
+  $quantiteFacturable: Float
+  $quantiteExecutee: Float
+  $prixTotalHt: Float
+  $statutPrix: String
+) @auth(level: PUBLIC) {
+  devisDqe_insert(data: {
+    projetId: $projetId
+    mercurialePrixCodeArticle: $codeArticle
+    ifcGuid: $ifcGuid
+    niveauSpatial: $niveauSpatial
+    quantiteIfcBrute: $quantiteIfcBrute
+    quantiteFacturable: $quantiteFacturable
+    quantiteExecutee: $quantiteExecutee
+    prixTotalHt: $prixTotalHt
+    statutPrix: $statutPrix
+  })
+}
+
+# 4. Ajouter un mapping BIM -> Mercuriale
+mutation CreateMappingBimPrix(
+  $macroCodeBim: String!
+  $codeArticle: String!
+  $ratioConversion: Float
+) @auth(level: PUBLIC) {
+  mappingBimPrix_insert(data: {
+    macroCodeBim: $macroCodeBim
+    mercurialePrixCodeArticle: $codeArticle
+    ratioConversion: $ratioConversion
+  })
+}

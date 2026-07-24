@@ -1,0 +1,72 @@
+# Fichier : dataconnect/schema/schema.gql
+
+# 1. La Mercuriale des Prix (Le catalogue de prix de base)
+type MercurialePrix @table(name: "mercuriale_prix", key: ["codeArticle"]) {
+  # codeArticle agit comme clé primaire / identifiant unique
+  codeArticle: String! @col(name: "code_article")
+  nomMateriau: String! @col(name: "nom_materiau")
+  designation: String!
+  unite: String!
+  prixUnitaireFourniture: Float! @col(name: "prix_unitaire_fourniture")
+  prixUnitaireMainOeuvre: Float! @col(name: "prix_unitaire_main_oeuvre")
+  categorieLot: String @col(name: "categorie_lot")
+  
+  # Optionnel : prix total unitaire (fourniture + main oeuvre)
+  prixTotalUnitaire: Float @col(name: "prix_total_unitaire")
+}
+
+# 2. La table Projets (L'en-tête de ton devis)
+type Projet @table(name: "projets") {
+  id: UUID! @default(expr: "uuidV4()")
+  nomProjet: String! @col(name: "nom_projet")
+  localisation: String
+  description: String
+  fraisGenerauxPct: Float @col(name: "frais_generaux_pct") @default(expr: "20.00")
+  margeAleasPct: Float @col(name: "marge_aleas_pct") @default(expr: "3.00")
+  dateCreation: Date! @col(name: "date_creation") @default(expr: "request.time")
+}
+
+# 3. Le Pont BIM (La table de traduction IFC -> Mercuriale)
+type MappingBimPrix @table(name: "mapping_bim_prix") {
+  id: UUID! @default(expr: "uuidV4()")
+  macroCodeBim: String! @col(name: "macro_code_bim")
+  
+  # Clé étrangère vers la Mercuriale
+  mercurialePrix: MercurialePrix!
+  
+  ratioConversion: Float @col(name: "ratio_conversion") @default(expr: "1.0000")
+}
+
+# 4. Le DQE (Détail Quantitatif Estimatif)
+type DevisDqe @table(name: "devis_dqe") {
+  id: UUID! @default(expr: "uuidV4()")
+  
+  # Relations (Clés étrangères) vers Projets et Mercuriale
+  projet: Projet!
+  mercurialePrix: MercurialePrix
+  
+  # Traçabilité BIM
+  ifcGuid: String @col(name: "ifc_id")
+  niveauSpatial: String @col(name: "niveau_spatial")
+  
+  # Quantités
+  quantiteIfcBrute: Float! @col(name: "quantite_ifc_brute")
+  quantiteFacturable: Float @col(name: "quantite_facturable")
+  quantiteExecutee: Float @col(name: "quantite_executee") @default(expr: "0.00")
+  
+  # Champs spécifiques DQE
+  prixTotalHt: Float @col(name: "prix_total_ht")
+  statutPrix: String @col(name: "statut_prix")
+}
+
+# 5. Memoire des Projets (RAG)
+type ProjectMemory @table(name: "project_memory") {
+  id: UUID! @default(expr: "uuidV4()")
+  projectName: String! @col(name: "project_name")
+  summary: String!
+  zoneClimatique: String @col(name: "zone_climatique")
+  typeDeSol: String @col(name: "type_de_sol")
+  accessibilite: String
+  embedding: Vector! @col(dataType: "vector(1536)")
+  createdAt: Date! @col(name: "created_at") @default(expr: "request.time")
+}

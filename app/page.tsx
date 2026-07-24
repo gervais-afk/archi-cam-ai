@@ -65,10 +65,11 @@ export default function HomePage() {
               <h4 className="text-white font-semibold text-sm mb-4">Produit</h4>
               <ul className="space-y-3">
                 {[
-                  { href: "#fonctionnalites", label: "Fonctionnalités" },
-                  { href: "#tarifs",          label: "Tarifs"          },
-                  { href: "/dashboard",       label: "Tableau de bord" },
-                  { href: "/login",           label: "Connexion"       },
+                  { href: "#fonctionnalites",        label: "Fonctionnalités" },
+                  { href: "#tarifs",                 label: "Tarifs"          },
+                  { href: "/dashboard/pro",          label: "Espace Pro"      },
+                  { href: "/dashboard/particulier",  label: "Espace Privé"    },
+                  { href: "/login",                  label: "Connexion"       },
                 ].map((link) => (
                   <li key={link.href}>
                     <Link

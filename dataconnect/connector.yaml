@@ -1,0 +1,5 @@
+connectorId: "archi-cam-connector"
+generate:
+  javascriptSdk:
+    outputDir: "../lib/generated"
+    package: "@archi-cam/dataconnect"

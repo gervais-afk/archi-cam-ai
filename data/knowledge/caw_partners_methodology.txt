@@ -1,0 +1,36 @@
+METHODOLOGIE DE CONCEPTION ET PLANIFICATION ARCHITECTURALE AU CAMEROUN
+
+RÉFÉRENCE TECHNIQUE :
+Méthodologies professionnelles de CAW & Partners et standards de l'Ordre National des Architectes du Cameroun (ONAC).
+
+1. LES PHASES CLEFS DU PROCESSUS DE CONCEPTION (DU PLAN A LA REALISATION)
+Pour concevoir et réaliser avec succès une maison ou un immeuble contemporain au Cameroun, l'architecte doit suivre cinq phases distinctes :
+
+A. L'Esquisse et l'Étude de Faisabilité (ESQ) :
+- Analyse du site d'implantation (topographie, orientation solaire, vents dominants pour optimiser la ventilation naturelle).
+- Vérification du Titre Foncier et des règles d'urbanisme (recul de voirie, coefficient d'emprise au sol COS).
+- Ébauche des premiers croquis spatiaux en accord avec les souhaits esthétiques et le budget global du client.
+
+B. L'Avant-Projet Sommaire (APS) & Avant-Projet Définitif (APD) :
+- Modélisation 3D du projet architectural et répartition des pièces.
+- Détermination du "Standing" de l'ouvrage (Économique, Moyen standing, Haut de gamme/Prestige) influençant directement la nature des revêtements et finitions.
+- Dessin des plans d'exécution techniques (coupes, façades, détails de toiture).
+
+C. Le Dossier de Permis de Construire (DPC) :
+- Constitution du dossier administratif complet avec les plans signés par un architecte inscrit à l'ONAC et un ingénieur inscrit à l'ONIGC.
+- Intégration du rapport géotechnique de sol (LABOGENIE ou équivalent agréé) pour justifier le calcul de structure des fondations.
+
+D. Le Devis Quantitatif Estimatif (DQE) et Cahier des Charges (CCTP) :
+- Rédaction du descriptif complet des travaux par lots (Gros oeuvre, Fluides, Électricité, Menuiseries, Enduits, Peinture).
+- Calcul des métrés précis (volumes de béton en m³, surface de cloisons en m², poids d'acier de ferraillage).
+- Indexation des prix unitaires réels du marché camerounais (prix du sac de ciment CPJ 35/45 à Yaoundé/Douala, m³ de sable Sanaga, gravier concassé, transport logistique).
+
+E. Le Suivi et la Coordination de Chantier :
+- Planification temporelle des phases de décaissement financier (Courbe en S).
+- Contrôle de la mise en oeuvre des matériaux (respect des dosages de béton, séchage technique de 21 jours Eurocode 2 pour les dalles béton armé avant décoffrage).
+
+2. STANDARDS DE STANDINGS ET LOGISTIQUE AU CAMEROUN
+Le choix du standing influe directement sur le prix au mètre carré ($m^2$) de construction :
+- Standing Économique : Revêtements locaux, fenêtres aluminium simples, sanitaires standards, carrelage grès cérame basique. Budget de référence maitrisé.
+- Moyen Standing : Carrelage de qualité supérieure, menuiserie aluminium robuste, faux-plafonds en staff décoratif, appareillage électrique moderne.
+- Haut de Gamme / Prestige : Pierre naturelle en façade, baies vitrées de grandes dimensions, marbre ou grès cérame poli importé, menuiseries bois massifs (Padouk, Iroko, Bubinga), systèmes de climatisation intégrés et domotique.

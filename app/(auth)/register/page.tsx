@@ -1,21 +1,58 @@
 "use client";
 
-import Link           from "next/link";
-import { useState }   from "react";
-import {
-  Building2, Mail, Lock, User, ArrowRight, Check,
-} from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Building2, Mail, Lock, User as UserIcon, ArrowRight, Check } from "lucide-react";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [agencyName, setAgencyName] = useState("");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // TODO: Firebase Auth createUserWithEmailAndPassword
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
-    window.location.href = "/dashboard";
+    setErrorMsg(null);
+    try {
+      const { createUserWithEmailAndPassword } = await import("firebase/auth");
+      const { doc, setDoc } = await import("firebase/firestore/lite");
+      const { auth, db } = await import("@/lib/firebase");
+      
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Enregistrement des détails d'agence dans Firestore local
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        fullName: fullName,
+        agencyName: agencyName,
+        createdAt: new Date().toISOString(),
+      });
+
+      // Création de la session locale
+      const token = await user.getIdToken();
+      const sessionRes = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+
+      if (!sessionRes.ok) {
+        throw new Error("Impossible de créer la session de connexion.");
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch (err: any) {
+      setErrorMsg(err.message || "Une erreur inattendue est survenue.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,6 +83,12 @@ export default function RegisterPage() {
             Créer un compte
           </h1>
 
+          {errorMsg && (
+            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-bold animate-fade-in">
+              {errorMsg}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-anthracite-300 text-sm font-medium mb-2">
@@ -55,6 +98,8 @@ export default function RegisterPage() {
                 <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-500" />
                 <input
                   type="text"
+                  value={agencyName}
+                  onChange={(e) => setAgencyName(e.target.value)}
                   placeholder="Agence Bâtir Yaoundé"
                   required
                   className="w-full pl-10 pr-4 py-3 bg-anthracite-800 border border-anthracite-700 rounded-xl text-white text-sm placeholder-anthracite-600 focus:border-wood-ocre/50 focus:outline-none transition-colors"
@@ -67,9 +112,11 @@ export default function RegisterPage() {
                 Prénom & Nom
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-500" />
+                <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-500" />
                 <input
                   type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="Jean-Pierre Mbarga"
                   required
                   className="w-full pl-10 pr-4 py-3 bg-anthracite-800 border border-anthracite-700 rounded-xl text-white text-sm placeholder-anthracite-600 focus:border-wood-ocre/50 focus:outline-none transition-colors"
@@ -85,6 +132,8 @@ export default function RegisterPage() {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-500" />
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="contact@agence.cm"
                   required
                   className="w-full pl-10 pr-4 py-3 bg-anthracite-800 border border-anthracite-700 rounded-xl text-white text-sm placeholder-anthracite-600 focus:border-wood-ocre/50 focus:outline-none transition-colors"
@@ -100,6 +149,8 @@ export default function RegisterPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-500" />
                 <input
                   type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="8 caractères minimum"
                   minLength={8}
                   required

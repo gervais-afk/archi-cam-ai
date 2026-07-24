@@ -11,7 +11,11 @@ export type ArchitecturalStyle =
   | "luxe-tropical"
   | "moderne-minimaliste"
   | "industriel"
-  | "africain-contemporain";
+  | "africain-contemporain"
+  | "3D_PHOTOREALISTE"
+  | "PLAN_2D_PHOTOSHOP"
+  | "MAQUETTE_BLANCHE"
+  | "TROPICAL_MOODY";
 
 export type SubscriptionTier = "free" | "pay-per-use" | "agency-pro";
 
@@ -52,11 +56,19 @@ export interface ProjectEstimate {
   currency: string; // "FCFA"
   lines: EstimateLine[];
   generatedAt: Date;
+  totalHT?: number;
+  margeBET?: number;
+  margeAleas?: number;
+  tva?: number;
+  totalTTC?: number;
 }
 
 export interface RenderResult {
   id: string;
   imageUrl: string;
+  videoUrl?: string | null;
+  videoJobId?: string | null;
+  videoStatus?: "processing" | "completed" | "failed";
   reportText: string;
   generatedAt: Date;
   style: ArchitecturalStyle;
@@ -64,6 +76,11 @@ export interface RenderResult {
   analysis?: AIAnalysis;
   ifcMetadata?: any; // To be typed properly later
   estimate?: ProjectEstimate;
+  superviseur?: {
+    approvalStatus: boolean;
+    riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+    comments?: string | null;
+  };
 }
 
 export interface UserProfile {

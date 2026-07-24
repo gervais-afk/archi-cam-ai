@@ -12,7 +12,7 @@
  */
 
 import { motion } from "framer-motion";
-import { ArrowRight, Home, CubeIcon, Sparkles } from "lucide-react";
+import { ArrowRight, Home, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export default function Hero() {
@@ -103,7 +103,7 @@ export default function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-6"
         >
           {/* Bouton Primaire — Particuliers */}
-          <Link href="/dashboard" className="w-full sm:w-auto">
+          <Link href="/dashboard/particulier" className="w-full sm:w-auto">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
@@ -115,7 +115,7 @@ export default function Hero() {
           </Link>
 
           {/* Bouton Secondaire — Professionnels (BIM) */}
-          <Link href="/dashboard" className="w-full sm:w-auto">
+          <Link href="/dashboard/pro" className="w-full sm:w-auto">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}

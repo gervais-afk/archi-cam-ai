@@ -1,0 +1,54 @@
+name: CI - Supabase Audit & Tests DQE
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install supabase
+
+      - name: Run table audit
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          python scripts/audit_tables.py
+
+  # ---------------------------------------------------------------------------
+  # Job 2 – Tests unitaires du Calculateur DQE (LOD 400)
+  # ---------------------------------------------------------------------------
+  test_dqe:
+    runs-on: ubuntu-latest
+    needs: audit
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installer les dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest supabase python-dotenv
+
+      - name: Lancer les tests DQE
+        run: |
+          pytest tests/test_lod400_calculations.py -v --tb=short

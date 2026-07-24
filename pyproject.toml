@@ -1,0 +1,23 @@
+[project]
+name = "archi-cameroun-ai"
+version = "1.0.0"
+description = "Agence Virtuelle Multi-Agents Archi Cam AI"
+authors = [
+    {name = "Archi Cam AI", email = "contact@archicamai.com"},
+]
+dependencies = [
+    "google-agents-cli",
+    "google-adk",
+    "pdfplumber",
+    "ifcopenshell",
+    "duckduckgo-search>=8.1.1",
+    "pg8000>=1.31.2",
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "mcp",
+    "crewai",
+]
+
+[tool.agents-cli]
+agent_directory = "archi_agents/router"

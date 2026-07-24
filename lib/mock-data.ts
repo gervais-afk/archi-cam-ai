@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-import { RenderResult } from "@/types";
-=======
 import type { GenerationStep, RenderResult, UserProfile } from "@/types";
 
 export const MOCK_USER: UserProfile = {
@@ -21,7 +18,6 @@ export const GENERATION_STEPS: GenerationStep[] = [
   { id: 5, label: "Rendu 4K en cours (IA)...",           duration: 3500 },
   { id: 6, label: "Génération du rapport technique...",  duration: 1500 },
 ];
->>>>>>> 1623802 (Initial commit: Archi Cam AI Premium Infrastructure)
 
 export const MOCK_RENDER_RESULT: RenderResult = {
   id:          "render-mock-001",
@@ -88,15 +84,12 @@ Classe **B** selon référentiel RT-Tropicale. Potentiel d'optimisation vers cla
 };
 
 export const ARCHITECTURAL_STYLES = [
-<<<<<<< HEAD
-  { value: "luxe-tropical",         label: "🌴 Luxe Tropical"           },
-  { value: "moderne-minimaliste",   label: "🏙️ Moderne Minimaliste"      },
-  { value: "industriel",            label: "🏗️ Industriel Urbain"        },
-  { value: "africain-contemporain", label: "🌍 Africain Contemporain"   },
-=======
   { value: "luxe-tropical",         label: "🌿 Luxe Tropical"           },
   { value: "moderne-minimaliste",   label: "◼ Moderne Minimaliste"      },
   { value: "industriel",            label: "⚙ Industriel Urbain"        },
   { value: "africain-contemporain", label: "🏛 Africain Contemporain"   },
->>>>>>> 1623802 (Initial commit: Archi Cam AI Premium Infrastructure)
+  { value: "3D_PHOTOREALISTE",      label: "📸 Rendu 3D Photoréaliste"  },
+  { value: "PLAN_2D_PHOTOSHOP",     label: "🎨 Plan 2D Photoshop"       },
+  { value: "MAQUETTE_BLANCHE",      label: "🏢 Maquette Blanche"        },
+  { value: "TROPICAL_MOODY",        label: "⛈ Tropical Moody (Edéa/Iroko)" },
 ] as const;

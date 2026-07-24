@@ -1,0 +1,27 @@
+EXIGENCES GÉOTECHNIQUES ET OBLIGATION DE L'ÉTUDE DE SOL AU CAMEROUN
+
+RÉFÉRENCE TECHNIQUE & LÉGALE :
+Loi n° 99/017 du 22 décembre 1999 régissant la sécurité et le contrôle de la qualité dans le bâtiment au Cameroun, complétée par les directives du Ministère des Travaux Publics (MINTP).
+
+1. L'OBLIGATION DE L'ÉTUDE DE SOL (ÉTUDE GÉOTECHNIQUE)
+Pour tout projet de construction d'une certaine envergure au Cameroun (bâtiments collectifs, immeubles de plus de deux niveaux R+2, ERP, ou projets industriels), la réalisation d'une étude de sol préalable est une obligation réglementaire absolue.
+Cette étude géotechnique doit figurer dans le Dossier Technique soumis pour l'obtention du permis de construire auprès de la Mairie ou de la Communauté Urbaine (CUD/CUY).
+
+2. RÔLE ET ATTRIBUTIONS DU LABOGENIE
+Le Laboratoire National de Génie Civil (LABOGENIE) est l'établissement public à caractère industriel et commercial de référence au Cameroun. 
+Ses principales missions consistent à :
+- Réaliser les sondages de sol sur site (pressiomètre, pénétromètre dynamique, forages carottés).
+- Effectuer les essais de laboratoire mécaniques et physiques (essais Proctor, limites d'Atterberg, analyse granulométrique, essais de cisaillement).
+- Contrôler la qualité des matériaux locaux mis en oeuvre (résistance mécanique du béton CPJ 35/45, acier HA, parpaings agglos).
+- Émettre un avis géotechnique formel et préconiser les types de fondations nécessaires.
+
+Des laboratoires privés agréés par le Ministère des Travaux Publics (MINTP) peuvent également fournir ces rapports, mais ils doivent posséder un agrément valide pour que le document soit jugé recevable par les commissions d'urbanisme.
+
+3. IMPACTS DU SOL SUR LE DIMENSIONNEMENT DES FONDATIONS (BIM/DQE)
+L'étude géotechnique détermine trois facteurs critiques pour le moteur de calcul d'Archi Cam AI :
+- La contrainte admissible du sol (Qad exprimée en bars ou MPa) : Détermine si les fondations seront superficielles (semelles isolées/filantes), semi-profondes (puits) ou profondes (pieux).
+- Le niveau de la nappe phréatique (niveau piézométrique) : Détermine la nécessité de mettre en place un système de drainage, un cuvelage étanche en sous-sol ou un pompage d'épuisement durant le terrassement.
+- La nature argileuse ou instable du sol (ex: sols latéritiques gonflants de Yaoundé ou sols sablonneux compressibles de Douala/Kribi) : Impose des coefficients de sécurité structuraux élevés (Eurocode 2) pour éviter les tassements différentiels et les fissures.
+
+4. ANTICIPATION CONSEILLÉE
+L'étude géotechnique doit obligatoirement être réalisée et validée AVANT la modélisation de la structure en béton armé et le dimensionnement de la dalle basse. Son rapport formule des préconisations qui influencent directement le volume de béton armé requis pour les semelles de fondation et le linéaire d'aciers HA indispensables à l'armature de la base du bâtiment.

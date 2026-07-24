@@ -12,10 +12,13 @@
  * 4. Finance : Calcul automatique de la TVA (19.25%) et Total TTC massif.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Download, FileSpreadsheet, Info, CheckCircle2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { ProjectEstimate, UserMode } from "@/types";
+import Spinner from "@/components/ui/Spinner";
+
 
 // ─── MOCK DATA RÉALISTE BTP CAMEROUN ────────────────────────────────────────
 const MOCK_DQE_LINES = [
@@ -32,8 +35,31 @@ const MOCK_DQE_LINES = [
 
 const TVA_RATE = 0.1925; // 19.25% au Cameroun
 
-export default function EstimateTable() {
-  const totalHT = MOCK_DQE_LINES.reduce((acc, line) => acc + (line.qty * line.price), 0);
+interface EstimateTableProps {
+  estimate?: ProjectEstimate;
+  mode: UserMode;
+  devisId?: string;
+  highlightedCode?: string | null;
+  onSelectLine?: (code: string | null) => void;
+}
+
+export default function EstimateTable({ estimate, mode, devisId, highlightedCode, onSelectLine }: EstimateTableProps) {
+
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const linesToRender = estimate?.lines && estimate.lines.length > 0 
+    ? estimate.lines 
+    : MOCK_DQE_LINES.map(l => ({
+        code: l.id.toString(),
+        category: "Gros Œuvre",
+        label: l.label,
+        quantity: l.qty,
+        unit: l.unit,
+        unitPrice: l.price,
+        totalPrice: l.qty * l.price
+      }));
+
+  const totalHT = linesToRender.reduce((acc, line) => acc + line.totalPrice, 0);
   const tvaAmount = totalHT * TVA_RATE;
   const totalTTC = totalHT + tvaAmount;
 
@@ -48,7 +74,7 @@ export default function EstimateTable() {
 
   const rowVars = {
     hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } }
   };
 
   return (
@@ -72,10 +98,45 @@ export default function EstimateTable() {
             </p>
           </div>
 
-          <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-anthracite-400 hover:text-white hover:bg-white/5 hover:border-white/20 transition-all group">
-            <Download className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
-            Exporter en Excel (.xlsx)
-          </button>
+            {/* Export Excel Button */}
+            <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-anthracite-400 hover:text-white hover:bg-white/5 hover:border-white/20 transition-all group">
+              <Download className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
+              Exporter en Excel (.xlsx)
+            </button>
+            {/* Download PDF Button */}
+            <button
+              onClick={async () => {
+                setIsDownloading(true);
+                try {
+                  const res = await fetch('/api/generate-pdf', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ projectId: devisId ?? '' }),
+                  });
+                  if (!res.ok) throw new Error('Failed to generate PDF');
+                  const blob = await res.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `${devisId ?? 'devis'}_DQE.pdf`;
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                } catch (e) {
+                  console.error(e);
+                } finally {
+                  setIsDownloading(false);
+                }
+              }}
+              disabled={isDownloading}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-anthracite-400 hover:text-white hover:bg-white/5 hover:border-white/20 transition-all group"
+            >
+                {isDownloading ? (
+                  <Spinner />
+                ) : (
+                  <Download className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
+                )}
+              {isDownloading ? null : '📄 Télécharger le DQE (PDF)'}
+            </button>
         </div>
 
         {/* ── TABLE UI ──────────────────────────────────────────────────────── */}
@@ -96,32 +157,56 @@ export default function EstimateTable() {
               initial="hidden"
               animate="visible"
             >
-              {MOCK_DQE_LINES.map((line) => (
-                <motion.tr 
-                  key={line.id}
-                  variants={rowVars}
-                  className="group border-b border-white/5 hover:bg-white/[0.03] transition-colors duration-300"
-                >
-                  <td className="px-8 py-5">
-                    <div className="flex flex-col">
-                      <span className="text-white text-sm font-bold tracking-tight">{line.label}</span>
-                      <span className="text-[9px] text-anthracite-600 font-bold uppercase tracking-widest mt-0.5">Code Lot: {line.id.toString().padStart(2, '0')}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-5 text-center">
-                    <span className="text-[10px] font-black text-anthracite-400 bg-white/5 px-2 py-1 rounded-md border border-white/5">{line.unit}</span>
-                  </td>
-                  <td className="px-6 py-5 text-right tabular-nums">
-                    <span className="text-white text-sm font-medium">{line.qty}</span>
-                  </td>
-                  <td className="px-6 py-5 text-right tabular-nums">
-                    <span className="text-anthracite-400 text-sm">{line.price.toLocaleString()}</span>
-                  </td>
-                  <td className="px-8 py-5 text-right tabular-nums">
-                    <span className="text-white text-sm font-black">{ (line.qty * line.price).toLocaleString() }</span>
-                  </td>
-                </motion.tr>
-              ))}
+              {linesToRender.map((line) => {
+                const isHighlighted = highlightedCode === line.code;
+                return (
+                  <motion.tr 
+                    key={line.code}
+                    variants={rowVars}
+                    animate={isHighlighted ? { backgroundColor: "rgba(16, 185, 129, 0.12)" } : { backgroundColor: "rgba(255, 255, 255, 0)" }}
+                    whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                    onClick={() => onSelectLine?.(line.code)}
+                    onMouseEnter={() => onSelectLine?.(line.code)}
+                    onMouseLeave={() => onSelectLine?.(null)}
+                    transition={isHighlighted ? { duration: 0.3 } : { duration: 1.5 }}
+                    className="group border-b border-white/5 transition-colors duration-300 cursor-pointer"
+                  >
+
+                    <td className="px-8 py-5">
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white text-sm font-bold tracking-tight">{line.label}</span>
+                          {isHighlighted && (
+                            <motion.span 
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              className="px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[8px] font-black uppercase tracking-wider animate-pulse"
+                            >
+                              Ajusté par l'IA
+                            </motion.span>
+                          )}
+                        </div>
+                        <span className="text-[9px] text-anthracite-600 font-bold uppercase tracking-widest mt-0.5">Code Lot: {line.code}</span>
+                        {(line as any).justification && (
+                          <span className="text-[10px] text-emerald-400/80 italic mt-1">{(line as any).justification}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-center">
+                      <span className="text-[10px] font-black text-anthracite-400 bg-white/5 px-2 py-1 rounded-md border border-white/5">{line.unit}</span>
+                    </td>
+                    <td className="px-6 py-5 text-right tabular-nums">
+                      <span className="text-white text-sm font-medium">{line.quantity}</span>
+                    </td>
+                    <td className="px-6 py-5 text-right tabular-nums">
+                      <span className="text-anthracite-400 text-sm">{line.unitPrice.toLocaleString()}</span>
+                    </td>
+                    <td className="px-8 py-5 text-right tabular-nums">
+                      <span className="text-white text-sm font-black">{line.totalPrice.toLocaleString()}</span>
+                    </td>
+                  </motion.tr>
+                );
+              })}
             </motion.tbody>
           </table>
         </div>

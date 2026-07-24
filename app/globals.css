@@ -10,12 +10,21 @@
     --wood-acajou:  107 45 45;
   }
 
-  * {
-    @apply border-anthracite-700;
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 
   ::-webkit-scrollbar {
@@ -87,5 +96,25 @@
     );
     background-size: 200% 100%;
     @apply animate-shimmer;
+  }
+
+  /* Smooth auto-scrolling chat messages */
+  .chat-messages {
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+  }
+
+  /* Thin scrollbar for chat */
+  .chat-messages::-webkit-scrollbar {
+    width: 4px;
+  }
+  .chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .chat-messages::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full;
+  }
+  .chat-messages::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/20;
   }
 }
