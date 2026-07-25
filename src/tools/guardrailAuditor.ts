@@ -77,3 +77,39 @@ export function auditBuildingMetrics(payload: {
     },
   };
 }
+
+/**
+ * Facteurs de majoration logistique par ville (fret acier/ciment depuis le port de Douala)
+ */
+export const REGIONAL_LOGISTICS_FACTORS: Record<string, number> = {
+  DOUALA: 1.00,    // Prix de base portuaire
+  YAOUNDE: 1.05,   // Fret léger (+5%)
+  BAFOUSSAM: 1.12, // Ouest (+12%)
+  GAROUA: 1.25,    // Grand Nord (+25%)
+  BERTOUA: 1.20,   // Est (+20%)
+};
+
+/**
+ * Applique la majoration logistique régionale au prix unitaire
+ */
+export function applyRegionalLogistics(baseUnitPrice: number, city: string): number {
+  const factor = REGIONAL_LOGISTICS_FACTORS[city.toUpperCase()] || 1.05;
+  return baseUnitPrice * factor;
+}
+
+/**
+ * Calcule le délai additionnel lié à la saison des pluies
+ */
+export function getRainySeasonImpact(startDate: Date, city: string): { durationMultiplier: number; riskFactor: string } {
+  const month = startDate.getMonth() + 1;
+  const isCoastalZone = ['DOUALA', 'KRIBI', 'LIMBE'].includes(city.toUpperCase());
+
+  if (month >= 6 && month <= 10) {
+    return {
+      durationMultiplier: isCoastalZone ? 1.40 : 1.25,
+      riskFactor: "SAISON_DES_PLUIES: Risque fort de ralentissement du coulage et terrassement. Prévoir bâchage."
+    };
+  }
+  return { durationMultiplier: 1.00, riskFactor: "SAISON_SECHE_OPTIMALE" };
+}
+

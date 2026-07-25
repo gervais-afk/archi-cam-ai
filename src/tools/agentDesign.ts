@@ -67,6 +67,22 @@ export function generateArchitecturalRenderPrompt(request: RenderRequest): Rende
     roomType,
     styleTheme,
     negativePrompt,
-    controlNetMaskStatus: request.maskLocked ? "MASK_STRICTLY_LOCKED" : "UNLOCKED",
+    controlNetMaskStatus: request.maskLocked ? "CONTROLNET_MASK_LOCKED_3LAYER" : "UNLOCKED",
   };
 }
+
+/**
+ * Construit un prompt architectural régionalisé selon le climat et la ville du Cameroun.
+ */
+export function buildRegionalArchitecturalPrompt(city: string, roomType: string, styleTheme: string): string {
+  const regionalContexts: Record<string, string> = {
+    YAOUNDE: "lush equatorial hills background, humid warm atmosphere, Iroko wooden louvers, red clay brick feature walls",
+    DOUALA: "coastal tropical lighting, high-ceiling cross-ventilation, moisture-resistant polished tiles",
+    BAFOUSSAM: "western highlands mountain light, Bamiléké carved wooden pillars, volcanic basalt stone feature wall",
+    GAROUA: "sahelian bright sun, shaded veranda with archways, earth-toned BTC compressed earth blocks"
+  };
+
+  const context = regionalContexts[city.toUpperCase()] || regionalContexts.YAOUNDE;
+  return `${roomType} interior architecture render, ${styleTheme} style, ${context}, 8k resolution, professional archviz.`;
+}
+
