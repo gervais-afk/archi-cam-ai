@@ -130,26 +130,18 @@ export default function Hero() {
           </Link>
         </motion.div>
 
-        {/* SOCIAL PROOF / TECH STACK */}
+        {/* SHORT SUMMARY OF APP CAPABILITIES */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1 }}
-          className="mt-24 pt-10 border-t border-white/5 flex flex-wrap justify-center items-center gap-x-12 gap-y-6 opacity-40"
+          className="mt-20 pt-8 border-t border-white/5 max-w-3xl mx-auto text-center"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-ai-glow" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-white">Google Gemini Pro</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-wood-ocre" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-white">IfcOpenShell</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-white" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-white">Supabase BTP Data</span>
-          </div>
+          <p className="text-xs md:text-sm text-anthracite-300 font-normal leading-relaxed">
+            ✨ <span className="text-white font-semibold">Une suite complète d&apos;IA pour le BTP</span> : Archi Cam AI transforme instantanément vos croquis manuscrits et maquettes 3D en devis déterministes normés, plannings d&apos;exécution et rendus photoréalistes adaptés à l&apos;architecture africaine.
+          </p>
         </motion.div>
+
       </div>
 
       {/* Decorative Bottom Gradient Line */}
