@@ -313,7 +313,7 @@ export default function DashboardProPage() {
                     onClick={handleGenerate}
                     disabled={state !== "file-ready"}
                     className={`
-                      w-full relative group flex items-center justify-center gap-3 py-5 px-6 rounded-2xl
+                      w-full relative overflow-hidden flex items-center justify-center gap-3 py-5 px-6 rounded-2xl
                       font-black text-sm uppercase tracking-[0.2em] transition-all duration-500
                       ${state === "file-ready"
                         ? "bg-wood-gradient text-white shadow-[0_15px_30px_-10px_rgba(197,160,89,0.5)] hover:shadow-[0_20px_40px_-10px_rgba(197,160,89,0.6)] hover:-translate-y-1"
@@ -321,12 +321,12 @@ export default function DashboardProPage() {
                       }
                     `}
                   >
-                    <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                     <Sparkles
                       className={`w-5 h-5 ${state === "file-ready" ? "text-white animate-pulse" : ""}`}
                     />
                     Lancer l&apos;IA
                   </button>
+
 
                   {state === "file-ready" && (
                     <div className="mt-6 p-3 rounded-xl bg-ai-glow/5 border border-ai-glow/20 flex items-center gap-3 animate-fade-in">
