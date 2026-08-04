@@ -12,7 +12,7 @@ import neo4j, { Driver } from 'neo4j-driver';
 
 const NEO4J_URI      = process.env.NEO4J_URI      || 'bolt://127.0.0.1:7687';
 const NEO4J_USER     = process.env.NEO4J_USER     || 'neo4j';
-const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD || 'password123';
+const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD || 'password123'; // Défaut = conteneur archicam_neo4j
 
 let driverInstance: Driver | null = null;
 

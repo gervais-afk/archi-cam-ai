@@ -29,11 +29,34 @@ yarn-error.log*
 .env*.local
 .env
 
+# python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# agent directory
+.agents/
+
+# database & build outputs
+*.db
+*.sqlite
+/tests/output/
+/public/out/
+/public/uploads/
+/public/renders/plan_rendered_*
+/public/renders/test_*
+/public/plan_rendered_*
+output_*.png
+output_*.bcfzip
+
 # scratch and debug scripts
 /scratch/
 *.ps1
 *.log
 /models/
+
 
 # vercel
 .vercel
@@ -41,4 +64,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
 

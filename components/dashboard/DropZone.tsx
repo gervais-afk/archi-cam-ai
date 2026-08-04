@@ -4,12 +4,6 @@
  * PREMIUM DROPZONE COMPONENT — ARCHI CAM AI
  * ──────────────────────────────────────────
  * Une interface d'upload cinématique avec validation intelligente.
- * 
- * Architecture des interactions :
- * 1. État Initial : Zone glassmorphism avec bordures dashed.
- * 2. État DragActive : Transition vers bordures Cyan lumineuses + Magnetic Pulse.
- * 3. État FileReady : Transition AnimatePresence vers une "File Card" premium.
- * 4. Bouton Action : Effet de brillance (shimmer) pour lancer le scan.
  */
 
 import React, { useCallback, useState } from "react";
@@ -21,7 +15,6 @@ import {
   X, 
   CheckCircle2, 
   AlertCircle, 
-  Zap,
   FileCode2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,10 +29,20 @@ interface DropZoneProps {
 export default function DropZone({ file, onFileAccepted, onFileRemoved, mode }: DropZoneProps) {
   const [error, setInternalError] = useState<string | null>(null);
 
-  // Configuration des types de fichiers selon le mode
-  const accept: import("react-dropzone").Accept = mode === "b2b" 
-    ? { "application/octet-stream": [".ifc"], "text/plain": [".ifc"] } 
-    : { "application/pdf": [".pdf"], "image/png": [".png"], "image/jpeg": [".jpg", ".jpeg"] };
+  // Configuration des types de fichiers selon le mode (Particulier B2C vs Pro B2B)
+  const accept: import("react-dropzone").Accept = mode === "b2c" 
+    ? {
+        "application/pdf": [".pdf"],
+        "image/png": [".png"],
+        "image/jpeg": [".jpg", ".jpeg"],
+      }
+    : {
+        "application/pdf": [".pdf"],
+        "image/png": [".png"],
+        "image/jpeg": [".jpg", ".jpeg"],
+        "application/octet-stream": [".ifc"],
+        "text/plain": [".ifc"]
+      };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -50,9 +53,9 @@ export default function DropZone({ file, onFileAccepted, onFileRemoved, mode }: 
 
   const onDropRejected = useCallback(() => {
     setInternalError(
-      mode === "b2b" 
-        ? "Seuls les fichiers IFC sont acceptés en mode Pro." 
-        : "Format non supporté (PDF ou Image requis)."
+      mode === "b2c" 
+        ? "Format non supporté (Plan PDF ou Image 2D requis)." 
+        : "Format non supporté (Maquette IFC, PDF ou Image 2D requis)."
     );
   }, [mode]);
 
@@ -111,9 +114,9 @@ export default function DropZone({ file, onFileAccepted, onFileRemoved, mode }: 
               <h3 className="text-white text-xl font-black tracking-tight">
                 {isDragActive 
                   ? "Déposez pour analyser" 
-                  : mode === "b2b" 
-                    ? "Importez votre maquette BIM (.ifc)" 
-                    : "Importez votre plan (.pdf)"}
+                  : mode === "b2c" 
+                    ? "Importez votre plan (.pdf, .png, .jpg)" 
+                    : "Importez votre fichier (.ifc, .pdf, .dwg)"}
               </h3>
               <p className="text-anthracite-500 text-sm max-w-sm mx-auto font-medium">
                 {isDragActive 
@@ -176,7 +179,7 @@ export default function DropZone({ file, onFileAccepted, onFileRemoved, mode }: 
               <div className="text-center mb-10">
                 <h4 className="text-white font-black text-lg truncate max-w-xs">{file.name}</h4>
                 <p className="text-anthracite-500 text-[10px] font-bold uppercase tracking-widest mt-1">
-                  {(file.size / (1024 * 1024)).toFixed(2)} Mo • Fichier {mode === "b2b" ? "BIM" : "Architectural"}
+                  {(file.size / (1024 * 1024)).toFixed(2)} Mo • Fichier {mode === "b2b" ? "BIM" : "Architectural 2D"}
                 </p>
               </div>
 

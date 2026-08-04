@@ -6,7 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "check:assets": "python scripts/check_assets.py",
+    "check:python": "python scripts/validate_python_scripts.py",
+    "test:local-render": "node scripts/validate-local-pipeline.js",
+    "test:integration": "node scripts/integration-tests/run-all-tests.js",
+    "test:render-only": "node scripts/integration-tests/run-all-tests.js --only=4",
+    "test:bim-only": "node scripts/integration-tests/run-all-tests.js --only=5",
+    "test:auth-only": "node scripts/integration-tests/run-all-tests.js --only=2,3",
+    "test:billing-only": "node scripts/integration-tests/run-all-tests.js --only=11",
+    "fixtures:generate": "python scripts/generate_test_fixtures.py",
+    "validate:local": "npm run typecheck && python scripts/check_assets.py && python scripts/validate_python_scripts.py",
+    "validate:full": "npm run typecheck && python scripts/generate_test_fixtures.py && npm run test:integration"
   },
   "dependencies": {
     "@dataconnect/generated": "file:src/dataconnect-generated",
@@ -14,6 +26,7 @@
     "@genkit-ai/mcp": "^1.36.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@radix-ui/react-progress": "^1.1.8",
+    "@react-pdf/renderer": "^4.5.1",
     "@thatopen/components": "^3.4.6",
     "@types/pg": "^8.20.0",
     "@types/three": "^0.184.1",
@@ -29,6 +42,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
+    "sharp": "^0.35.3",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^2.3.0",
     "three": "^0.184.0",
     "typescript": "^5"

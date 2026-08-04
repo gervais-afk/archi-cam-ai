@@ -12,18 +12,25 @@ export type ArchitecturalStyle =
   | "moderne-minimaliste"
   | "industriel"
   | "africain-contemporain"
+  | "TROPICAL_MOODY";
+
+export type RenderMode = 
   | "3D_PHOTOREALISTE"
   | "PLAN_2D_PHOTOSHOP"
-  | "MAQUETTE_BLANCHE"
-  | "TROPICAL_MOODY";
+  | "MAQUETTE_BLANCHE";
 
 export type SubscriptionTier = "free" | "pay-per-use" | "agency-pro";
 
 export interface GenerationOptions {
   style: ArchitecturalStyle;
+  renderMode: RenderMode;
   cinematicVideo: boolean;
   bioclimaticAudit: boolean;
   googleMapsIntegration: boolean;
+  latitude?: number;
+  longitude?: number;
+  elevation?: number;
+  city?: string;
 }
 
 export interface AIAnalysis {
@@ -49,6 +56,7 @@ export interface EstimateLine {
   unit: string;
   unitPrice: number;
   totalPrice: number;
+  justification?: string;
 }
 
 export interface ProjectEstimate {
@@ -66,8 +74,14 @@ export interface ProjectEstimate {
 export interface RenderResult {
   id: string;
   imageUrl: string;
+  renderUrl?: string;
+  originalPlanUrl?: string;
+  previewUrl?: string;
+  maskUrl?: string;
   videoUrl?: string | null;
   videoJobId?: string | null;
+
+
   videoStatus?: "processing" | "completed" | "failed";
   reportText: string;
   generatedAt: Date;
@@ -81,6 +95,10 @@ export interface RenderResult {
     riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
     comments?: string | null;
   };
+  latitude?: number;
+  longitude?: number;
+  elevation?: number;
+  city?: string;
 }
 
 export interface UserProfile {

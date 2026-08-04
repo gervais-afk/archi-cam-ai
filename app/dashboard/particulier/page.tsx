@@ -16,14 +16,17 @@ import {
 import ProjectHistory from "@/components/dashboard/ProjectHistory";
 import CreditsModal from "@/components/dashboard/CreditsModal";
 import type { GenerationOptions, RenderResult, UserMode } from "@/types";
-import { MOCK_RENDER_RESULT, MOCK_USER }         from "@/lib/mock-data";
+import { MOCK_RENDER_RESULT }         from "@/lib/mock-data";
 import Link from "next/link";
 import { User, Briefcase } from "lucide-react";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { mapVilleToZone } from "@/hooks/useGeolocation";
 
 type DashboardState = "idle" | "file-ready" | "generating" | "result";
 
 const DEFAULT_OPTIONS: GenerationOptions = {
   style:                  "luxe-tropical",
+  renderMode:             "3D_PHOTOREALISTE",
   cinematicVideo:         false,
   bioclimaticAudit:       false,
   googleMapsIntegration:  false,
@@ -37,6 +40,9 @@ export default function DashboardParticulierPage() {
   const [result,   setResult]   = useState<RenderResult | null>(null);
   const [showCredits, setShowCredits] = useState(false);
 
+  // ── Utilisateur courant (mock auth prototype) ──
+  const { user, projects } = useCurrentUser();
+
   const handleFileAccepted = useCallback((f: File) => {
     setFile(f);
     setState("file-ready");
@@ -45,8 +51,29 @@ export default function DashboardParticulierPage() {
   const triggerGeneration = async () => {
     setState("generating");
     
-    const prompt = `Villa contemporaine de style ${options.style} avec bois Iroko et pierre d'Edéa`;
+    let planUrl: string | undefined = undefined;
+    if (file) {
+      try {
+        const buffer = await file.arrayBuffer();
+        const base64 = Buffer.from(buffer).toString("base64");
+        planUrl = `data:${file.type || "application/pdf"};base64,${base64}`;
+      } catch (e) {
+        console.warn("Could not encode file to base64", e);
+      }
+    }
+
+    const prompt = `Villa contemporaine de style ${options.style} avec bois Iroko et pierre d'Edéa. Mode de rendu : ${options.renderMode}`;
     
+    // Détermination de la géolocalisation (priorité au choix de l'utilisateur sur la carte)
+    const chosenCity = options.city || "Yaoundé";
+    const chosenLat = options.latitude !== undefined ? options.latitude : 3.8480;
+    const chosenLng = options.longitude !== undefined ? options.longitude : 11.5021;
+    const chosenElev = options.elevation !== undefined ? options.elevation : 730;
+
+    const mapped = mapVilleToZone(chosenCity);
+    const chosenRegion = mapped.region !== "INCONNUE" ? mapped.region : "CENTRE";
+    const chosenZone = mapped.zone !== "INCONNUE" ? mapped.zone : "EQUATORIAL_INTERIEUR";
+
     try {
       if (options.cinematicVideo) {
         const res = await fetch("/api/render/video", {
@@ -56,6 +83,12 @@ export default function DashboardParticulierPage() {
             projectId: "demo-project-123",
             prompt,
             style: options.style,
+            ville: chosenCity,
+            region: chosenRegion,
+            zoneClimatique: chosenZone,
+            latitude: chosenLat,
+            longitude: chosenLng,
+            elevation: chosenElev,
           }),
         });
         
@@ -78,6 +111,15 @@ export default function DashboardParticulierPage() {
           body: JSON.stringify({
             prompt,
             style: options.style,
+            renderMode: options.renderMode,
+            planUrl,
+            pdfFileName: file?.name,
+            ville: chosenCity,
+            region: chosenRegion,
+            zoneClimatique: chosenZone,
+            latitude: chosenLat,
+            longitude: chosenLng,
+            elevation: chosenElev,
           }),
         });
         
@@ -89,8 +131,14 @@ export default function DashboardParticulierPage() {
           ...MOCK_RENDER_RESULT,
           style: options.style,
           imageUrl: data.imageUrl,
+          renderUrl: data.renderUrl || data.imageUrl,
+          originalPlanUrl: data.originalPlanUrl || planUrl,
+          ...(data.analysis ? { analysis: data.analysis } : {}),
+          ...(data.estimate ? { estimate: data.estimate } : {}),
+          ...(data.reportText ? { reportText: data.reportText } : {}),
         };
         setResult(newResult);
+        setState("result");
       }
     } catch (err) {
       console.error("Erreur de génération :", err);
@@ -98,6 +146,7 @@ export default function DashboardParticulierPage() {
         ...MOCK_RENDER_RESULT,
         style: options.style,
       });
+      setState("result");
     }
   };
 
@@ -111,10 +160,9 @@ export default function DashboardParticulierPage() {
   };
 
   const handleGenerationComplete = () => {
-    if (!result) {
-      setResult(MOCK_RENDER_RESULT);
+    if (result) {
+      setState("result");
     }
-    setState("result");
   };
 
   const handleReset = useCallback(() => {
@@ -138,7 +186,7 @@ export default function DashboardParticulierPage() {
       <CreditsModal 
         isOpen={showCredits} 
         onClose={() => setShowCredits(false)} 
-        currentCredits={MOCK_USER.credits} 
+        currentCredits={user?.credits ?? 0} 
       />
 
       <Navbar />
@@ -178,7 +226,7 @@ export default function DashboardParticulierPage() {
               >
                 <Coins className="w-4 h-4 text-wood-ocre" />
                 <span className="text-white text-sm font-black">
-                  {MOCK_USER.credits}
+                  {user?.credits ?? 0}
                 </span>
                 <span className="text-anthracite-500 text-[10px] font-bold uppercase tracking-widest">Crédits</span>
               </button>
@@ -312,7 +360,7 @@ export default function DashboardParticulierPage() {
                   )}
                 </div>
                 
-                <ProjectHistory />
+                <ProjectHistory projects={projects} />
               </div>
             </div>
           )}

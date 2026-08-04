@@ -33,7 +33,7 @@ export const ProjectEstimateSchema = z.object({
 // Configuration de l'agent Genkit
 export const ai = genkit({
   plugins: [googleAI()],
-  model: 'googleai/gemini-1.5-flash', // Très rapide, très bon pour l'utilisation d'outils MCP, et très généreux
+  model: 'googleai/gemini-2.5-flash', // Meilleur raisonnement, meme cout, API stable (juillet 2026)
 });
 
 // --- LE FLUX AGENTIQUE (FLOW) ---

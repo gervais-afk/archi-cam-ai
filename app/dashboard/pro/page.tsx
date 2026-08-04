@@ -12,18 +12,24 @@ import {
   Coins,
   Settings,
   ChevronRight,
+  MapPin,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import ProjectHistory from "@/components/dashboard/ProjectHistory";
 import CreditsModal from "@/components/dashboard/CreditsModal";
 import type { GenerationOptions, RenderResult, UserMode } from "@/types";
-import { MOCK_RENDER_RESULT, MOCK_USER }         from "@/lib/mock-data";
+import { MOCK_RENDER_RESULT }         from "@/lib/mock-data";
 import Link from "next/link";
 import { User, Briefcase } from "lucide-react";
+import { useGeolocation, ZONE_TO_BTP_COEFF, mapVilleToZone } from "@/hooks/useGeolocation";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 type DashboardState = "idle" | "file-ready" | "generating" | "result";
 
 const DEFAULT_OPTIONS: GenerationOptions = {
   style:                  "luxe-tropical",
+  renderMode:             "3D_PHOTOREALISTE",
   cinematicVideo:         false,
   bioclimaticAudit:       false,
   googleMapsIntegration:  false,
@@ -37,6 +43,12 @@ export default function DashboardProPage() {
   const [result,   setResult]   = useState<RenderResult | null>(null);
   const [showCredits, setShowCredits] = useState(false);
 
+  // ── Utilisateur courant (mock auth prototype) ──
+  const { user, projects } = useCurrentUser();
+
+  // ── Géolocalisation souveraine (navigator.geolocation + Nominatim OSM) ──
+  const geo = useGeolocation();
+
   const handleFileAccepted = useCallback((f: File) => {
     setFile(f);
     setState("file-ready");
@@ -45,20 +57,56 @@ export default function DashboardProPage() {
   const triggerGeneration = async () => {
     setState("generating");
     
-    const prompt = `Villa contemporaine de style ${options.style} avec bois Iroko et pierre d'Edéa`;
+    const prompt = `Villa contemporaine de style ${options.style} avec bois Iroko et pierre d'Edéa. Mode de rendu : ${options.renderMode}`;
     
+    // Détermination de la géolocalisation (priorité au choix de l'utilisateur sur la carte)
+    const chosenCity = options.city || (geo.detected ? geo.ville : "Yaoundé");
+    const chosenLat = options.latitude !== undefined ? options.latitude : (geo.detected ? geo.latitude : 3.8480);
+    const chosenLng = options.longitude !== undefined ? options.longitude : (geo.detected ? geo.longitude : 11.5021);
+    const chosenElev = options.elevation !== undefined ? options.elevation : 730;
+
+    const mapped = mapVilleToZone(chosenCity);
+    const chosenRegion = mapped.region !== "INCONNUE" ? mapped.region : (geo.detected ? geo.region : "CENTRE");
+    const chosenZone = mapped.zone !== "INCONNUE" ? mapped.zone : (geo.detected ? geo.zoneClimatique : "EQUATORIAL_INTERIEUR");
+
     let realEstimate: any = null;
+    let realMeta: any = null;
     if (file) {
       try {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('style', options.style);
+        // Transmission de la géolocalisation au pipeline BTP
+        formData.append('ville',           chosenCity);
+        formData.append('region',          chosenRegion);
+        formData.append('zoneClimatique',  chosenZone);
+        formData.append('latitude',        String(chosenLat));
+        formData.append('longitude',       String(chosenLng));
+        formData.append('elevation',       String(chosenElev));
+
         const devisRes = await fetch('/api/devis/generate', { method: 'POST', body: formData });
         if (devisRes.ok) {
           const data = await devisRes.json();
-          if (data.success) realEstimate = data.estimate;
+          if (data.success) {
+            realEstimate = data.estimate;
+            // Stocker les métadonnées pour l'affichage dans ResultsPanel
+            if (data.meta) {
+              realMeta = data.meta;
+            }
+          }
         }
       } catch (e) { console.error("Erreur Agent Devis :", e); }
+    }
+
+    let planUrl: string | undefined = undefined;
+    if (file) {
+      try {
+        const buffer = await file.arrayBuffer();
+        const base64 = Buffer.from(buffer).toString("base64");
+        planUrl = `data:${file.type || "application/pdf"};base64,${base64}`;
+      } catch (e) {
+        console.warn("Could not encode file to base64", e);
+      }
     }
 
     try {
@@ -83,7 +131,13 @@ export default function DashboardProPage() {
           videoJobId: data.jobId,
           videoStatus: "processing",
           videoUrl: null,
-          ...(realEstimate ? { estimate: realEstimate } : {})
+          latitude: chosenLat,
+          longitude: chosenLng,
+          elevation: chosenElev,
+          city: chosenCity,
+          ...(realEstimate ? { estimate: realEstimate } : {}),
+          ...(realMeta ? { ifcMetadata: { ...MOCK_RENDER_RESULT.ifcMetadata, fileName: realMeta.fileName, fileSize: realMeta.fileSize } } : {}),
+          ...(file ? { reportText: `DQE généré depuis ${file.name} — Zone ${chosenZone} (x${ZONE_TO_BTP_COEFF[chosenZone]?.coeff || 1.0})` } : {}),
         };
         setResult(newResult);
       } else {
@@ -93,6 +147,15 @@ export default function DashboardProPage() {
           body: JSON.stringify({
             prompt,
             style: options.style,
+            renderMode: options.renderMode,
+            planUrl,
+            pdfFileName: file?.name,
+            ville: chosenCity,
+            region: chosenRegion,
+            zoneClimatique: chosenZone,
+            latitude: chosenLat,
+            longitude: chosenLng,
+            elevation: chosenElev,
           }),
         });
         
@@ -103,17 +166,49 @@ export default function DashboardProPage() {
         const newResult: RenderResult = {
           ...MOCK_RENDER_RESULT,
           style: options.style,
-          imageUrl: data.imageUrl,
-          ...(realEstimate ? { estimate: realEstimate } : {})
+          imageUrl: data.renderUrl || data.imageUrl,
+          originalPlanUrl: data.originalPlanUrl || data.previewUrl,
+          renderUrl: data.renderUrl || data.imageUrl,
+          previewUrl: data.previewUrl,
+          maskUrl: data.maskUrl,
+          latitude: chosenLat,
+          longitude: chosenLng,
+          elevation: chosenElev,
+          city: chosenCity,
+          ...(realEstimate ? { estimate: realEstimate } : data.estimate ? { estimate: data.estimate } : {}),
+          ...(realMeta ? { 
+            ifcMetadata: { 
+              ...MOCK_RENDER_RESULT.ifcMetadata, 
+              fileName: realMeta.fileName, 
+              fileSize: realMeta.fileSize,
+              complianceScore: realMeta.bimAudit?.complianceScore ?? 95,
+              lod: realMeta.bimAudit?.lod ?? 300,
+              elementCount: (realMeta.bimAudit?.elementCounts?.walls || 0) + (realMeta.bimAudit?.elementCounts?.slabs || 0) + (realMeta.bimAudit?.elementCounts?.beams || 0) || MOCK_RENDER_RESULT.ifcMetadata.elementCount
+            } 
+          } : {}),
+          ...(data.reportText ? { reportText: data.reportText } : file ? { reportText: `DQE généré depuis ${file.name} — Zone ${chosenZone} (x${ZONE_TO_BTP_COEFF[chosenZone]?.coeff || 1.0})` } : {}),
         };
         setResult(newResult);
+        setState("result");
       }
     } catch (err) {
       console.error("Erreur de génération :", err);
+      // Même en cas d'erreur de rendu, on affiche les vraies données DQE si disponibles
       setResult({
         ...MOCK_RENDER_RESULT,
         style: options.style,
+        latitude: chosenLat,
+        longitude: chosenLng,
+        elevation: chosenElev,
+        city: chosenCity,
+        ...(realEstimate ? { estimate: realEstimate } : {}),
+        ifcMetadata: {
+          ...MOCK_RENDER_RESULT.ifcMetadata,
+          ...(realMeta ? { fileName: realMeta.fileName, fileSize: realMeta.fileSize } : {}),
+          ...(file && !realMeta ? { fileName: file.name, fileSize: file.size } : {}),
+        },
       });
+      setState("result");
     }
   };
 
@@ -127,10 +222,9 @@ export default function DashboardProPage() {
   };
 
   const handleGenerationComplete = () => {
-    if (!result) {
-      setResult(MOCK_RENDER_RESULT);
+    if (result) {
+      setState("result");
     }
-    setState("result");
   };
 
   const handleReset = useCallback(() => {
@@ -154,7 +248,7 @@ export default function DashboardProPage() {
       <CreditsModal 
         isOpen={showCredits} 
         onClose={() => setShowCredits(false)} 
-        currentCredits={MOCK_USER.credits} 
+        currentCredits={user?.credits ?? 0} 
       />
 
       <Navbar />
@@ -195,7 +289,7 @@ export default function DashboardProPage() {
               >
                 <Coins className="w-4 h-4 text-wood-ocre" />
                 <span className="text-white text-sm font-black">
-                  {MOCK_USER.credits}
+                  {user?.credits ?? 0}
                 </span>
                 <span className="text-anthracite-500 text-[10px] font-bold uppercase tracking-widest">Crédits</span>
               </button>
@@ -227,6 +321,38 @@ export default function DashboardProPage() {
                     <p className="text-anthracite-500 text-sm mt-1 font-medium">
                       Intelligence Artificielle de précision pour le BTP camerounais.
                     </p>
+
+                    {/* ── Badge de géolocalisation automatique ── */}
+                    <div className="mt-3 flex items-center gap-2">
+                      {geo.loading && (
+                        <span className="flex items-center gap-1.5 text-xs text-anthracite-400">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          Détection de votre position...
+                        </span>
+                      )}
+                      {geo.detected && (
+                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-ai-glow/10 border border-ai-glow/30 text-xs font-bold text-ai-glow">
+                          <MapPin className="w-3 h-3" />
+                          {geo.ville} — {ZONE_TO_BTP_COEFF[geo.zoneClimatique].label}
+                          <span className="ml-1 text-ai-glow/60">×{ZONE_TO_BTP_COEFF[geo.zoneClimatique].coeff}</span>
+                        </span>
+                      )}
+                      {geo.error && (
+                        <span className="flex items-center gap-1.5 text-xs text-amber-400/80">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          {geo.error}
+                        </span>
+                      )}
+                      {!geo.loading && !geo.detected && !geo.error && (
+                        <button
+                          onClick={geo.refresh}
+                          className="flex items-center gap-1 text-xs text-anthracite-500 hover:text-ai-glow transition-colors"
+                        >
+                          <MapPin className="w-3.5 h-3.5" />
+                          Autoriser la géolocalisation
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <button
                     onClick={handleDemoScan}
@@ -338,7 +464,7 @@ export default function DashboardProPage() {
                   )}
                 </div>
                 
-                <ProjectHistory />
+                <ProjectHistory projects={projects} />
               </div>
             </div>
           )}

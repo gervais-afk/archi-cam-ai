@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
+import localFont from "next/font/local";
+import { Toaster } from "sonner";
 import "./globals.css";
 
-const inter = Inter({
-  subsets:  ["latin"],
+// Configuration des polices locales avec fallback système explicite
+// Désactive 100% des appels distants à fonts.googleapis.com
+const inter = localFont({
+  src: "./fonts/GeistVF.woff",
   variable: "--font-inter",
-  display:  "swap",
+  display: "swap",
+  fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
 });
 
-const poppins = Poppins({
-  subsets:  ["latin"],
-  weight:   ["400", "500", "600", "700", "800"],
+const poppins = localFont({
+  src: "./fonts/GeistMonoVF.woff",
   variable: "--font-poppins",
-  display:  "swap",
+  display: "swap",
+  fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
 });
 
 export const metadata: Metadata = {
@@ -31,7 +35,10 @@ export default function RootLayout({
     <html lang="fr" className={`${inter.variable} ${poppins.variable}`}>
       <body className="bg-anthracite-900 text-white antialiased font-sans">
         {children}
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );
 }
+
+

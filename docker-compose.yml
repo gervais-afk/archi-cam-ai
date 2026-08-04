@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  # ── Application Next.js ──────────────────────────────────────────────────────
+  archi-cam-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: archi-cam-ai-app
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=production
+    restart: always
+    depends_on:
+      neo4j:
+        condition: service_healthy
+
+  # ── Neo4j 5.20 GraphRAG ──────────────────────────────────────────────────────
+  neo4j:
+    image: neo4j:5.20-community
+    container_name: archi-cam-neo4j
+    ports:
+      - "7474:7474"   # Interface Web (Neo4j Browser)
+      - "7687:7687"   # Bolt (driver TypeScript/Python)
+    environment:
+      - NEO4J_AUTH=neo4j/password123
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
+      - NEO4J_dbms_memory_heap_initial__size=512m
+      - NEO4J_dbms_memory_heap_max__size=1G
+      - NEO4J_dbms_memory_pagecache_size=512m
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "password123", "RETURN 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 8
+      start_period: 30s
+
+volumes:
+  neo4j_data:
+  neo4j_logs:

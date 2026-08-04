@@ -1,13 +1,15 @@
 "use client";
 
-import { ARCHITECTURAL_STYLES } from "@/lib/mock-data";
+import { ARCHITECTURAL_STYLES, RENDER_MODES } from "@/lib/mock-data";
 import type { GenerationOptions } from "@/types";
-import { ChevronDown, Video, Leaf, MapPin } from "lucide-react";
+import { ChevronDown, Video, Leaf, MapPin, Lock } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import LandSelector from "./LandSelector";
 
 interface StyleSelectorProps {
   options:   GenerationOptions;
   onChange:  (opts: GenerationOptions) => void;
+  mode?:     "b2c" | "b2b";
 }
 
 const PREMIUM_OPTIONS = [
@@ -34,19 +36,27 @@ const PREMIUM_OPTIONS = [
   },
 ];
 
-export default function StyleSelector({ options, onChange }: StyleSelectorProps) {
+export default function StyleSelector({ options, onChange, mode = "b2c" }: StyleSelectorProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [renderModeDropdownOpen, setRenderModeDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const renderModeDropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedStyle = ARCHITECTURAL_STYLES.find(
     (s) => s.value === options.style
   );
+  
+  const selectedRenderMode = RENDER_MODES.find(
+    (s) => s.value === options.renderMode
+  );
 
-  /* Close on outside click */
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (renderModeDropdownRef.current && !renderModeDropdownRef.current.contains(e.target as Node)) {
+        setRenderModeDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClick);
@@ -54,6 +64,7 @@ export default function StyleSelector({ options, onChange }: StyleSelectorProps)
   }, []);
 
   const toggleOption = (key: keyof GenerationOptions) => {
+    if (mode === "b2c") return; // Option figée en mode Particulier
     onChange({ ...options, [key]: !options[key] });
   };
 
@@ -103,22 +114,79 @@ export default function StyleSelector({ options, onChange }: StyleSelectorProps)
         </div>
       </div>
 
+      {/* Render Mode Dropdown */}
+      <div>
+        <label className="block text-anthracite-300 text-sm font-medium mb-2">
+          Mode d'Extraction / Rendu
+        </label>
+        <div className="relative" ref={renderModeDropdownRef}>
+          <button
+            onClick={() => setRenderModeDropdownOpen(!renderModeDropdownOpen)}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-anthracite-800 border border-anthracite-700 hover:border-wood-ocre/50 text-white transition-all duration-200"
+          >
+            <span>{selectedRenderMode?.label ?? "Sélectionnez un mode"}</span>
+            <ChevronDown
+              className={`w-4 h-4 text-anthracite-400 transition-transform duration-200 ${
+                renderModeDropdownOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {renderModeDropdownOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 rounded-xl bg-anthracite-800 border border-anthracite-700 shadow-2xl shadow-black/60 z-20 overflow-hidden animate-slide-up">
+              {RENDER_MODES.map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => {
+                    onChange({ ...options, renderMode: s.value as any });
+                    setRenderModeDropdownOpen(false);
+                  }}
+                  className={`w-full flex items-center px-4 py-3 text-left text-sm transition-colors hover:bg-anthracite-700 ${
+                    options.renderMode === s.value
+                      ? "text-wood-ocre bg-wood-ocre/10"
+                      : "text-white"
+                  }`}
+                >
+                  {s.label}
+                  {options.renderMode === s.value && (
+                    <span className="ml-auto text-wood-ocre text-xs">✓</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Premium Options */}
       <div>
-        <label className="block text-anthracite-300 text-sm font-medium mb-3">
-          Options Premium
-        </label>
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-anthracite-300 text-sm font-medium">
+            Options Premium
+          </label>
+          {mode === "b2c" && (
+            <span className="text-[10px] font-bold text-amber-400/80 flex items-center gap-1">
+              <Lock className="w-3 h-3" /> Réservé Offre Pro
+            </span>
+          )}
+        </div>
+
         <div className="space-y-3">
           {PREMIUM_OPTIONS.map(({ key, icon: Icon, label, description, badge }) => {
-            const checked = options[key] as boolean;
+            const checked = options[key] as boolean && mode === "b2b";
+            const isDisabled = mode === "b2c";
+
             return (
               <button
                 key={key}
+                disabled={isDisabled}
                 onClick={() => toggleOption(key)}
                 className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl border text-left transition-all duration-200 ${
-                  checked
-                    ? "border-wood-ocre/60 bg-wood-ocre/10"
-                    : "border-anthracite-700 bg-anthracite-800 hover:border-wood-ocre/30"
+                  isDisabled 
+                    ? "opacity-60 cursor-not-allowed border-anthracite-800 bg-anthracite-900/50" 
+                    : checked
+                      ? "border-wood-ocre/60 bg-wood-ocre/10"
+                      : "border-anthracite-700 bg-anthracite-800 hover:border-wood-ocre/30"
                 }`}
               >
                 {/* Custom Checkbox */}
@@ -126,7 +194,7 @@ export default function StyleSelector({ options, onChange }: StyleSelectorProps)
                   className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all duration-200 ${
                     checked
                       ? "bg-wood-ocre border-wood-ocre"
-                      : "border-anthracite-600"
+                      : "border-anthracite-600 bg-anthracite-900"
                   }`}
                 >
                   {checked && (
@@ -143,6 +211,9 @@ export default function StyleSelector({ options, onChange }: StyleSelectorProps)
                         strokeLinejoin="round"
                       />
                     </svg>
+                  )}
+                  {isDisabled && (
+                    <Lock className="w-3 h-3 text-anthracite-500" />
                   )}
                 </div>
 
@@ -166,7 +237,7 @@ export default function StyleSelector({ options, onChange }: StyleSelectorProps)
                   <div className="flex items-center gap-2">
                     <span
                       className={`text-sm font-medium ${
-                        checked ? "text-white" : "text-anthracite-200"
+                        checked ? "text-white" : "text-anthracite-300"
                       }`}
                     >
                       {label}
@@ -184,6 +255,32 @@ export default function StyleSelector({ options, onChange }: StyleSelectorProps)
           })}
         </div>
       </div>
+
+      {/* Sélecteur de terrain (Cartographie interactive) */}
+      {(mode === "b2c" || options.googleMapsIntegration) && (
+        <div className="pt-6 border-t border-anthracite-700/50 space-y-3">
+          <label className="block text-anthracite-300 text-sm font-medium">
+            📍 Emplacement & Géolocalisation du Terrain
+          </label>
+          <LandSelector
+            initialSelection={{
+              latitude: options.latitude,
+              longitude: options.longitude,
+              elevation: options.elevation,
+              city: options.city
+            }}
+            onSelect={(selection) => {
+              onChange({
+                ...options,
+                latitude: selection.latitude,
+                longitude: selection.longitude,
+                elevation: selection.elevation,
+                city: selection.city
+              });
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

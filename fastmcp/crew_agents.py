@@ -11,16 +11,34 @@ from dotenv import load_dotenv
 # Charger les variables depuis .env.local
 load_dotenv(".env.local")
 
-# --- CONFIGURATION DU LLM GEMINI ---
+# --- CONFIGURATION DU LLM GEMINI (Agents créatifs / économiques) ---
 gemini_api_key = os.environ.get("GEMINI_API_KEY")
 if not gemini_api_key:
     raise ValueError("GEMINI_API_KEY manquante dans l'environnement. Veuillez la configurer dans .env.local")
 
 llm = LLM(
-    model="gemini/gemini-1.5-flash",
+    model="gemini/gemini-2.5-flash",  # Fallback cloud + agents créatifs/économiques
     api_key=gemini_api_key,
     temperature=0.1
 )
+
+# --- CONFIGURATION DU LLM GEMMA 4 LOCAL (Souverain / Edge AI pour @agent-structure) ---
+# LM Studio expose un endpoint OpenAI-compatible sur http://127.0.0.1:1234/v1
+# Modèle chargé : google/gemma-4-12b-qat
+LOCAL_LLM_URL = os.environ.get("LOCAL_LLM_URL", "http://127.0.0.1:1234/v1")
+LOCAL_LLM_MODEL = os.environ.get("LOCAL_LLM_MODEL", "google/gemma-4-12b-qat")
+
+try:
+    llm_gemma4_local = LLM(
+        model=f"openai/{LOCAL_LLM_MODEL}",
+        base_url=LOCAL_LLM_URL,
+        api_key="lm-studio",  # LM Studio n'a pas de vraie clé API
+        temperature=0.0  # Zéro température pour les calculs structuraux déterministes
+    )
+    print(f"[CrewAI] ✅ Gemma 4 local (souverain) branché sur {LOCAL_LLM_URL} avec modèle '{LOCAL_LLM_MODEL}'")
+except Exception as e:
+    print(f"[CrewAI] ⚠️  Gemma 4 local non disponible ({e}). Fallback sur Gemini Flash pour l'agent structure.")
+    llm_gemma4_local = llm  # Fallback gracieux sur Gemini si LM Studio est éteint
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:ArchiCamAI_2025_Secure_BIM!@127.0.0.1:5433/fdcdb")
 
@@ -111,6 +129,10 @@ def search_similar_projects_tool(query: str) -> str:
         return f"Erreur de recherche RAG (base de données locale) : {str(e)}"
 
 # --- DÉFINITION DES AGENTS ---
+# 🟠 designer  → Gemini 1.5 Flash (créativité, bioclimat)
+# 🔒 technique → Gemma 4 local Souverain (calculs BAEL 91 — données sensibles HORS cloud)
+# 💼 commercial→ Gemini 1.5 Flash (chiffrage Mercuriale, RAG)
+# 🏗️ conducteur→ Gemini 1.5 Flash (planning, synthèse JSON)
 
 designer = Agent(
     role="Architecte Designer Bioclimatique",
@@ -121,20 +143,22 @@ designer = Agent(
     Tu adaptes ton design à la zone climatique indiquée pour minimiser la consommation énergétique.""",
     verbose=True,
     allow_delegation=False,
-    llm=llm
+    llm=llm  # Gemini 1.5 Flash
 )
 
 technique = Agent(
-    role="Ingénieur Structure & Métrés BTP",
+    role="Ingénieur Structure & Métrés BTP — Auditeur BAEL 91 Souverain",
     goal="""Traduire les volumes bruts de béton (extraits de la maquette IFC) en quantitatifs exacts 
     de ressources avec coefficients de pertes en appliquant les dosages de l'OKF et en ajustant 
-    le dimensionnement selon la nature du sol.""",
-    backstory="""Tu es un ingénieur structure chevronné. Tu maîtrises l'Eurocode 2 et les dosages 
-    de ressources (ciment, sable, gravier, acier). Si le sol est marécageux ou instable, tu es très strict : 
-    tu imposes des fondations renforcées (ex: longrines ou radier) et tu augmentes le ratio d'acier par m3 de 20% par précaution.""",
+    le dimensionnement selon la nature du sol. Vérifier la conformité BAEL 91 et Eurocodes.""",
+    backstory="""Tu es un ingénieur structure chevronné formé en Europe et expert du BTP africain. 
+    Tu maîtrises l'Eurocode 2, la norme BAEL 91 et les dosages de ressources (ciment, sable, gravier, acier).
+    Tu travailles en LOCAL SOUVERAIN : les plans de bâtiments gouvernementaux ou privés ne quittent JAMAIS 
+    les serveurs locaux. Si le sol est marécageux ou instable, tu imposes des fondations renforcées 
+    (longrines ou radier) et tu augmentes le ratio d'acier de 20% par précaution géotechnique.""",
     verbose=True,
     allow_delegation=False,
-    llm=llm,
+    llm=llm_gemma4_local,  # 🔒 GEMMA 4 LOCAL (google/gemma-4-12b-qat via LM Studio) — 100% Souverain
     tools=[read_okf_rules_tool]
 )
 

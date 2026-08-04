@@ -243,3 +243,21 @@ export function calculateB2Cestimate(params: B2CParams): ProjectEstimate {
 
   return estimateResult;
 }
+
+export function calculateDevisFromQuantities(quantities: {
+  wallVolumeM3?: number;
+  slabAreaM2?: number;
+  doorCount?: number;
+  windowCount?: number;
+}): ProjectEstimate {
+  const surfaceSol = quantities.slabAreaM2 || 120.0;
+  return calculateB2Cestimate({
+    surfaceSol: surfaceSol,
+    niveaux: 1,
+    hauteurPlafond: 3.0,
+    standing: "moyen",
+    ville: "Yaounde",
+    margeBetPct: 5,
+    margeAleasPct: 5,
+  });
+}

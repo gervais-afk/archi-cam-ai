@@ -69,9 +69,9 @@ pour une bonne ventilation et luminosité naturelle. Surface estimée de plus de
         import pg8000.dbapi
         
         host = os.environ.get("DB_HOST", "127.0.0.1")
-        port = int(os.environ.get("DB_PORT", 5432))
+        port = int(os.environ.get("DB_PORT", 5433))
         user = os.environ.get("DB_USER", "postgres")
-        password = os.environ.get("DB_PASSWORD", "ArchiCamAI_2025_Secure_BIM!")
+        password = os.environ.get("DB_PASSWORD", "postgres")
         database = os.environ.get("DB_NAME", "fdcdb")
         
         conn = pg8000.dbapi.connect(

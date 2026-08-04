@@ -10,6 +10,10 @@ import {
   TrendingUp
 } from "lucide-react";
 
+import { useState } from "react";
+import CesiumBimViewer from "@/components/dashboard/CesiumBimViewer";
+import SovereignBiDashboard from "@/components/dashboard/SovereignBiDashboard";
+
 interface BimAnalysisProps {
   data: {
     concreteVolume: number;
@@ -19,9 +23,21 @@ interface BimAnalysisProps {
     clashes: number;
     complianceScore: number;
   };
+  latitude?: number;
+  longitude?: number;
+  elevation?: number;
+  city?: string;
 }
 
-export default function BimAnalysisPanel({ data }: BimAnalysisProps) {
+export default function BimAnalysisPanel({ 
+  data,
+  latitude,
+  longitude,
+  elevation,
+  city
+}: BimAnalysisProps) {
+  const [showGeospatial3D, setShowGeospatial3D] = useState(false);
+
   return (
     <div className="card-premium p-6 relative overflow-hidden">
       <div className="absolute top-0 right-0 p-8 opacity-5">
@@ -33,12 +49,31 @@ export default function BimAnalysisPanel({ data }: BimAnalysisProps) {
           <Layers className="w-5 h-5 text-wood-ocre" />
           Analyse de la Maquette Numérique (BIM)
         </h3>
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-wood-ocre/10 border border-wood-ocre/20">
-          <span className="text-wood-ocre text-[10px] font-black uppercase tracking-wider">
-            IFC 4.0 Standard
-          </span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowGeospatial3D(!showGeospatial3D)}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-[11px] font-bold transition-all cursor-pointer"
+          >
+            {showGeospatial3D ? "Masquer Insertion 3D" : "🌐 Insertion Urbaine 3D Tiles"}
+          </button>
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-wood-ocre/10 border border-wood-ocre/20">
+            <span className="text-wood-ocre text-[10px] font-black uppercase tracking-wider">
+              IFC 4.0 Standard
+            </span>
+          </div>
         </div>
       </div>
+
+      {showGeospatial3D && (
+        <div className="mb-8">
+          <CesiumBimViewer 
+            latitude={latitude}
+            longitude={longitude}
+            elevation={elevation}
+            city={city}
+          />
+        </div>
+      )}
 
       {/* BIM Metrics */}
       <div className="grid grid-cols-3 gap-4 mb-8">
@@ -129,7 +164,7 @@ export default function BimAnalysisPanel({ data }: BimAnalysisProps) {
       </div>
 
       {/* Technical Tip */}
-      <div className="mt-8 p-4 rounded-xl bg-ai-glow/5 border border-ai-glow/20 flex items-start gap-4">
+      <div className="mt-8 p-4 rounded-xl bg-ai-glow/5 border border-ai-glow/20 flex items-start gap-4 mb-8">
          <Construction className="w-5 h-5 text-ai-glow mt-1" />
          <div>
             <p className="text-white font-bold text-xs">Estimation du ferraillage calculée au ratio local</p>
@@ -137,6 +172,11 @@ export default function BimAnalysisPanel({ data }: BimAnalysisProps) {
                Basé sur une densité moyenne de 90kg/m³ de béton armé pour les zones sismiques modérées au Cameroun.
             </p>
          </div>
+      </div>
+
+      {/* Sovereign BI Dashboard Driven by DuckDB 1.5.5 & OKF v0.2 */}
+      <div className="mt-8">
+         <SovereignBiDashboard />
       </div>
     </div>
   );

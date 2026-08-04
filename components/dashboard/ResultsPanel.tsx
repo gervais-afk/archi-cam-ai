@@ -7,8 +7,10 @@ import BimAnalysisPanel from "./BimAnalysisPanel";
 import EstimateTable from "./EstimateTable";
 import type { UserMode } from "@/types";
 import { mapIfcToEstimate } from "@/lib/bim-mapper";
-import { generateCctpMock } from "@/lib/cctp-service";
+import { generateCctp } from "@/lib/cctp-service";
 import MediaViewerPro from "./MediaViewerPro";
+import PlanComparisonSlider from "@/components/PlanComparisonSlider";
+
 
 interface ResultsPanelProps {
   result:   RenderResult;
@@ -31,7 +33,15 @@ export default function ResultsPanel({ result, mode, onReset }: ResultsPanelProp
   const [currentImageUrl, setCurrentImageUrl] = useState<string>(currentResult.imageUrl);
   const [activeJobId, setActiveJobId] = useState<string | null>(currentResult.videoJobId || null);
 
-  // Override Mode States
+  const [cctpContent, setCctpContent] = useState<string>("Génération du CCTP par l'IA en cours...");
+
+  useEffect(() => {
+    let isMounted = true;
+    generateCctp(currentResult.ifcMetadata, { ville: currentResult.city, standing: currentResult.style })
+      .then((text) => { if (isMounted && text) setCctpContent(text); })
+      .catch(() => { if (isMounted) setCctpContent("CCTP disponible dans le rapport complet."); });
+    return () => { isMounted = false; };
+  }, [currentResult]);
   const [overrideVolBeton, setOverrideVolBeton] = useState<number>(
     currentResult.ifcMetadata?.concreteVolume || 5.0
   );
@@ -445,20 +455,30 @@ export default function ResultsPanel({ result, mode, onReset }: ResultsPanelProp
                   setErrorMessage(null);
                 }}
               />
+              <PlanComparisonSlider
+                originalImageUrl={currentResult.originalPlanUrl || currentResult.previewUrl || currentImageUrl}
+                renderedImageUrl={currentResult.renderUrl || currentImageUrl}
+              />
             </div>
           )}
 
           {activeTab === "analysis" && currentResult.analysis && (
             <div className="animate-slide-up">
                {mode === "b2b" ? (
-                 <BimAnalysisPanel data={{
-                    concreteVolume: currentResult.ifcMetadata?.concreteVolume || 42.5,
-                    steelWeight: currentResult.ifcMetadata?.steelWeight || 3825,
-                    wallArea: currentResult.ifcMetadata?.wallArea || 185,
-                    elementCount: currentResult.ifcMetadata?.elementCount || 154,
-                    clashes: currentResult.ifcMetadata?.clashes || 0,
-                    complianceScore: currentResult.ifcMetadata?.complianceScore || 98
-                 }} />
+                 <BimAnalysisPanel 
+                    data={{
+                      concreteVolume: currentResult.ifcMetadata?.concreteVolume || 42.5,
+                      steelWeight: currentResult.ifcMetadata?.steelWeight || 3825,
+                      wallArea: currentResult.ifcMetadata?.wallArea || 185,
+                      elementCount: currentResult.ifcMetadata?.elementCount || 154,
+                      clashes: currentResult.ifcMetadata?.clashes || 0,
+                      complianceScore: currentResult.ifcMetadata?.complianceScore || 98
+                    }} 
+                    latitude={currentResult.latitude}
+                    longitude={currentResult.longitude}
+                    elevation={currentResult.elevation}
+                    city={currentResult.city}
+                 />
                ) : (
                  <AnalysisPanel analysis={currentResult.analysis} />
                )}
@@ -486,8 +506,8 @@ export default function ResultsPanel({ result, mode, onReset }: ResultsPanelProp
             <div className="card-premium p-8 animate-slide-up h-[600px] overflow-y-auto">
               <div className="prose prose-invert prose-sm max-w-none">
                  <div className="space-y-4">
-                   {(mode === "b2b" ? generateCctpMock(currentResult.ifcMetadata) : currentResult.reportText)
-                     .split('\n').map((line, idx) => {
+                   {(mode === "b2b" ? (cctpContent || "Chargement du CCTP...") : (currentResult.reportText || "Rapport non disponible"))
+                      .split('\n').map((line: string, idx: number) => {
                       if (line.startsWith('## ')) return <h2 key={idx} className="text-wood-ocre text-xl font-bold border-b border-white/5 pb-2 mb-4">{line.replace('## ', '')}</h2>
                       if (line.startsWith('### ')) return <h3 key={idx} className="text-white text-lg font-bold mt-6">{line.replace('### ', '')}</h3>
                       if (line.trim() === '---') return <hr key={idx} className="border-white/5 my-6" />

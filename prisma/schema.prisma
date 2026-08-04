@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserCredit {
+  id           String              @id @default(uuid())
+  userId       String              @unique @map("user_id")
+  balance      Int                 @default(0)
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+  transactions CreditTransaction[]
+
+  @@map("user_credits")
+}
+
+model CreditTransaction {
+  id          String     @id @default(uuid())
+  userId      String     @map("user_id")
+  amount      Int
+  feature     String
+  createdAt   DateTime   @default(now()) @map("created_at")
+  userCredit  UserCredit @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("credit_transactions")
+}
+
+model RenderJob {
+  id           String   @id @default(uuid())
+  projectId    String?  @map("project_id")
+  userId       String?  @map("user_id")
+  mediaType    String   @map("media_type")
+  prompt       String?
+  style        String?
+  status       String   @default("processing")
+  mediaUrl     String?  @map("media_url")
+  falRequestId String?  @map("fal_request_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("render_jobs")
+}

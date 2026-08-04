@@ -1,0 +1,43 @@
+{
+  "version": "1.0.0",
+  "framework": "Object Knowledge Framework (OKF) BTP Cameroun",
+  "mercuriale_ref": "Mercuriale NDA FAMILY 2025 / MIPROMALO",
+  "categories": {
+    "CHAMBRE": {
+      "abbreviations": ["ch", "ch.", "ch 1", "ch 2", "ch 3", "chambre", "ch. princ", "ch. parent", "suite", "master", "bedroom", "dressing"],
+      "material_code": "MAT-REV-PARQUET-01",
+      "material_name": "Parquet Chêne Massif / Bois Iroko",
+      "texture_pattern": "parquet_oak",
+      "real_scale_mm": 1200,
+      "unit_price_fcfa": 18500,
+      "labor_price_fcfa": 3500
+    },
+    "SEJOUR": {
+      "abbreviations": ["salon", "séjour", "sejour", "hall", "dgt", "dégagement", "degagement", "circulation", "living", "salle a manger", "sam"],
+      "material_code": "MAT-REV-MARBRE-01",
+      "material_name": "Marbre Poli Carrara Blanc / Grès Cérame (60x60)",
+      "texture_pattern": "marble_carrara",
+      "real_scale_mm": 600,
+      "unit_price_fcfa": 14500,
+      "labor_price_fcfa": 3000
+    },
+    "PIECE_EAU": {
+      "abbreviations": ["sdb", "s.d.e.", "sde", "toil", "toilette", "wc", "cuisine", "kitchen", "buanderie", "cellier", "bain"],
+      "material_code": "MAT-REV-ARDOISE-01",
+      "material_name": "Faïence Céramique Ardoise Antidérapante (32x32)",
+      "texture_pattern": "slate_ceramic",
+      "real_scale_mm": 320,
+      "unit_price_fcfa": 8500,
+      "labor_price_fcfa": 2500
+    },
+    "EXTERIEUR": {
+      "abbreviations": ["balcon", "terrasse", "deck", "veranda", "véranda", "patio", "jardin", "loggia", "porche"],
+      "material_code": "MAT-REV-TECK-01",
+      "material_name": "Teck Marin & Gazon Tropical Paysagé",
+      "texture_pattern": "teak_decking",
+      "real_scale_mm": 1500,
+      "unit_price_fcfa": 16000,
+      "labor_price_fcfa": 4000
+    }
+  }
+}

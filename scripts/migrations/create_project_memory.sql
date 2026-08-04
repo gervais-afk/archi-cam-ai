@@ -1,5 +1,6 @@
--- Activation de l'extension vector
+-- Activation des extensions nécessaires
 CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS project_memory (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

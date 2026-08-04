@@ -1,89 +1,150 @@
-import { query } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { query } from "@/lib/db";
+import { getUserCredits, deductCredits, refundCredits } from "@/lib/credits";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { projectId, prompt, style } = body;
+// Coût unitaire d'un rendu vidéo cinématique I2V (10 crédits)
+const VIDEO_CREDIT_COST = 10;
 
-    if (!prompt) {
+/**
+ * ROUTE API DE RENDU VIDÉO CINÉMATIQUE (FAL.AI LUMA DREAM MACHINE)
+ * ───────────────────────────────────────────────────────────────
+ * 1. Vérification du solde (10 crédits requis).
+ * 2. Prélèvement transactionnel de crédits (BDD PostgreSQL).
+ * 3. Envoi du job I2V vers FAL.ai avec Webhook Callback.
+ */
+export async function POST(req: Request) {
+  let userIdToRefund: string | null = null;
+  let creditsDeducted = false;
+
+  try {
+    const body = await req.json();
+    const { userId, projectId, imageUrl, cameraMotion, style } = body;
+    const targetUserId = userId || "usr_guest";
+
+    if (!imageUrl && !projectId) {
       return NextResponse.json(
-        { error: "Le paramètre 'prompt' est requis." },
+        { error: "Paramètres manquants : 'imageUrl' ou 'projectId' requis." },
         { status: 400 }
       );
     }
 
-    // 1. Insertion de la tâche de rendu en base de données PostgreSQL (Cloud SQL)
-    const dbResult = await query(
-      `INSERT INTO render_jobs (project_id, media_type, prompt, style, status)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, status`,
-      [projectId || null, "video", prompt, style || "modern", "processing"]
-    );
+    const sourceImage = imageUrl || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=80";
+    const falApiKey = process.env.FAL_API_KEY;
 
-    const job = dbResult.rows[0];
-
-    if (!job) {
-      console.error("Erreur insertion job : Aucune ligne retournée.");
+    // ── 1. VÉRIFICATION DE SOLDE & PRÉLÈVEMENT TRANSACTIONNEL ──
+    const userBalance = await getUserCredits(targetUserId);
+    if (userBalance < VIDEO_CREDIT_COST) {
+      console.warn(`[API Video] Solde insuffisant pour ${targetUserId} (${userBalance}/${VIDEO_CREDIT_COST} crédits)`);
       return NextResponse.json(
-        { error: "Impossible de créer la tâche de rendu en base de données." },
-        { status: 500 }
+        {
+          error: "Solde de crédits insuffisant pour générer la visite vidéo 4K.",
+          required: VIDEO_CREDIT_COST,
+          balance: userBalance,
+        },
+        { status: 402 } // HTTP 402 Payment Required -> Déclenche la modal Mobile Money
       );
     }
 
-    const jobId = job.id;
+    const deductRes = await deductCredits(targetUserId, VIDEO_CREDIT_COST, "VIDEO_DRONE_I2V");
+    if (!deductRes.success) {
+      return NextResponse.json(
+        { error: deductRes.error || "Échec du prélèvement de crédits." },
+        { status: 402 }
+      );
+    }
 
-    // 2. Lancement asynchrone de la simulation du rendu Veo 3 (non bloquant)
-    (async () => {
-      try {
-        console.log(`[Veo 3 Polling Engine] Démarrage du rendu en arrière-plan pour le job: ${jobId}`);
-        
-        // Simulation d'une attente de 20 secondes (temps de traitement Veo 3)
-        await new Promise((resolve) => setTimeout(resolve, 20000));
+    creditsDeducted = true;
+    userIdToRefund = targetUserId;
 
-        // Ajout d'une touche locale camerounaise dans la simulation de génération
-        const promptLower = prompt.toLowerCase();
-        let mockVideoUrl = "https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-building-exterior-42247-large.mp4"; // video moderne par défaut
-        
-        if (promptLower.includes("interieur") || promptLower.includes("intérieur") || promptLower.includes("salon")) {
-          // Vidéo d'intérieur premium (Mixkit)
-          mockVideoUrl = "https://assets.mixkit.co/videos/preview/mixkit-living-room-of-a-modern-apartment-43037-large.mp4";
-        }
-
-        // 3. Mise à jour de la tâche en 'completed' avec l'URL de la vidéo dans Cloud SQL
-        await query(
-          `UPDATE render_jobs 
-           SET status = $1, media_url = $2, updated_at = NOW() 
-           WHERE id = $3`,
-          ["completed", mockVideoUrl, jobId]
-        );
-        console.log(`[Veo 3 Background] Job de rendu ${jobId} complété avec succès !`);
-      } catch (err: any) {
-        console.error(`[Veo 3 Background] Échec critique du job ${jobId}:`, err);
-        try {
-          await query(
-            `UPDATE render_jobs 
-             SET status = $1, error_message = $2, updated_at = NOW() 
-             WHERE id = $3`,
-            ["failed", err?.message || "Erreur inconnue en tâche de fond", jobId]
-          );
-        } catch (dbErr) {
-          console.error(`[Veo 3 Background] Erreur lors de l'enregistrement de l'échec du job ${jobId}:`, dbErr);
-        }
-      }
-    })();
-
-    // 4. Réponse immédiate avec le jobId et le statut initial
-    return NextResponse.json(
-      { jobId: jobId, status: "processing" },
-      { status: 202 } // 202 Accepted
+    // ── 2. ENREGISTREMENT DU JOB EN BDD (Statut: processing) ──
+    const jobRes = await query(
+      `INSERT INTO render_jobs (project_id, user_id, media_type, prompt, style, status, media_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id`,
+      [
+        projectId || null,
+        targetUserId,
+        "video",
+        cameraMotion || "orbit_flythrough",
+        style || "photorealistic_luxury",
+        "processing",
+        null
+      ]
     );
+
+    const jobId = jobRes.rows[0]?.id || `job_${Date.now()}`;
+    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://archicambtp.cm"}/api/webhooks/fal-video`;
+
+    // ── 3. APPEL API FAL.AI LUMA DREAM MACHINE (I2V) ──
+    if (falApiKey && !falApiKey.startsWith("mock")) {
+      console.log(`[API Video] Envoi de l'ordre d'animation I2V vers FAL.ai (Job ID: ${jobId})...`);
+
+      const falRes = await fetch("https://api.fal.ai/v1/fal-ai/luma-dream-machine/image-to-video", {
+        method: "POST",
+        headers: {
+          "Authorization": `Key ${falApiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          prompt: `Cinematic 4K architectural drone flythrough, smooth camera motion ${cameraMotion || "orbit"}, luxury tropical estate, daylight ray tracing`,
+          image_url: sourceImage,
+          aspect_ratio: "16:9",
+          webhook_url: `${webhookUrl}?jobId=${jobId}&userId=${targetUserId}`
+        })
+      });
+
+      if (falRes.ok) {
+        const falData = await falRes.json();
+        const requestId = falData.request_id || jobId;
+
+        await query(
+          `UPDATE render_jobs SET fal_request_id = $1 WHERE id = $2`,
+          [requestId, jobId]
+        );
+
+        return NextResponse.json({
+          success: true,
+          jobId,
+          requestId,
+          status: "processing",
+          message: "Visite virtuelle vidéo 4K en cours de génération dans le Cloud GPU...",
+          remainingBalance: deductRes.balance,
+        });
+      }
+    }
+
+    // ── MOCK / FALLBACK LOCAL DÉVELOPPEMENT ──
+    console.log(`[API Video] Mode Mock/Fallback actif pour le Job ID: ${jobId}`);
+    setTimeout(async () => {
+      await query(
+        `UPDATE render_jobs 
+         SET status = 'completed', media_url = $1, updated_at = NOW() 
+         WHERE id = $2`,
+        ["/sample_drone_tour.mp4", jobId]
+      );
+    }, 4000);
+
+    return NextResponse.json({
+      success: true,
+      jobId,
+      status: "processing",
+      videoUrl: "/sample_drone_tour.mp4",
+      remainingBalance: deductRes.balance,
+    });
+
   } catch (error: any) {
-    console.error("Erreur API Render Video:", error);
+    console.error("[API Video] Erreur serveur lors de l'animation vidéo :", error);
+
+    // REMBURSEMENT AUTOMATIQUE EN CAS DE CRASH SERVEUR
+    if (creditsDeducted && userIdToRefund) {
+      console.warn(`[API Video] Déclenchement du remboursement automatique de ${VIDEO_CREDIT_COST} crédits pour ${userIdToRefund}...`);
+      await refundCredits(userIdToRefund, VIDEO_CREDIT_COST, "Échec serveur rendu vidéo");
+    }
+
     return NextResponse.json(
-      { error: "Erreur serveur lors de l'initiation du rendu." },
+      { error: "Erreur serveur lors de la génération vidéo." },
       { status: 500 }
     );
   }

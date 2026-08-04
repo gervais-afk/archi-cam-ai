@@ -15,9 +15,15 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Download, FileSpreadsheet, Info, CheckCircle2 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { formatCurrency } from "@/lib/utils";
 import { ProjectEstimate, UserMode } from "@/types";
 import Spinner from "@/components/ui/Spinner";
+
+const ExportDevisButton = dynamic(
+  () => import("@/components/pdf/ExportDevisButton").then((mod) => mod.ExportDevisButton),
+  { ssr: false }
+);
 
 
 // ─── MOCK DATA RÉALISTE BTP CAMEROUN ────────────────────────────────────────
@@ -84,17 +90,24 @@ export default function EstimateTable({ estimate, mode, devisId, highlightedCode
       <div className="bg-[#121212] border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
         <div className="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3 mb-1">
+            <div className="flex items-center gap-3 mb-1 flex-wrap">
               <h2 className="text-white font-black text-xl tracking-tight uppercase">
                 Détail Quantitatif Estimatif (DQE)
               </h2>
               <div className="px-2 py-0.5 rounded-md bg-emerald-400/10 border border-emerald-400/20 flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Base de prix : Douala 2026</span>
+                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Base : MINMAP 2026</span>
+              </div>
+              <div className="px-2.5 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[9px] font-black uppercase tracking-widest">
+                Pertes &amp; Chutes (+5% à +10%) Incluses
+              </div>
+              <div className="px-2.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-widest flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-amber-400" />
+                Visa Ingénieur ONIGC : En attente
               </div>
             </div>
             <p className="text-anthracite-500 text-xs font-medium italic">
-              Généré par intelligence artificielle à partir de l&apos;analyse géométrique de l&apos;IFC.
+              Conforme SCoT BTP Cameroun v0.2 — Formules physiques attestées &amp; Majoration logistique météo appliquée.
             </p>
           </div>
 
@@ -213,11 +226,28 @@ export default function EstimateTable({ estimate, mode, devisId, highlightedCode
 
         {/* ── RÉSUMÉ FINANCIER ─────────────────────────────────────────────── */}
         <div className="p-8 bg-white/[0.01] flex flex-col md:flex-row items-end justify-between gap-8">
-          <div className="flex items-start gap-3 max-w-xs">
-            <Info className="w-4 h-4 text-anthracite-600 mt-1" />
-            <p className="text-[10px] text-anthracite-600 leading-relaxed italic">
-              Note : Ce devis est une estimation automatique. Il doit être validé par un ingénieur métré avant toute contractualisation. Taux de TVA appliqué : 19.25%.
-            </p>
+          <div className="flex flex-col items-start gap-4 max-w-xs">
+            <div className="flex items-start gap-3">
+              <Info className="w-4 h-4 text-anthracite-600 mt-1" />
+              <p className="text-[10px] text-anthracite-600 leading-relaxed italic">
+                Note : Ce devis est une estimation automatique. Il doit être validé par un ingénieur métré avant toute contractualisation. Taux de TVA appliqué : 19.25%.
+              </p>
+            </div>
+            {/* BOUTON D'EXPORTATION PDF VECTORIEL ARCHITECTE */}
+            <div className="pt-2">
+              <ExportDevisButton
+                projectData={{
+                  title: "Duplex R+1 Contemporain",
+                  client: "Client Archi Cam AI",
+                  devisItems: linesToRender.map((line) => ({
+                    description: line.label,
+                    quantity: line.quantity,
+                    unit: line.unit,
+                    unitPriceFCFA: line.unitPrice,
+                  })),
+                }}
+              />
+            </div>
           </div>
 
           <div className="w-full md:w-80 space-y-3">

@@ -1,0 +1,12 @@
+node_modules
+.next
+.venv
+.git
+.pytest_cache
+scratch
+dataconnect-debug.log
+firebase-debug.log
+firestore-debug.log
+pglite-debug.log
+*.png
+*.bcfzip

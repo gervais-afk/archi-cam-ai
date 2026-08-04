@@ -1,6 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { verifyFirebaseToken } from "@/lib/firebase-server";
+import { Pool } from "pg";
+import { queryGraphRAG } from "@/src/tools/graphRAGReasoner";
+
+// ── Pool PostgreSQL dédié aux prix mercuriale (Phase 3) ──────────────────────
+const _mercurialePool = new Pool({
+  connectionString:
+    process.env.DATABASE_URL ||
+    "postgresql://postgres:ArchiCamAI_2025_Secure_BIM!@127.0.0.1:5432/fdcdb",
+});
+
+/**
+ * Récupère les prix unitaires officiels MINMAP 2026 depuis PostgreSQL.
+ * Retourne une chaîne formatée prête à être injectée dans le prompt système.
+ */
+async function fetchMercurialeFromDB(ville: string = "Yaounde"): Promise<string> {
+  try {
+    const result = await _mercurialePool.query(
+      `SELECT designation, unite, prix_unitaire_fcfa, categorie
+       FROM mercuriale_minmap
+       WHERE LOWER(ville) = LOWER($1) OR ville = 'National'
+       ORDER BY categorie, designation
+       LIMIT 80`,
+      [ville]
+    );
+    if (!result.rows.length) return "";
+    const rows = result.rows
+      .map(
+        (r: any) =>
+          `  • [${r.categorie}] ${r.designation} — ${Number(r.prix_unitaire_fcfa).toLocaleString("fr-FR")} FCFA/${r.unite}`
+      )
+      .join("\n");
+    return `\n\n=== BASE DE PRIX OFFICIELS MINMAP 2026 (${ville}) ===\n${rows}\n=== FIN DES PRIX OFFICIELS ===`;
+  } catch (err: any) {
+    console.warn("[Researcher] Impossible de lire la mercuriale PostgreSQL :", err.message);
+    return "";
+  }
+}
 
 const geminiApiKey = process.env.GEMINI_API_KEY || "";
 
@@ -78,7 +115,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { message, agent = "router", history = [], model = "gemini-1.5-flash", attachment, projectId } = await req.json();
+    const { message, agent = "router", history = [], model = "gemini-2.5-flash", attachment, projectId } = await req.json();
 
     if (!message && !attachment) {
       return NextResponse.json({ error: "Message or attachment is required" }, { status: 400 });
@@ -95,7 +132,7 @@ export async function POST(req: NextRequest) {
         agent,
         sources: [],
         usedRAG: true,
-        model: "gemini-1.5-flash"
+        model: "gemini-2.5-flash"
       });
     }
 
@@ -195,7 +232,34 @@ export async function POST(req: NextRequest) {
 
     // 4. Formulate System Prompt with ADK Profile & Context
     const basePrompt = AGENT_SYSTEM_PROMPTS[agent] || AGENT_SYSTEM_PROMPTS.router;
-    const finalSystemPrompt = `${basePrompt}${contextString}
+
+    // ── Phase 3 : Enrichissement dynamique de l'Agent Researcher ─────────────
+    let mercurialeCtx = "";
+    if (agent === "researcher") {
+      // Extraire la ville depuis le message si mentionnée (Yaoundé / Douala / Bafoussam)
+      const villeMatch = (message || "").match(/yaound[ée]|douala|bafoussam/i);
+      const villeResearcher = villeMatch
+        ? villeMatch[0].charAt(0).toUpperCase() + villeMatch[0].slice(1)
+        : "Yaounde";
+      mercurialeCtx = await fetchMercurialeFromDB(villeResearcher);
+    }
+
+    // ── Neo4j GraphRAG : Parcours de Graphe Sémantique & Contrôle ABAC ────────
+    let graphContext = "";
+    try {
+      if (message && message.trim().length > 3) {
+        const userRole = agent === "engineer" ? "INGENIEUR" : agent === "architect" ? "ARCHITECTE" : "CLIENT";
+        const graphRes = await queryGraphRAG(message.trim(), userRole as any, 2);
+        if (graphRes && graphRes.nodesFound > 0) {
+          graphContext = `\n\n${graphRes.oagContext}\n=== FIN CONTEXTE NEO4J ===\n`;
+          console.log(`[Neo4j GraphRAG] ${graphRes.nodesFound} nœuds ontologiques trouvés pour "${message.slice(0, 30)}..."`);
+        }
+      }
+    } catch (graphErr: any) {
+      console.warn("[Neo4j GraphRAG] Information indisponible :", graphErr.message || graphErr);
+    }
+
+    const finalSystemPrompt = `${basePrompt}${contextString}${graphContext}${mercurialeCtx}
     
     CONSIGNES CRITIQUES :
     - Utilise le contexte local RAG ci-dessus pour répondre de façon extrêmement précise et documentée.
@@ -265,10 +329,12 @@ export async function POST(req: NextRequest) {
     });
 
     // Enforce an actual multimodal model for safety
-    const apiModel = "gemini-1.5-flash";
+    const apiModel = "gemini-2.5-flash";
     console.log(`[RAG API] Initiating content generation with ${apiModel}...`);
 
     // 6. Request Gemini content generation
+    // ── Phase 3 : Google Search Grounding pour l'Agent Researcher ─────────────
+    const useGrounding = agent === "researcher";
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${geminiApiKey}`,
       {
@@ -282,7 +348,11 @@ export async function POST(req: NextRequest) {
           generationConfig: {
             temperature: 0.3,
             maxOutputTokens: 2048
-          }
+          },
+          // Grounding Search activé uniquement pour le Researcher (prix marché live)
+          ...(useGrounding && {
+            tools: [{ googleSearch: {} }],
+          }),
         })
       }
     );

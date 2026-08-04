@@ -78,7 +78,17 @@ def train_pipeline():
     logging.info(f"   MAE  : {mae:,.0f} XAF")
     logging.info(f"   R²   : {r2:.4f}")
     
-    # Sauvegarde des métriques et du rapport de modèle
+    # ---------------------------------------------------------------
+    # Sauvegarde du modèle entraîné (pickle) pour usage LIVE FastMCP
+    # Le tool MCP 'predict_cost_ml' charge ce fichier à chaque requête
+    # ---------------------------------------------------------------
+    import pickle
+    model_pkl_path = MODELS_DIR / "cost_predictor.pkl"
+    with open(model_pkl_path, "wb") as f:
+        pickle.dump({"model": model, "feature_names": list(X.columns)}, f)
+    logging.info(f"💾 Modèle ML sérialisé (pickle) → {model_pkl_path}")
+    
+    # Sauvegarde des métriques et du rapport de modèle (model card MLOps)
     model_card = {
         "model_type": "GradientBoostingRegressor",
         "dataset_samples": len(df),
@@ -86,14 +96,16 @@ def train_pipeline():
             "mae_xaf": round(mae, 2),
             "r2_score": round(r2, 4)
         },
-        "features": list(X.columns)
+        "features": list(X.columns),
+        "pipeline_integration": "fastmcp/main.py → predict_cost_ml()"
     }
     
     card_path = MODELS_DIR / "cost_predictor_card.json"
     with open(card_path, "w", encoding="utf-8") as f:
         json.dump(model_card, f, indent=2, ensure_ascii=False)
         
-    logging.info(f"💾 Fiche du modèle MLOps sauvegardée dans {card_path}")
+    logging.info(f"💾 Fiche MLOps sauvegardée → {card_path}")
+    logging.info(f"🚀 Modèle prêt pour usage LIVE via l'outil MCP 'predict_cost_ml'")
 
 if __name__ == "__main__":
     train_pipeline()

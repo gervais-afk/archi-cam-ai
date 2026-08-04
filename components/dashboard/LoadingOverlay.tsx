@@ -17,7 +17,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import * as Progress from "@radix-ui/react-progress";
-import { CheckCircle2, Box, Layers, Cpu, Database, FileText } from "lucide-react";
+import { CheckCircle2, Box, Layers, Cpu, Database, FileText, Loader2, Sparkles } from "lucide-react";
 import { GENERATION_STEPS } from "@/lib/mock-data";
 import type { GenerationStep } from "@/types";
 
@@ -29,11 +29,17 @@ interface LoadingOverlayProps {
 
 // ─── Steps B2B avec icônes dédiées ──────────────────────────────────────────
 const BIM_STEPS: (GenerationStep & { icon: React.ReactNode })[] = [
-  { id: 1, label: "Initialisation du moteur IfcOpenShell...",    duration: 1500, icon: <Cpu       className="w-4 h-4" /> },
-  { id: 2, label: "Extraction de la géométrie (murs, dalles)...", duration: 2000, icon: <Box       className="w-4 h-4" /> },
-  { id: 3, label: "Audit des matériaux et ferraillage...",         duration: 2500, icon: <Layers    className="w-4 h-4" /> },
-  { id: 4, label: "Matching avec la mercuriale Postgres...",       duration: 1500, icon: <Database  className="w-4 h-4" /> },
-  { id: 5, label: "Génération du DQE et du CCTP...",              duration: 2000, icon: <FileText  className="w-4 h-4" /> },
+  { id: 1, label: "Initialisation du moteur IfcOpenShell...",    duration: 4000, icon: <Cpu       className="w-4 h-4" /> },
+  { id: 2, label: "Extraction de la géométrie (murs, dalles)...", duration: 5000, icon: <Box       className="w-4 h-4" /> },
+  { id: 3, label: "Audit des matériaux et ferraillage...",         duration: 5000, icon: <Layers    className="w-4 h-4" /> },
+  { id: 4, label: "Matching avec la mercuriale Postgres...",       duration: 4000, icon: <Database  className="w-4 h-4" /> },
+  { id: 5, label: "Génération du DQE et du CCTP...",              duration: 5000, icon: <FileText  className="w-4 h-4" /> },
+];
+
+const FINALIZATION_MESSAGES = [
+  "L'IA applique les finitions photoréalistes et textures 2.5D...",
+  "Calcul déterministe DuckDB & Mercuriale BTP Cameroun en cours...",
+  "Optimisation de l'affichage HD et préparation du tableau de bord..."
 ];
 
 // ─── Composant principal ─────────────────────────────────────────────────────
@@ -41,7 +47,17 @@ export default function LoadingOverlay({ onComplete, mode }: LoadingOverlayProps
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedSteps,   setCompletedSteps]   = useState<number[]>([]);
   const [progress,         setProgress]         = useState(0);
+  const [finalMsgIdx,      setFinalMsgIdx]      = useState(0);
   const laserControls = useAnimation();
+
+  // Rotation des messages de finalisation quand on atteint 100%
+  useEffect(() => {
+    if (progress < 100) return;
+    const interval = setInterval(() => {
+      setFinalMsgIdx(prev => (prev + 1) % FINALIZATION_MESSAGES.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [progress]);
 
   // Sélection des étapes selon le mode
   const steps = mode === "b2b" ? BIM_STEPS : GENERATION_STEPS.map(s => ({ ...s, icon: null }));
@@ -311,14 +327,71 @@ export default function LoadingOverlay({ onComplete, mode }: LoadingOverlayProps
                 );
               })}
             </div>
+
+            {/* ── Indicateur visuel d'attente à 100% (Temps de réponse du serveur API) ── */}
+            {progress === 100 && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                className="mt-5 p-3.5 rounded-2xl border flex items-center justify-between gap-3 shadow-lg backdrop-blur-md"
+                style={{
+                  borderColor: mode === "b2b" ? "rgba(0,240,255,0.3)" : "rgba(197,160,89,0.35)",
+                  background: mode === "b2b" 
+                    ? "linear-gradient(135deg, rgba(0,240,255,0.08) 0%, rgba(0,102,255,0.05) 100%)"
+                    : "linear-gradient(135deg, rgba(197,160,89,0.12) 0%, rgba(226,196,141,0.05) 100%)"
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 animate-spin" style={{ color: mode === "b2b" ? "#00F0FF" : "#C5A059" }} />
+                    <Sparkles className="w-2.5 h-2.5 absolute text-white animate-pulse" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-white tracking-wide flex items-center gap-1.5">
+                      Finalisation du Rendu 4K & Devis
+                    </p>
+                    <AnimatePresence mode="wait">
+                      <motion.p
+                        key={finalMsgIdx}
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.3 }}
+                        className="text-[10px] text-zinc-300 font-medium"
+                      >
+                        {FINALIZATION_MESSAGES[finalMsgIdx]}
+                      </motion.p>
+                    </AnimatePresence>
+                  </div>
+                </div>
+                <span className="flex h-2.5 w-2.5 relative shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: mode === "b2b" ? "#00F0FF" : "#C5A059" }} />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ background: mode === "b2b" ? "#00F0FF" : "#C5A059" }} />
+                </span>
+              </motion.div>
+            )}
+          </div>
+
+          {/* ── Astuce / Fiche Matériaux Locaux OKF ──────────────────────────── */}
+          <div className="px-8 pb-4">
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-left">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-amber-400 uppercase tracking-widest">
+                <span>💡 Fiche Matériaux OKF BTP Cameroun</span>
+              </div>
+              <p className="mt-1 text-[11px] text-slate-300 leading-snug">
+                {currentStepIndex % 3 === 0 && "La Pierre Volcanique d'Edéa assure un déphasage thermique optimal pour le soubassement des villas."}
+                {currentStepIndex % 3 === 1 && "Les Blocs de Terre Comprimée (BTC MIPROMALO) offrent un gain de 22% sur le lot maçonnerie et régulent l'humidité."}
+                {currentStepIndex % 3 === 2 && "Le bois Iroko imputrescible est préconisé pour les bardages et vérandas en climat tropical."}
+              </p>
+            </div>
           </div>
 
           {/* ── Footer ─────────────────────────────────────────────────────── */}
           <div className="px-8 pb-6 text-center">
-            <p className="text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: "#2A2A2F" }}>
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: "#52525B" }}>
               {mode === "b2b"
-                ? "Archi-Cam AI Engine v2.0 • Analyse BIM Certifiée"
-                : "Ne fermez pas cette fenêtre • Rendu 4K en haute qualité"}
+                ? "Archi-Cam AI Engine v2.5 • Analyse BIM IFC Certifiée OKF"
+                : "Ne fermez pas cette fenêtre • Rendu 4K & Devis Mercuriale BTP"}
             </p>
           </div>
 

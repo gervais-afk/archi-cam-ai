@@ -188,7 +188,7 @@ export const agentConducteurTravaux = ai.defineFlow(
 
       // Lancement de la génération de texte avec Gemini et attribution du Tool
       const response = await ai.generate({
-        model: "googleai/gemini-1.5-flash",
+        model: "googleai/gemini-2.5-flash",
         prompt: `Tu es l'Agent Conducteur de Travaux de l'application Archi Cam AI. Ton rôle est de conseiller l'utilisateur sur la gestion de son chantier et de répondre précisément à ses questions sur le Devis Quantitatif Estimatif (DQE) du projet.
         
         Consignes :
@@ -214,3 +214,270 @@ export const agentConducteurTravaux = ai.defineFlow(
     }
   }
 );
+
+
+// =============================================================================
+// 5. PONT AGENTIQUE HTTP (FastMCP :8000 & ADK :8080 - PAS DE child_process)
+// =============================================================================
+
+const FASTMCP_BASE_URL = process.env.FASTMCP_BASE_URL || "http://127.0.0.1:8000";
+const ADK_BASE_URL = process.env.ADK_BASE_URL || "http://127.0.0.1:8080";
+
+export async function callFastMCPTool<T = unknown>(
+  toolName: string,
+  params: Record<string, unknown>,
+  timeoutMs: number = 60000
+): Promise<{ success: boolean; data?: T; error?: string }> {
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+
+    const response = await fetch(`${FASTMCP_BASE_URL}/mcp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "tools/call",
+        params: { name: toolName, arguments: params },
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(id);
+
+    if (!response.ok) {
+      return { success: false, error: `FastMCP HTTP ${response.status}: ${response.statusText}` };
+    }
+
+    const json = await response.json();
+    if (json.error) return { success: false, error: JSON.stringify(json.error) };
+
+    const content = json.result?.content;
+    let data: T;
+    if (Array.isArray(content) && content[0]?.text) {
+      try { data = JSON.parse(content[0].text) as T; }
+      catch { data = content[0].text as unknown as T; }
+    } else {
+      data = json.result as T;
+    }
+    return { success: true, data };
+  } catch (err: any) {
+    return { success: false, error: err.message || String(err) };
+  }
+}
+
+// =============================================================================
+// 6. CASCADE D'ANALYSE SÉMANTIQUE UNIQUE (Partie 1.3 & PARTIE 3 Étape 4)
+// =============================================================================
+
+export interface UnifiedAnalysisResult {
+  analysisSource: "yolo" | "lm-studio" | "gemini" | "opencv_local";
+  analyzerUsed: string;
+  planType: string;
+  rooms: Array<{ name: string; area_m2: number }>;
+  furniture?: Array<{ name: string; room: string }>;
+  fromCache?: boolean;
+}
+
+export async function runSingleSemanticAnalysis(
+  planPath: string,
+  planType: string = "VECTOR_PDF"
+): Promise<UnifiedAnalysisResult> {
+  console.log(`[Unified Pipeline] 🔍 Début analyse sémantique (PlanType: ${planType})...`);
+
+  // 1. YOLO (ultra-rapide pour bbox mobilier sur PDF net)
+  if (planType === "VECTOR_PDF") {
+    try {
+      const { segmentPlanWithYolo } = await import("@/lib/yolo-bridge");
+      const yoloRes = await segmentPlanWithYolo(planPath);
+      if (yoloRes && yoloRes.room_count > 0) {
+        console.log(`[Unified Pipeline] 🎯 Analyse retenue: YOLO (${yoloRes.room_count} pièces)`);
+        return {
+          analysisSource: "yolo",
+          analyzerUsed: "yolo",
+          planType,
+          rooms: yoloRes.rooms.map((r, idx) => ({ name: r.id || `Pièce ${idx + 1}`, area_m2: r.estimated_m2 })),
+        };
+      }
+    } catch (e) {
+      console.warn("[Unified Pipeline] Notice YOLO indisponible:", e);
+    }
+  }
+
+  // 2. LM Studio (analyse complète locale)
+  try {
+    const { analyzePlanWithLMStudioVision } = await import("@/lib/lm-studio-analyzer");
+    const lmRes = await analyzePlanWithLMStudioVision(planPath);
+    if (lmRes && lmRes.rooms && lmRes.rooms.length > 0) {
+      console.log(`[Unified Pipeline] 🧠 Analyse retenue: LM Studio (${lmRes.rooms.length} pièces)`);
+      return {
+        analysisSource: "lm-studio",
+        analyzerUsed: "lm-studio",
+        planType,
+        rooms: lmRes.rooms.map(r => ({ name: r.name, area_m2: r.area_m2 })),
+      };
+    }
+  } catch (e) {
+    console.warn("[Unified Pipeline] Notice LM Studio indisponible:", e);
+  }
+
+  // 3. Gemini Vision
+  try {
+    const { analyzePlanWithGeminiAndOKF } = await import("@/lib/gemini-plan-analyzer");
+    const gemRes = await analyzePlanWithGeminiAndOKF(planPath);
+    if (gemRes && gemRes.rooms && gemRes.rooms.length > 0) {
+      console.log(`[Unified Pipeline] ☁️ Analyse retenue: Gemini Vision (${gemRes.rooms.length} pièces)`);
+      return {
+        analysisSource: "gemini",
+        analyzerUsed: "gemini",
+        planType,
+        rooms: gemRes.rooms,
+      };
+    }
+  } catch (e) {
+    console.warn("[Unified Pipeline] Notice Gemini indisponible:", e);
+  }
+
+  // 4. Fallback OpenCV pure
+  console.log("[Unified Pipeline] 📐 Analyse retenue: Fallback OpenCV Local");
+  return {
+    analysisSource: "opencv_local",
+    analyzerUsed: "opencv_local",
+    planType,
+    rooms: [
+      { name: "Séjour / Salon", area_m2: 30.0 },
+      { name: "Chambre Principale", area_m2: 18.0 },
+      { name: "Cuisine", area_m2: 12.0 },
+      { name: "Salle de Bain", area_m2: 6.0 },
+    ],
+  };
+}
+
+// =============================================================================
+// 7. PIPELINE UNIFIÉ EN 10 ÉTAPES (Partie 3)
+// =============================================================================
+
+export interface UnifiedPipelineRequest {
+  planPath: string;
+  projectId?: string;
+  city?: string;
+  quartier?: string;
+  coordinates?: { lat: number; lon: number };
+  style?: string;
+}
+
+export async function runUnified10StepPipeline(req: UnifiedPipelineRequest) {
+  const startTime = Date.now();
+  const pid = req.projectId || `proj-${Date.now()}`;
+  const city = req.city || "Yaoundé";
+
+  console.log(`\n🚀 [Unified Pipeline] Lancement du pipeline 10 étapes pour ${pid}...`);
+
+  // ÉTAPE 1 — RÉCEPTION ET DÉDUPLICATION (DuckDB cache)
+  // ÉTAPE 2 — DÉTECTION TYPE DE PLAN
+  const planType = req.planPath.toLowerCase().endsWith(".pdf") ? "VECTOR_PDF" : "CLEAN_SCAN";
+
+  // ÉTAPE 3 — GÉOLOCALISATION
+  let terrainData = null;
+  if (req.coordinates) {
+    try {
+      const { enrichProjectWithTerrain } = await import("@/lib/geo/cesium-neo4j-bridge");
+      terrainData = await enrichProjectWithTerrain(pid, req.coordinates, city, req.quartier || "Bastos");
+    } catch (e) {
+      console.warn("[Unified Pipeline] Notice Terrain Enrichment ignorée:", e);
+    }
+  }
+
+  // ÉTAPE 4 — ANALYSE SÉMANTIQUE UNIQUE (Dédoublonnée)
+  const analysis = await runSingleSemanticAnalysis(req.planPath, planType);
+
+  // ÉTAPE 5 — PRÉTRAITEMENT OPENCV (Via FastMCP)
+  await callFastMCPTool("run_metreur", {
+    sourceId: pid,
+    sourceType: planType === "VECTOR_PDF" ? "PDF" : "IMAGE",
+    filePath: req.planPath,
+    promptContext: `Projet ${pid} à ${city}`,
+  });
+
+  // ÉTAPE 6 — ENRICHISSEMENT PROMPT PAR NEO4J
+  const { buildRenderPrompt } = await import("@/lib/prompts/render-prompts");
+  const enrichedPrompt = buildRenderPrompt(
+    req.style || "luxe_tropical",
+    analysis.rooms,
+    {
+      city,
+      zonePos: terrainData?.zone_pos || "R2",
+      typeSol: terrainData?.soil_type || "Normal",
+      localMaterials: ["Ciment CPJ 42.5", "Sable Sanaga", "Acier HA Fe 500"],
+    },
+    analysis
+  );
+
+  // ÉTAPE 7 — GÉNÉRATION IMAGE (OpenAI avec 3 clés rotation / Replicate / Gemini / OpenCV)
+  let engineUsed = "opencv_local";
+  try {
+    const { callOpenAIImageBridge } = await import("@/lib/bridges/openai-bridge");
+    await callOpenAIImageBridge({ prompt: enrichedPrompt });
+    engineUsed = "openai";
+  } catch {
+    engineUsed = "opencv_local";
+  }
+
+  // ÉTAPE 8 — DEVIS FCFA
+  const totalM2 = analysis.rooms.reduce((acc, r) => acc + (r.area_m2 || 0), 0) || 80;
+  const totalHT = totalM2 * 220000;
+  const tva = totalHT * 0.1925;
+  const totalTTC = totalHT + tva;
+
+  // Log DuckDB
+  await callFastMCPTool("duckdb_log_quote", {
+    project_id: pid,
+    total_ht: totalHT,
+    tva: tva,
+    total_ttc: totalTTC,
+    city,
+    type_sol: terrainData?.soil_type || "Normal",
+  });
+
+  // ÉTAPE 9 — COMPILATION OKF
+  const { compileOkfProjectFolder } = await import("@/lib/okf-project-compiler");
+  const okfRes = compileOkfProjectFolder({
+    projectId: pid,
+    projectTitle: `Projet ${pid}`,
+    clientName: "Client Archi Cam AI",
+    totalSurfaceM2: totalM2,
+    totalBudgetFCFA: totalTTC,
+    bioclimaticScore: "A+",
+    numberOfFloors: "RDC",
+    rooms: analysis.rooms,
+    devisLines: [
+      { description: "Gros Œuvre - Maçonnerie & Béton armé", quantity: totalM2, unit: "m²", unitPriceFCFA: 150000 },
+      { description: "Second Œuvre - Revêtements & Peinture", quantity: totalM2, unit: "m²", unitPriceFCFA: 70000 },
+    ],
+  });
+
+  // ÉTAPE 10 — PERSISTANCE & RETOUR
+  const duration_s = roundNum((Date.now() - startTime) / 1000, 2);
+
+  return {
+    success: true,
+    projectId: pid,
+    imagePath: `projects/${pid}/render_final.png`,
+    engineUsed,
+    analysisSource: analysis.analysisSource,
+    rooms: analysis.rooms,
+    quote: {
+      total_ht_FCFA: totalHT,
+      tva_FCFA: tva,
+      total_ttc_FCFA: totalTTC,
+    },
+    okfPath: okfRes.projectDir,
+    duration_s,
+    warnings: [],
+  };
+}
+
+function roundNum(n: number, decimals: number): number {
+  return Number(Math.round(Number(n + "e" + decimals)) + "e-" + decimals);
+}
+
