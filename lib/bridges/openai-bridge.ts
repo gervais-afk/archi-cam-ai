@@ -32,7 +32,7 @@ const MODEL_PARAMS: Record<SupportedImageModel, {
     defaultSize: "1024x1024",
     supportsQuality: true,
     supportsResponseFormat: false,
-    supportsStyle: true,
+    supportsStyle: false,
   },
   "dall-e-2": {
     supportedSizes: ["256x256", "512x512", "1024x1024"],
