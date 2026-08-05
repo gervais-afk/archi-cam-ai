@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- font-encoding: utf-8 -*-
 """
-CLEAN PLAN PROCESSOR — ARCHI CAM AI
-───────────────────────────────────
+CLEAN PLAN PROCESSOR V2 — ARCHI CAM AI
+──────────────────────────────────────
 1. Rasterisation HD des plans PDF/PNG et export d'une image d'aperçu PNG d'origine (_preview.png).
-2. Binarisation adaptative douce (21x5) & fermeture morphologique (3x3 puis 5x5).
-3. Export de _clean_plan.png (murs anthracite #1E293B sur fond blanc pur #FFFFFF) et _text.png.
+2. Binarisation adaptative douce & isolation du polygone englobant principal du bâtiment.
+3. Suppression automatique des cotations extérieures (flèches, dimensions, marges).
+4. Fermeture morphologique stricte (9x9) pour étanchéité parfaite des pièces sans fuite de texture.
+5. Conservation nette du cartouche architectural en bas de page sans artefacts noirs.
 """
 
 import os
@@ -49,12 +51,50 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> np.ndarray:
     closed = cv2.morphologyEx(closed, cv2.MORPH_CLOSE, kernel5)
     return closed
 
+def detect_building_envelope(binary_walls: np.ndarray, width: int, height: int) -> np.ndarray:
+    """
+    Isole le polygone englobant principal du bâtiment et efface les cotations extérieures.
+    """
+    building_mask = np.zeros((height, width), dtype=np.uint8)
+    cartouche_y_limit = int(height * 0.85)
+
+    # Zone de recherche principale (hors cartouche bas)
+    search_zone = binary_walls.copy()
+    search_zone[cartouche_y_limit:, :] = 0
+
+    # Marges extérieures (effacer les cotations sur 8% des bords)
+    margin_x = int(width * 0.07)
+    margin_y = int(height * 0.07)
+    search_zone[:margin_y, :] = 0
+    search_zone[:, :margin_x] = 0
+    search_zone[:, width - margin_x:] = 0
+
+    cnts, _ = cv2.findContours(search_zone, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not cnts:
+        # Fallback si aucun contour majeur : autoriser le centre 85%
+        building_mask[margin_y:cartouche_y_limit, margin_x:width - margin_x] = 255
+        return building_mask
+
+    # Trier les contours par surface délimitée
+    large_cnts = [c for c in cnts if cv2.contourArea(c) > 2000]
+    if large_cnts:
+        all_pts = np.vstack(large_cnts)
+        hull = cv2.convexHull(all_pts)
+        cv2.drawContours(building_mask, [hull], -1, 255, -1)
+        # Dilater légèrement (15px) pour inclure les murs extérieurs d'enceinte
+        kernel_exp = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
+        building_mask = cv2.dilate(building_mask, kernel_exp)
+    else:
+        building_mask[margin_y:cartouche_y_limit, margin_x:width - margin_x] = 255
+
+    return building_mask
+
 def clean_and_separate_plan_layers(input_path: str, output_path: str):
     if not input_path or not os.path.exists(input_path):
         print(f"❌ Erreur : Fichier introuvable : {input_path}")
         return False
 
-    print(f"🧹 Démarrage du nettoyage plan traits fins OpenCV sur : {input_path}")
+    print(f"🧹 Démarrage du nettoyage plan traits fins OpenCV V2 sur : {input_path}")
 
     if input_path.lower().endswith((".png", ".jpg", ".jpeg")):
         base_image = Image.open(input_path).convert("RGBA")
@@ -68,36 +108,39 @@ def clean_and_separate_plan_layers(input_path: str, output_path: str):
     base_np_bgr = cv2.cvtColor(base_np_rgb, cv2.COLOR_RGB2BGR)
     gray = cv2.cvtColor(base_np_bgr, cv2.COLOR_BGR2GRAY)
 
-    # Export d'une image d'aperçu d'origine au format PNG (pour le comparateur Frontend)
     preview_plan_path = output_path.replace(".png", "_preview.png") if output_path.endswith(".png") else output_path + "_preview.png"
     base_image.convert("RGB").save(preview_plan_path, "PNG")
 
-    # 1. Binarisation adaptative douce pour capturer les traits fins sans perte
+    # 1. Binarisation adaptative douce
     binary_walls = cv2.adaptiveThreshold(
         gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, 5
     )
 
-    # 2. Double fermeture morphologique (3x3 puis 5x5)
-    kernel3 = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    kernel5 = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-    closed_walls = cv2.morphologyEx(binary_walls, cv2.MORPH_CLOSE, kernel3)
-    closed_walls = cv2.morphologyEx(closed_walls, cv2.MORPH_CLOSE, kernel5)
+    # 2. Détection & Isolation du polygone principal du bâtiment (efface cotations extérieures)
+    building_mask = detect_building_envelope(binary_walls, width, height)
 
-    # 3. Filtrage très doux (CC_STAT_AREA >= 10 px)
+    # Conservations des murs UNIQUEMENT dans l'enveloppe du bâtiment
+    binary_walls_in_envelope = cv2.bitwise_and(binary_walls, building_mask)
+
+    # 3. Fermeture morphologique stricte (9x9) pour étanchéité parfaite des pièces
+    kernel9 = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 9))
+    closed_walls = cv2.morphologyEx(binary_walls_in_envelope, cv2.MORPH_CLOSE, kernel9)
+
+    # 4. Filtrage des composants résiduels
     num_components, comp_labels, comp_stats, _ = cv2.connectedComponentsWithStats(closed_walls)
     clean_walls = np.zeros_like(closed_walls, dtype=np.uint8)
     for i in range(1, num_components):
-        if comp_stats[i, cv2.CC_STAT_AREA] >= 10:
+        if comp_stats[i, cv2.CC_STAT_AREA] >= 30:
             clean_walls[comp_labels == i] = 255
 
-    # 4. Calque B : Textes et Annotations
+    # 5. Calque B : Textes, Annotations & Cartouche (net et vectoriel)
     orig_dark_pixels = (gray < 175)
     text_layer = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     text_np = np.array(text_layer)
     text_np[orig_dark_pixels] = (15, 23, 42, 255)
     text_layer = Image.fromarray(text_np)
 
-    # 5. Image _clean_plan.png (Fond blanc pur #FFFFFF, Murs Anthracite #1E293B)
+    # 6. Image _clean_plan.png (Fond blanc pur #FFFFFF, Murs Anthracite #1E293B)
     clean_plan_img = np.ones((height, width, 3), dtype=np.uint8) * 255
     clean_plan_img[clean_walls > 0] = (30, 41, 59)
 
@@ -110,6 +153,7 @@ def clean_and_separate_plan_layers(input_path: str, output_path: str):
 
     # Comptage des pièces fermées
     inv_clean = cv2.bitwise_not(clean_walls)
+    inv_clean[building_mask == 0] = 0 # restreindre aux pièces intérieures
     num_rooms, _, room_stats, _ = cv2.connectedComponentsWithStats(inv_clean)
     valid_room_count = 0
     img_area = width * height
@@ -126,9 +170,9 @@ def clean_and_separate_plan_layers(input_path: str, output_path: str):
     }
     print(f"STATUS_METADATA:{json.dumps(metadata)}")
 
-    print(f"✨ Calque A (_clean_plan.png murs complets) : {clean_plan_path}")
-    print(f"✨ Calque B (_text.png annotations vectorielles)          : {text_plan_path}")
-    print(f"🖼️ Aperçu PNG Plan Source pour Comparateur              : {preview_plan_path}")
+    print(f"✨ Calque A (_clean_plan.png murs étanches) : {clean_plan_path}")
+    print(f"✨ Calque B (_text.png annotations vectorielles) : {text_plan_path}")
+    print(f"🖼️ Aperçu PNG Plan Source pour Comparateur     : {preview_plan_path}")
     return True
 
 if __name__ == "__main__":

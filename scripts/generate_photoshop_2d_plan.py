@@ -184,6 +184,37 @@ def load_input_image(input_path: str) -> np.ndarray:
 # 2. SEGMENTATION TOPOLOGIQUE PRÉCISE (MURS DÉPENDANCE + MOBILIER)
 # ═════════════════════════════════════════════════════════════════════════════
 
+def detect_building_envelope(binary_walls: np.ndarray, width: int, height: int) -> np.ndarray:
+    """Isole le polygone englobant principal du bâtiment et efface les cotations extérieures."""
+    building_mask = np.zeros((height, width), dtype=np.uint8)
+    cartouche_y_limit = int(height * 0.82)
+
+    search_zone = binary_walls.copy()
+    search_zone[cartouche_y_limit:, :] = 0
+
+    margin_x = int(width * 0.06)
+    margin_y = int(height * 0.06)
+    search_zone[:margin_y, :] = 0
+    search_zone[:, :margin_x] = 0
+    search_zone[:, width - margin_x:] = 0
+
+    cnts, _ = cv2.findContours(search_zone, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not cnts:
+        building_mask[margin_y:cartouche_y_limit, margin_x:width - margin_x] = 255
+        return building_mask
+
+    large_cnts = [c for c in cnts if cv2.contourArea(c) > 2000]
+    if large_cnts:
+        all_pts = np.vstack(large_cnts)
+        hull = cv2.convexHull(all_pts)
+        cv2.drawContours(building_mask, [hull], -1, 255, -1)
+        kernel_exp = cv2.getStructuringElement(cv2.MORPH_RECT, (12, 12))
+        building_mask = cv2.dilate(building_mask, kernel_exp)
+    else:
+        building_mask[margin_y:cartouche_y_limit, margin_x:width - margin_x] = 255
+
+    return building_mask
+
 def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     height, width = bgr_img.shape[:2]
     gray = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2GRAY)
@@ -195,9 +226,13 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
 
     _, binary = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
-    kernel_seal = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
-    sealed_walls = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel_seal)
-    sealed_walls = cv2.morphologyEx(sealed_walls, cv2.MORPH_DILATE, cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2)))
+    # 1. Détection de l'enveloppe du bâtiment pour éliminer les cotations extérieures
+    building_mask = detect_building_envelope(binary, width, height)
+    binary_in_building = cv2.bitwise_and(binary, building_mask)
+
+    # 2. Fermeture morphologique 9x9 pour étanchéité parfaite des pièces
+    kernel_seal = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 9))
+    sealed_walls = cv2.morphologyEx(binary_in_building, cv2.MORPH_CLOSE, kernel_seal)
 
     num_wall_comps, wall_labels, wall_stats, _ = cv2.connectedComponentsWithStats(sealed_walls)
     structural_walls = np.zeros_like(sealed_walls, dtype=np.uint8)
@@ -210,7 +245,7 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
         if area >= 30 or comp_w >= 15 or comp_h >= 18:
             structural_walls[wall_labels == i] = 255
 
-    non_wall_ink = cv2.bitwise_and(binary, cv2.bitwise_not(structural_walls))
+    non_wall_ink = cv2.bitwise_and(binary_in_building, cv2.bitwise_not(structural_walls))
     num_ink_comps, ink_labels, ink_stats, _ = cv2.connectedComponentsWithStats(non_wall_ink)
     
     furniture_mask = np.zeros_like(non_wall_ink, dtype=np.uint8)
@@ -234,6 +269,7 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
         "furniture_mask": furniture_mask,
         "clean_text_mask": clean_text_mask,
         "text_layer_rgba": Image.fromarray(text_rgba, "RGBA"),
+        "building_mask": building_mask,
         "width": width,
         "height": height
     }
@@ -463,13 +499,14 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
     width, height = proc_result["width"], proc_result["height"]
     sealed_walls = proc_result["structural_walls"]
     furniture_mask = proc_result["furniture_mask"]
+    building_mask = proc_result.get("building_mask", np.ones((height, width), dtype=np.uint8) * 255)
     img_area = width * height
 
-    # 1. Canvas fond gris architectural neutre pro (#DCDFE6 / 220, 223, 230)
-    canvas_base = Image.new("RGBA", (width, height), (220, 223, 230, 255))
+    # 1. Canvas fond blanc neutre pro (#FFFFFF / 255, 255, 255)
+    canvas_base = Image.new("RGBA", (width, height), (255, 255, 255, 255))
     layer1_floors = canvas_base.copy()
 
-    cartouche_y_limit = int(height * 0.77)
+    cartouche_y_limit = int(height * 0.82)
 
     # 2. Zone Carport / Driveway (Pavés brique rouge #A84838)
     carport_mask = np.zeros((height, width), dtype=np.uint8)
@@ -480,6 +517,7 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
         255,
         -1
     )
+    carport_mask = cv2.bitwise_and(carport_mask, building_mask)
     carport_mask_pil = Image.fromarray(carport_mask)
     tex_cobble = _CATALOG.get_texture("cobblestone", width, height)
     layer1_floors.paste(tex_cobble, (0, 0), mask=carport_mask_pil)
@@ -493,12 +531,14 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
         255,
         -1
     )
+    veranda_mask = cv2.bitwise_and(veranda_mask, building_mask)
     veranda_mask_pil = Image.fromarray(veranda_mask)
     tex_veranda = _CATALOG.get_texture("veranda", width, height)
     layer1_floors.paste(tex_veranda, (0, 0), mask=veranda_mask_pil)
 
-    # 4. Texturage intérieur pièce par pièce
+    # 4. Texturage intérieur pièce par pièce - restreint STRICTEMENT à l'enveloppe du bâtiment
     inv_sealed = cv2.bitwise_not(sealed_walls)
+    inv_sealed[building_mask == 0] = 0 # élimine les zones hors bâtiment
     num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(inv_sealed)
     areas = stats[:, cv2.CC_STAT_AREA]
     largest_label = np.argmax(areas)
