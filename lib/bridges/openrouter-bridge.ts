@@ -55,8 +55,56 @@ function parseStrictJson<T>(rawText: string): T | null {
 }
 
 /**
+ * Redimensionne un Base64 image à 1024×1024 max et compresse en JPEG q=80
+ * pour ne pas dépasser la limite de payload des APIs OpenRouter / Gemini.
+ * En cas d'échec (sharp absent ou erreur), retourne l'image d'origine inchangée.
+ */
+async function resizeBase64ImageForCloud(base64: string): Promise<string> {
+  try {
+    const match = base64.match(/^data:([a-zA-Z0-9/+]+);base64,(.+)$/);
+    const mimeType = match?.[1] || "image/png";
+    const rawB64 = match?.[2] || base64;
+    const buffer = Buffer.from(rawB64, "base64");
+
+    const MAX_DIM = 1024;
+    const JPEG_QUALITY = 80;
+
+    // Dynamically import sharp — sharp's default export is a factory function.
+    // We avoid typing it as `typeof import("sharp")` which includes the namespace shape;
+    // instead we type it as `any` and cast the result for type safety downstream.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let sharpFactory: ((input: Buffer) => any) | null = null;
+    try {
+      const sharpModule = await import("sharp");
+      // sharp CJS default export is the factory function itself
+      sharpFactory = (sharpModule.default as unknown as (input: Buffer) => any);
+    } catch {
+      // sharp not available in this environment — return original unchanged
+      return base64.startsWith("data:") ? base64 : `data:${mimeType};base64,${rawB64}`;
+    }
+
+    if (!sharpFactory) {
+      return base64.startsWith("data:") ? base64 : `data:${mimeType};base64,${rawB64}`;
+    }
+
+    const resized: Buffer = await sharpFactory(buffer)
+      .resize(MAX_DIM, MAX_DIM, { fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: JPEG_QUALITY })
+      .toBuffer();
+
+    return `data:image/jpeg;base64,${resized.toString("base64")}`;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn("[OpenRouter Bridge] resizeBase64ImageForCloud non-fatal:", msg);
+    return base64.startsWith("data:") ? base64 : `data:image/png;base64,${base64}`;
+  }
+}
+
+/**
  * ÉTAPE 1.A : Extraction des métadonnées du plan (< 1.5s)
  * Modèle : google/gemini-2.5-flash via OpenRouter
+ * NOTE : L'image est redimensionnée à 1024×1024 JPEG q=80 avant envoi
+ * pour éviter les erreurs "fetch failed" sur les payloads Base64 lourds.
  */
 export async function extractPlanMetadata(imageBase64: string): Promise<PlanMetadataResult> {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -65,9 +113,10 @@ export async function extractPlanMetadata(imageBase64: string): Promise<PlanMeta
     return { rooms: [], totalSurface: 0, roomCount: 0 };
   }
 
-  const imageUri = imageBase64.startsWith("data:")
-    ? imageBase64
-    : `data:image/png;base64,${imageBase64}`;
+  // ── OPTIMISATION PAYLOAD : resize 1024×1024 JPEG q=80 avant envoi ──────────
+  const imageUri = await resizeBase64ImageForCloud(
+    imageBase64.startsWith("data:") ? imageBase64 : `data:image/png;base64,${imageBase64}`
+  );
 
   const prompt = `Analyse ce plan d'architecte et extrais les pièces sous forme de tableau JSON strict.
 Structure attendue :
@@ -133,7 +182,10 @@ Structure attendue :
 
 /**
  * ÉTAPE 1.B : Génération de l'image architecturale HD à partir du masque OpenCV
- * Modèles : google/nano-banana-pro (défaut) -> black-forest-labs/flux-2-pro -> black-forest-labs/flux-1-schnell
+ * Le masque transmis DOIT être le masque nettoyé (sans texte OCR, sans lignes de cahier).
+ * L'image est redimensionnée à 1024×1024 JPEG q=80 avant envoi pour éviter les
+ * erreurs "fetch failed" sur les payloads Base64 lourds.
+ * Modèles : google/gemini-2.5-flash-image -> gemini-3.1-flash-image -> gemini-3-pro-image
  */
 export async function generateArchitecturalRender(
   imageBase64Mask: string,
@@ -145,9 +197,10 @@ export async function generateArchitecturalRender(
     return null;
   }
 
-  const imageUri = imageBase64Mask.startsWith("data:")
-    ? imageBase64Mask
-    : `data:image/png;base64,${imageBase64Mask}`;
+  // ── OPTIMISATION PAYLOAD : resize 1024×1024 JPEG q=80 avant envoi ──────────
+  const imageUri = await resizeBase64ImageForCloud(
+    imageBase64Mask.startsWith("data:") ? imageBase64Mask : `data:image/png;base64,${imageBase64Mask}`
+  );
 
   const candidateModels = [
     "google/gemini-2.5-flash-image",

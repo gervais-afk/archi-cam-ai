@@ -80,7 +80,7 @@ TRUST THE CANNY MAP over any general knowledge.
   } else if (s.includes("r_plus_2") || s.includes("r+2")) {
     styleSpecifics = "STYLE IMMEUBLE RESIDENTIEL R+2: Multi-family R+2 apartment complex layout with T3/T4 apartments, elevator shaft with stainless steel cabin, central staircase core, private balconies, covered parking bays.";
   } else {
-    styleSpecifics = "STYLE LUXE TROPICAL VILLA: Warm honey teak hardwood floors in living areas and bedrooms, polished white Calacatta marble tiles in kitchen and corridors, patterned ceramic tiles in bathrooms, terracotta brick paving in parking area with red car.";
+    styleSpecifics = "STYLE LUXE TROPICAL VILLA: Warm honey teak hardwood floors in living areas and bedrooms, polished white Calacatta marble tiles in kitchen and corridors, patterned ceramic tiles in bathrooms. Top-down 2D architectural floorplan, clean inner rooms, realistic wood and tile textures, no cars, no vehicles, no external parking, strictly match internal wall geometry.";
   }
 
   let neo4jPromptInject = "";

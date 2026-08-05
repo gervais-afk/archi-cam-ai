@@ -222,11 +222,10 @@ def detect_building_envelope(binary_walls: np.ndarray, width: int, height: int) 
 def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     height, width = bgr_img.shape[:2]
 
-    # ── ÉTAPE 1 : NETTOYAGE DU PAPIER MILLIMÉTRÉ / CAHIER QUADRILLÉ ───────────
-    # Filtrer l'encre bleue/cyan des lignes de grille du cahier
+    # ── ÉTAPE 0 : NETTOYAGE DES COULEURS (bleu cahier HSV) ───────────────────
+    # Supprimer l'encre bleue/cyan des lignes de grille (HSV H:80-140)
     hsv = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
     grid_blue_mask = cv2.inRange(hsv, (80, 20, 100), (140, 255, 255))
-    
     cleaned_bgr = bgr_img.copy()
     cleaned_bgr[grid_blue_mask > 0] = (255, 255, 255)
 
@@ -237,15 +236,36 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
 
     _, binary = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
+    # ── ÉTAPE 1 : SUPPRESSION DES LIGNES HORIZONTALES DU CAHIER (réglé / ligné) ─
+    # Un noyau horizontal (30×1) détecte les traits de réglure qui auraient résisté
+    # au filtre HSV (encre noire sur papier blanc ligné).
+    kernel_hline = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 1))
+    detected_hlines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_hline, iterations=1)
+    # On soustrait ces lignes pures pour ne conserver QUE les murs et traits de stylo
+    binary = cv2.subtract(binary, detected_hlines)
+    print(f"[Sketch] Lignes horizontales supprimées : {np.sum(detected_hlines > 0)} px retirés")
+
+    # ── GARDE-FOU : masque corrompu ? ──────────────────────────────────────────
+    # Si > 40% de l'image est noire après soustraction, le masque est encore trop
+    # pollué (photo floue, papier très foncé). On bascule sur un tracé Lineart propre.
+    black_ratio = np.sum(binary == 0) / (height * width)
+    print(f"[Sketch] Ratio noir après filtrage lignes : {black_ratio:.2%}")
+    if black_ratio > 0.40:
+        print("[Sketch] ⚠️ Masque corrompu (>40% noir). Désactivation FloodFill → Lineart binaire propre.")
+        # Revert to simple Otsu without heavy dilation to avoid flood-fill leaks
+        binary_safe = binary.copy()
+        binary = binary_safe
+
     # Détection de l'enveloppe du bâtiment pour éliminer les cotations extérieures
     building_mask = detect_building_envelope(binary, width, height)
     binary_in_building = cv2.bitwise_and(binary, building_mask)
 
     # ── ÉTAPE 2 : FERMETURE MORPHOLOGIQUE RENFORCÉE DES MURS (9x9) ─────────────
     # Épaississement des traits de stylo pour boucher les micro-trous et éviter les fuites
+    # NOTE : La dilatation est appliquée APRÈS le retrait des lignes horizontales.
     kernel_dilate = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
     binary_thickened = cv2.dilate(binary_in_building, kernel_dilate, iterations=1)
-    
+
     kernel_seal = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
     sealed_walls = cv2.morphologyEx(binary_thickened, cv2.MORPH_CLOSE, kernel_seal)
 
@@ -447,9 +467,13 @@ def render_furniture_layer(canvas: Image.Image, furniture_mask: np.ndarray, widt
         h = stats[i, cv2.CC_STAT_HEIGHT]
         area = stats[i, cv2.CC_STAT_AREA]
 
-        # 1. Véhicule (dans la zone carport en bas à gauche)
-        if x < width * 0.35 and y > height * 0.55 and area > 12000:
-            canvas = render_car_sprite(canvas, x, y, w, h)
+        # 1. Grand objet non-identifié — rendu générique sobre (PAS de voiture générée automatiquement)
+        # Les véhicules ne sont rendus QUE si le plan source contient explicitement un espace de stationnement.
+        if area > 12000 and (w > h * 1.5 or h > w * 1.5):
+            # Forme allongée inconnue → table ou meuble massif
+            elem_mask = np.where(labels == i, 255, 0).astype(np.uint8)
+            elem_mask_pil = Image.fromarray(elem_mask)
+            canvas.paste(Image.new("RGBA", (width, height), (180, 160, 130, 220)), (0, 0), mask=elem_mask_pil)
             continue
 
         # 2. Lits (Duvet + oreillers)
