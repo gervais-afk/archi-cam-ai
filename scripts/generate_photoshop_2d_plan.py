@@ -542,16 +542,27 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
         if area < 3500:
             # Cuisines / Sanitaires : Carrelage beige/mint (#E8F0E6)
             tex_img = _CATALOG.get_texture("kitchen", width, height)
+            layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
         elif area > 10000 or valid_room_count % 2 == 1:
             # Salons / Séjours : Parquet chêne miel/clair (#D9AA72)
             tex_img = _CATALOG.get_texture("parquet", width, height)
+            layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
+            # Mobilier Salon : Table / Canapé au centre de la pièce avec ombre portée
+            if w > 60 and h > 60:
+                fw, fh = int(w * 0.45), int(h * 0.45)
+                fx, fy = x + int(w * 0.25), y + int(h * 0.25)
+                layer1_floors = render_bed(layer1_floors, fx, fy, fw, fh, "beige")
         else:
             # Chambres : Carrelage mat bleu/gris pastel (#E3E8ED)
             tex_img = _CATALOG.get_texture("bedroom", width, height)
+            layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
+            # Mobilier Chambre : Lit double (Duvet + Oreillers) au centre avec ombre portée
+            if w > 60 and h > 60:
+                fw, fh = int(w * 0.50), int(h * 0.55)
+                fx, fy = x + int(w * 0.25), y + int(h * 0.20)
+                layer1_floors = render_bed(layer1_floors, fx, fy, fw, fh, "beige")
 
-        layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
-
-    # 5. Rendu du Mobilier et du Véhicule avec Ombres Portées Douces
+    # 5. Rendu du Mobilier et du Véhicule extraits ou superposés avec Ombres Portées Douces
     render_furniture_layer(layer1_floors, furniture_mask, width, height)
 
     # 6. Ajout des plantes décoratives en pot
