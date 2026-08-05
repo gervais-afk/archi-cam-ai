@@ -129,12 +129,16 @@ Le moteur de rendu visuel repose sur un pipeline à 3 étages combinant vision d
   - *Blending Max* : `np.maximum(depth_rdc, depth_etage)` & `np.maximum(..., depth_roof)` (Conserve les terrasses RDC non recouvertes).
 - **Déformation Isométrique Synchrone** : Transformation matricielle $45^\circ$ (`cv2.warpPerspective`) appliquée simultanément sur la Depth Map et le masque Canny fusionné (`merged_canny_mask`).
 
-### 6.4 Module "Sketch-to-Pro" (Croquis Papier Manuscrit)
-- **Nettoyage OpenCV Anti-Quadrillage (`clean_hand_drawn_sketch`)** :
-  - *Filtrage HSV* : Suppression des lignes de cahier bleu/cyan (`H 85-135`) et rouges.
-  - *Égalisation CLAHE* : Correction adaptative de l'exposition et des ombres d'appareil photo.
-  - *Binarisation Adaptative Gaussienne* : Extraction pure du tracé au stylo bille/feutre.
-- **Bascule Dynamique ControlNet Scribble** : Permutation automatique vers `controlnet-scribble-sdxl-1.0` (`conditioning_scale: 0.65`) pour interpréter avec souplesse les traits dessinés à la main.
+### 6.4 Module "Sketch-to-Pro" (Croquis Papier Manuscrit) & Les 5 Couches de Protection
+
+Le traitement des croquis à main levée est sécurisé par un pipeline de protection à 5 couches critiques pour garantir la robustesse en production :
+
+1. **Smart Resize Lanczos3 (`smartResizeBase64`)** : Redimensionnement automatique de l'image source (max 1024px) avec algorithme de Lanczos3 et filtre d'accentuation (sharpen) pour préserver la lisibilité des textes et cotations tout en limitant le poids des payloads réseau (évite les erreurs de chargement lourd sur les API Vision).
+2. **Filtre Hough Adaptatif (`detect_and_remove_ruled_lines`)** : Détection des lignes de cahier (Seyès, petits carreaux) et calcul de signature de réglure. Si l'espacement moyen présente un écart-type ($\sigma < 5\text{px}$), les réglures de cahier sont supprimées. À l'inverse, si l'espacement est irrégulier ($\sigma > 5\text{px}$), les lignes sont identifiées comme des murs horizontaux légitimes et sont **préservées**.
+3. **Garde-fou Intelligent de Masque (`validate_mask_quality`)** : Analyse multi-critères adaptative du masque binarisé (ratio de noir, densité de contours par Canny, flou par variance du Laplacien) pour bloquer les images non conformes (floues, sombres, vides) et rediriger automatiquement vers un **Fallback Lineart Canny** sécurisé.
+4. **Logging Structuré des Échecs (`MaskProcessingFailure`)** : Enregistrement en base de données de chaque rejet (ex: `DARK_CORRUPTED`, `TOO_LIGHT`, `BLURRY`) avec conservation des chemins d'image d'origine et de masque pour l'audit et l'amélioration continue de l'algorithme.
+5. **Dashboard des Métriques Qualité (`QualityMetricsTracker`)** : Enregistrement et calcul en temps réel des taux de succès par étape (`MASK_GENERATION`, `RULED_LINES_REMOVAL`, `METADATA_EXTRACTION`, `RENDER_GENERATION`) consultables en direct par les administrateurs.
+
 
 ---
 

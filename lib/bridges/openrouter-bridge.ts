@@ -128,7 +128,17 @@ Structure attendue :
       return { rooms: [], totalSurface: 0, roomCount: 0 };
     }
 
-    const data = await res.json();
+    const text = await res.text();
+    console.log("[OpenRouter Bridge] VLM Raw Response:", text.slice(0, 1000));
+    
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (jsonErr: any) {
+      console.error("[OpenRouter Bridge] VLM JSON Parse Error:", jsonErr.message, "on text:", text);
+      return { rooms: [], totalSurface: 0, roomCount: 0 };
+    }
+    
     const content = data.choices?.[0]?.message?.content || "";
     const parsed = parseStrictJson<PlanMetadataResult>(content);
 
@@ -199,15 +209,32 @@ export async function generateArchitecturalRender(
       });
 
       if (res.ok) {
-        const data = await res.json();
-        const output = data.choices?.[0]?.message?.content || "";
-        const imgUrlMatch = output.match(/https?:\/\/[^\s\)"']+\.(?:png|jpg|jpeg|webp)|data:image\/[a-zA-Z]+;base64,[^\s\)"']+/i);
-        if (imgUrlMatch) {
-          console.log(`[OpenRouter Bridge] ✨ Image générée avec succès via ${model} !`);
-          return imgUrlMatch[0];
+        const text = await res.text();
+        console.log(`[OpenRouter Bridge] Chat Raw Response (${model}):`, text.slice(0, 1000));
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (jsonErr: any) {
+          console.error(`[OpenRouter Bridge] Chat JSON Parse Error (${model}):`, jsonErr.message, "on text:", text);
+          continue;
         }
-        if (output.startsWith("http://") || output.startsWith("https://") || output.startsWith("data:image/")) {
-          return output;
+        const output = data.choices?.[0]?.message?.content || "";
+        let imgUrl = "";
+        const msgImages = data.choices?.[0]?.message?.images;
+        if (Array.isArray(msgImages) && msgImages[0]?.image_url?.url) {
+          imgUrl = msgImages[0].image_url.url;
+        } else {
+          const imgUrlMatch = output.match(/https?:\/\/[^\s\)"']+\.(?:png|jpg|jpeg|webp)|data:image\/[a-zA-Z]+;base64,[^\s\)"']+/i);
+          if (imgUrlMatch) {
+            imgUrl = imgUrlMatch[0];
+          } else if (output.startsWith("http://") || output.startsWith("https://") || output.startsWith("data:image/")) {
+            imgUrl = output;
+          }
+        }
+
+        if (imgUrl) {
+          console.log(`[OpenRouter Bridge] ✨ Image générée avec succès via ${model} !`);
+          return imgUrl;
         }
       }
     } catch (e: any) {
@@ -229,7 +256,15 @@ export async function generateArchitecturalRender(
       });
 
       if (res.ok) {
-        const data = await res.json();
+        const text = await res.text();
+        console.log(`[OpenRouter Bridge] Images Gen Raw Response (${model}):`, text.slice(0, 1000));
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (jsonErr: any) {
+          console.error(`[OpenRouter Bridge] Images Gen JSON Parse Error (${model}):`, jsonErr.message, "on text:", text);
+          continue;
+        }
         const imageUrl = data.data?.[0]?.url || (data.data?.[0]?.b64_json ? `data:image/png;base64,${data.data[0].b64_json}` : null);
         if (imageUrl) {
           console.log(`[OpenRouter Bridge] ✨ Image générée via /images/generations (${model}) !`);

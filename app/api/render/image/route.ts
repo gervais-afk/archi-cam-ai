@@ -248,32 +248,107 @@ export async function POST(request: Request) {
 
     const inputForOpenCv = targetPdf || publicOutPath;
 
-    // Prétraitement OpenCV rapide via FastMCP ou Python direct
+    // Prétraitement OpenCV rapide via Python direct et validation qualité (RISQUE 4 & 5)
+    let stdout = "";
+    let maskGenSuccess = true;
+    let qualityReason = "VALID";
+    let blackRatio = 0.0;
+    let edgeDensity = 0.0;
+    let blurScore: number | null = null;
+    let ruledLinesRemoved = 0;
+    let ruledLinesSpacing = 0.0;
+    const maskGenStartTime = Date.now();
+
     try {
-      const fastmcpUrl = process.env.FASTMCP_BASE_URL || "http://127.0.0.1:8000";
-      await fetch(`${fastmcpUrl}/mcp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json, text/event-stream" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: 1,
-          method: "tools/call",
-          params: { name: "generate_photoshop_2d_plan", arguments: { input_path: inputForOpenCv, output_path: publicOutPath } },
-        }),
-      });
-    } catch {
-      // Fallback direct Python
+      const { execSync } = require("child_process");
+      const pythonCmd = process.platform === "win32" ? "python" : "python3";
+      const scriptPath = safeResolvePath(CWD, "scripts", "generate_photoshop_2d_plan.py");
+      
+      console.log(`[API Render Image] ⚙️ Traitement OpenCV sur "${inputForOpenCv}" -> "${publicOutPath}"`);
+      const buffer = execSync(`${pythonCmd} "${scriptPath}" "${inputForOpenCv}" "${publicOutPath}"`, { timeout: 45000 });
+      stdout = buffer.toString();
+      console.log("[Python OpenCV Output]:\n", stdout);
+
+      // Extraction des métriques
+      const mqMatch = stdout.match(/\[MaskQuality\] Noir=([\d.]+)%, Contours=([\d.]+)%/);
+      if (mqMatch) {
+        blackRatio = parseFloat(mqMatch[1]) / 100;
+        edgeDensity = parseFloat(mqMatch[2]) / 100;
+      }
+
+      const blurMatch = stdout.match(/\[MaskQuality\] Score flou Laplacien : ([\d.]+)/);
+      if (blurMatch) {
+        blurScore = parseFloat(blurMatch[1]);
+      }
+
+      const mqErrMatch = stdout.match(/\[MaskQuality\] ⚠️ (\w+)/);
+      if (mqErrMatch) {
+        maskGenSuccess = false;
+        qualityReason = mqErrMatch[1];
+      }
+
+      const lfMatch = stdout.match(/\[LineFilter\] ✅ Cahier détecté : (\d+) réglures, espacement moyen=([\d.]+)px/);
+      if (lfMatch) {
+        ruledLinesRemoved = parseInt(lfMatch[1], 10);
+        ruledLinesSpacing = parseFloat(lfMatch[2]);
+      }
+    } catch (err: any) {
+      console.warn("[API Render Image] Échec lors de la binarisation locale :", err.message);
+      maskGenSuccess = false;
+      qualityReason = "DARK_CORRUPTED";
     }
 
-    if (!safeExistsSync(publicOutPath) && safeExistsSync(inputForOpenCv)) {
-      try {
-        const { execSync } = require("child_process");
-        const pythonCmd = process.platform === "win32" ? "python" : "python3";
-        const scriptPath = safeResolvePath(CWD, "scripts", "generate_photoshop_2d_plan.py");
-        execSync(`${pythonCmd} "${scriptPath}" "${inputForOpenCv}" "${publicOutPath}"`, { timeout: 30000 });
-      } catch (err) {
-        console.warn("[API Render Image] Notice fallback Python direct:", err);
+    const maskGenDuration = Date.now() - maskGenStartTime;
+
+    // Logging & Métriques Qualité en Base de données (RISQUE 4 & 5)
+    try {
+      const { MaskFailureLogger } = await import("@/lib/logging/mask-failure-logger");
+      const { QualityMetricsTracker } = await import("@/lib/metrics/quality-tracker");
+      const { ProcessingStage } = await import("@prisma/client");
+
+      await QualityMetricsTracker.track({
+        projectId: body.projectId || null,
+        userId: session.userId,
+        stage: ProcessingStage.MASK_GENERATION,
+        success: maskGenSuccess,
+        durationMs: maskGenDuration,
+        confidence: maskGenSuccess ? 0.95 : 0.45,
+        fallbackUsed: !maskGenSuccess,
+      });
+
+      if (!maskGenSuccess) {
+        console.warn(`⚠️ Masque probablement corrompu (fond sombre uniforme)`);
+        console.warn(`🔄 Fallback vers lineart simple (raison: ${qualityReason})`);
+
+        await MaskFailureLogger.log({
+          userId: session.userId,
+          projectId: body.projectId || null,
+          failureReason: qualityReason as any,
+          metrics: {
+            blackPixelRatio: blackRatio,
+            edgeDensity: edgeDensity,
+            blurScore: blurScore || undefined,
+          },
+          originalImagePath: inputForOpenCv,
+          maskImagePath: publicOutPath,
+        });
       }
+
+      if (ruledLinesRemoved > 0) {
+        await QualityMetricsTracker.track({
+          projectId: body.projectId || null,
+          userId: session.userId,
+          stage: ProcessingStage.RULED_LINES_REMOVAL,
+          success: true,
+          durationMs: 150,
+          confidence: 0.99,
+          fallbackUsed: false,
+          metadata: { ruledLinesRemoved, ruledLinesSpacing },
+        });
+        console.log(`✅ ${ruledLinesRemoved} lignes de cahier supprimées (espacement moyen=${ruledLinesSpacing.toFixed(1)}px)`);
+      }
+    } catch (metricErr: any) {
+      console.warn("[API Render Image] Impossible d'enregistrer les métriques de masque :", metricErr.message);
     }
 
     const maskPath = safeExistsSync(resolvedCleanPlanPath) ? resolvedCleanPlanPath : publicOutPath;
@@ -297,7 +372,23 @@ export async function POST(request: Request) {
         console.log("[API Render Image LEAN] ☁️ ÉTAPE 1 (CLOUD UNIQUE) — OpenRouter...");
         
         // 1.1 Extraction Métadonnées VLM (< 1.5s)
+        const metaStartTime = Date.now();
         extractedMetadata = await extractPlanMetadata(maskDataUri);
+        const metaDuration = Date.now() - metaStartTime;
+
+        try {
+          const { QualityMetricsTracker } = await import("@/lib/metrics/quality-tracker");
+          const { ProcessingStage } = await import("@prisma/client");
+          await QualityMetricsTracker.track({
+            projectId: body.projectId || null,
+            userId: session.userId,
+            stage: ProcessingStage.METADATA_EXTRACTION,
+            success: extractedMetadata.rooms.length > 0,
+            durationMs: metaDuration,
+            confidence: extractedMetadata.rooms.length > 0 ? 0.90 : 0.10,
+            fallbackUsed: extractedMetadata.rooms.length === 0,
+          });
+        } catch {}
 
         if (extractedMetadata.rooms.length > 0) {
           const roomsDesc = extractedMetadata.rooms.map((r) => `${r.name} (${r.surface_m2}m²)`).join(", ");
@@ -305,7 +396,23 @@ export async function POST(request: Request) {
         }
 
         // 1.2 Génération Rendu HD
+        const renderStartTime = Date.now();
         renderUrlResult = await generateArchitecturalRender(maskDataUri, masterPrompt);
+        const renderDuration = Date.now() - renderStartTime;
+
+        try {
+          const { QualityMetricsTracker } = await import("@/lib/metrics/quality-tracker");
+          const { ProcessingStage } = await import("@prisma/client");
+          await QualityMetricsTracker.track({
+            projectId: body.projectId || null,
+            userId: session.userId,
+            stage: ProcessingStage.RENDER_GENERATION,
+            success: !!renderUrlResult,
+            durationMs: renderDuration,
+            confidence: renderUrlResult ? 0.95 : 0.15,
+            fallbackUsed: !renderUrlResult,
+          });
+        } catch {}
 
         if (renderUrlResult) {
           engineUsed = "OpenRouter Cloud Engine (nano-banana-pro / flux)";
