@@ -100,7 +100,7 @@ Return raw JSON ONLY with no markdown commentary.
           },
         ],
         temperature: 0.1,
-        max_tokens: 2500,
+        max_tokens: 1000,
       }),
     });
 
