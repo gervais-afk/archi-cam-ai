@@ -125,21 +125,17 @@ export async function analyzePlanWithLMStudioVision(imageOrPdfPath: string): Pro
 
     const promptText = `
 You are an expert architectural plan analyzer specialized in African residential floor plans.
-ANTI-HALLUCINATION RULES (CRITICAL):
-- Analyze ONLY what is visible in THIS specific image.
-- Do NOT invent rooms, walls, or spaces not present.
-- Do NOT use general knowledge of typical floor plans.
-- If a room name is not legible, use "Pièce X".
-- If an area is not written, estimate from pixel dimensions.
-- Trust ONLY the provided image.
-
-Analyze this floor plan image and return ONLY a valid raw JSON object matching this structure:
+Analyze this floor plan image and return ONLY a valid raw JSON object listing the visible rooms and their estimated areas:
 {
-  "plan_info": {"title": "PLAN RESIDENTIEL", "total_area": 120.0, "floors": "RDC", "image_width_px": 512, "image_height_px": 512},
-  "rooms": [{"id": "room_01", "name": "Séjour Principal", "area_m2": 30.0, "texture": "marble_tile", "bbox": {"x": 50, "y": 50, "w": 400, "h": 300}, "center": {"x": 250, "y": 200}}],
-  "furniture": [{"id": "furn_01", "type": "sofa_3seat", "room_id": "room_01", "bbox": {"x": 100, "y": 100, "w": 120, "h": 60}, "rotation_deg": 0, "wall_snap": "none", "confidence": 0.9}]
+  "plan_info": {"title": "PLAN RESIDENTIEL", "total_area": 120.0},
+  "rooms": [
+    {"name": "Séjour Principal", "area_m2": 30.0, "texture": "parquet"},
+    {"name": "Chambre 1", "area_m2": 15.0, "texture": "parquet"},
+    {"name": "Cuisine", "area_m2": 12.0, "texture": "marble_tile"},
+    {"name": "Salle de Bain", "area_m2": 6.0, "texture": "patterned_tile"}
+  ]
 }
-Return raw JSON ONLY with no markdown commentary.
+Return raw JSON ONLY with no markdown commentary or bounding boxes.
 `;
 
     // 2. TIMEOUT HTTP ÉTENDU & AGENT KEEP-ALIVE
@@ -171,7 +167,7 @@ Return raw JSON ONLY with no markdown commentary.
           },
         ],
         temperature: 0.1,
-        max_tokens: 800,
+        max_tokens: 250,
       }),
     });
 

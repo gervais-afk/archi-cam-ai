@@ -122,9 +122,9 @@ def clean_and_separate_plan_layers(input_path: str, output_path: str):
     # Conservations des murs UNIQUEMENT dans l'enveloppe du bâtiment
     binary_walls_in_envelope = cv2.bitwise_and(binary_walls, building_mask)
 
-    # 3. Fermeture morphologique stricte (9x9) pour étanchéité parfaite des pièces
-    kernel9 = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 9))
-    closed_walls = cv2.morphologyEx(binary_walls_in_envelope, cv2.MORPH_CLOSE, kernel9)
+    # 3. Fermeture morphologique stricte (15x15) pour étanchéité parfaite des pièces (colmatage portes & terrasses)
+    kernel15 = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
+    closed_walls = cv2.morphologyEx(binary_walls_in_envelope, cv2.MORPH_CLOSE, kernel15)
 
     # 4. Filtrage des composants résiduels
     num_components, comp_labels, comp_stats, _ = cv2.connectedComponentsWithStats(closed_walls)

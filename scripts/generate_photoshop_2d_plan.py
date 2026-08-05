@@ -230,8 +230,8 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     building_mask = detect_building_envelope(binary, width, height)
     binary_in_building = cv2.bitwise_and(binary, building_mask)
 
-    # 2. Fermeture morphologique 9x9 pour étanchéité parfaite des pièces
-    kernel_seal = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 9))
+    # 2. Fermeture morphologique 15x15 pour étanchéité parfaite des pièces (colmatage terrasses & portes)
+    kernel_seal = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
     sealed_walls = cv2.morphologyEx(binary_in_building, cv2.MORPH_CLOSE, kernel_seal)
 
     num_wall_comps, wall_labels, wall_stats, _ = cv2.connectedComponentsWithStats(sealed_walls)
