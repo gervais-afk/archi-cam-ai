@@ -219,6 +219,127 @@ def detect_building_envelope(binary_walls: np.ndarray, width: int, height: int) 
 
     return building_mask
 
+def detect_and_remove_ruled_lines(binary_img: np.ndarray, width: int) -> np.ndarray:
+    """
+    Supprime les lignes horizontales de cahier réglé (Seyès, petits carreaux)
+    SANS toucher aux murs architecturaux horizontaux.
+
+    Stratégie :
+      1. Détection initiale via MORPH_OPEN (30×1)
+      2. Validation HoughLinesP pour confirmer que les lignes sont bien
+         des réglures (longueur > 50% de la largeur, angle < 2°)
+      3. Signature de cahier : vérification que l'espacement est régulier (std < 5px)
+      4. Si < 3 lignes ou espacement irrégulier → ce sont des murs, on NE supprime PAS
+    """
+    h, w = binary_img.shape[:2]
+
+    # 1. Détection primaire : noyau horizontal (30×1)
+    kernel_hline = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 1))
+    candidate_hlines = cv2.morphologyEx(binary_img, cv2.MORPH_OPEN, kernel_hline, iterations=1)
+
+    # 2. Validation Hough : confirme les vraies réglures
+    lines = cv2.HoughLinesP(
+        candidate_hlines,
+        rho=1,
+        theta=np.pi / 180,
+        threshold=50,
+        minLineLength=int(width * 0.50),  # Au moins 50% de la largeur
+        maxLineGap=10
+    )
+
+    if lines is None:
+        print("[LineFilter] Aucune réglure confirmée par Hough. Aucune suppression.")
+        return binary_img
+
+    # 3. Filtrer les lignes quasi-horizontales (angle < 2°)
+    horizontal_lines = []
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        angle = abs(np.arctan2(y2 - y1, x2 - x1) * 180 / np.pi)
+        if angle < 2.0:
+            horizontal_lines.append((x1, y1, x2, y2))
+
+    if len(horizontal_lines) < 3:
+        print(f"[LineFilter] Seulement {len(horizontal_lines)} lignes horizontales (<3) → probablement des murs. Conservation.")
+        return binary_img
+
+    # 4. Signature cahier : espacement régulier (std < 5px)
+    y_positions = sorted(set(y1 for _, y1, _, _ in horizontal_lines))
+    if len(y_positions) >= 2:
+        spacings = np.diff(y_positions)
+        spacing_std = float(np.std(spacings))
+        spacing_mean = float(np.mean(spacings))
+
+        if spacing_std > 5.0:
+            print(f"[LineFilter] Espacement irrégulier (std={spacing_std:.1f}px) → ce sont des murs architecturaux. Conservation.")
+            return binary_img
+
+        print(f"[LineFilter] ✅ Cahier détecté : {len(horizontal_lines)} réglures, espacement moyen={spacing_mean:.1f}px (std={spacing_std:.1f}px). Suppression.")
+    else:
+        print("[LineFilter] Positions Y insuffisantes pour calculer l'espacement. Conservation.")
+        return binary_img
+
+    # 5. Suppression sécurisée : masque des lignes validées uniquement
+    mask_to_remove = np.zeros_like(binary_img, dtype=np.uint8)
+    for x1, y1, x2, y2 in horizontal_lines:
+        cv2.line(mask_to_remove, (x1, y1), (x2, y2), 255, thickness=3)
+
+    cleaned = cv2.subtract(binary_img, mask_to_remove)
+    return cleaned
+
+
+def validate_mask_quality(binary_mask: np.ndarray) -> tuple:
+    """
+    Remplace le seuil fixe 40% par une analyse adaptative multi-critères.
+    Retourne (is_valid: bool, reason: str)
+
+    Catégories :
+      - DARK_CORRUPTED : Beaucoup de noir + peu de contours (fond sombre uniforme)
+      - TOO_LIGHT      : Presque tout blanc (masque vide ou surexposé)
+      - BLURRY         : Forte zone grise + flou Laplacien < 100
+      - COMPLEX_VALID  : Ratio élevé MAIS beaucoup de contours (coupe/façade détaillée)
+      - VALID          : Cas normal bien exploitable
+    """
+    h, w = binary_mask.shape[:2]
+    total_pixels = h * w
+
+    black_pixels = np.sum(binary_mask == 0)
+    black_ratio = black_pixels / total_pixels
+
+    # Densité de contours via Canny
+    edges = cv2.Canny(binary_mask, 50, 150)
+    edge_pixels = int(np.sum(edges > 0))
+    edge_density = edge_pixels / total_pixels
+
+    print(f"[MaskQuality] Noir={black_ratio*100:.1f}%, Contours={edge_density*100:.2f}%")
+
+    # Règle 1 : Très noir ET peu de détails → fond sombre corrompu
+    if black_ratio > 0.70 and edge_density < 0.03:
+        print("[MaskQuality] ⚠️ DARK_CORRUPTED : fond très sombre et peu de contours")
+        return False, "DARK_CORRUPTED"
+
+    # Règle 2 : Presque tout blanc → masque vide
+    if black_ratio < 0.05:
+        print("[MaskQuality] ⚠️ TOO_LIGHT : masque quasi-vide")
+        return False, "TOO_LIGHT"
+
+    # Règle 3 : Ratio élevé MAIS beaucoup de contours → dessin complexe valide
+    if 0.40 < black_ratio < 0.65 and edge_density > 0.08:
+        print("[MaskQuality] ✅ COMPLEX_VALID : dessin complexe (coupe/façade détaillée)")
+        return True, "COMPLEX_VALID"
+
+    # Règle 4 : Zone grise + score flou bas → photo floue
+    if black_ratio > 0.40:
+        blur_score = float(cv2.Laplacian(binary_mask, cv2.CV_64F).var())
+        print(f"[MaskQuality] Score flou Laplacien : {blur_score:.1f}")
+        if blur_score < 100.0:
+            print("[MaskQuality] ⚠️ BLURRY : photo floue détectée")
+            return False, "BLURRY"
+
+    print("[MaskQuality] ✅ VALID : masque exploitable")
+    return True, "VALID"
+
+
 def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     height, width = bgr_img.shape[:2]
 
@@ -236,25 +357,20 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
 
     _, binary = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
-    # ── ÉTAPE 1 : SUPPRESSION DES LIGNES HORIZONTALES DU CAHIER (réglé / ligné) ─
-    # Un noyau horizontal (30×1) détecte les traits de réglure qui auraient résisté
-    # au filtre HSV (encre noire sur papier blanc ligné).
-    kernel_hline = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 1))
-    detected_hlines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_hline, iterations=1)
-    # On soustrait ces lignes pures pour ne conserver QUE les murs et traits de stylo
-    binary = cv2.subtract(binary, detected_hlines)
-    print(f"[Sketch] Lignes horizontales supprimées : {np.sum(detected_hlines > 0)} px retirés")
+    # ── ÉTAPE 1 : SUPPRESSION DES LIGNES HORIZONTALES DU CAHIER (adapt. Hough) ───
+    # Utilise detect_and_remove_ruled_lines() qui valide la régularité des espacements
+    # pour ne pas supprimer les murs architecturaux horizontaux par erreur.
+    binary = detect_and_remove_ruled_lines(binary, width)
 
-    # ── GARDE-FOU : masque corrompu ? ──────────────────────────────────────────
-    # Si > 40% de l'image est noire après soustraction, le masque est encore trop
-    # pollué (photo floue, papier très foncé). On bascule sur un tracé Lineart propre.
-    black_ratio = np.sum(binary == 0) / (height * width)
-    print(f"[Sketch] Ratio noir après filtrage lignes : {black_ratio:.2%}")
-    if black_ratio > 0.40:
-        print("[Sketch] ⚠️ Masque corrompu (>40% noir). Désactivation FloodFill → Lineart binaire propre.")
-        # Revert to simple Otsu without heavy dilation to avoid flood-fill leaks
-        binary_safe = binary.copy()
-        binary = binary_safe
+    # ── GARDE-FOU ADAPTATIF : remplacement du seuil fixe 40% ──────────────────
+    # validate_mask_quality() analyse la densité de contours (Canny) et le flou
+    # pour différencier un masque corrompu d'un dessin complexe valide.
+    is_valid, quality_reason = validate_mask_quality(binary)
+    if not is_valid:
+        print(f"[Sketch] ⚠️ Masque invalide (raison: {quality_reason}). Fallback Lineart Canny propre.")
+        # Retourner un Canny propre plutôt qu'un masque corrompu
+        fallback_canny = cv2.Canny(binary, 50, 150)
+        binary = fallback_canny
 
     # Détection de l'enveloppe du bâtiment pour éliminer les cotations extérieures
     building_mask = detect_building_envelope(binary, width, height)

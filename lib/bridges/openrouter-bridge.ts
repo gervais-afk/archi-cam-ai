@@ -1,15 +1,21 @@
 /**
  * UNIFIED OPENROUTER BRIDGE — ARCHI CAM AI
  * ════════════════════════════════════════════════════════════════════════════
- * Bridge unique et ultra-léger utilisant l'API OpenRouter (https://openrouter.ai/api/v1)
+ * Bridge unique utilisant l'API OpenRouter (https://openrouter.ai/api/v1)
  *
  * 1. extractPlanMetadata(imageBase64) : Extraction VLM ultra-rapide (< 1.5s)
  *    de la structure JSON des pièces (google/gemini-2.5-flash)
  *
  * 2. generateArchitecturalRender(imageBase64Mask, prompt) : Rendu d'image HD
- *    photoréaliste à partir du masque OpenCV (google/nano-banana-pro / flux-2-pro)
+ *    photoréaliste à partir du masque OpenCV nettoyé (sans lignes de cahier)
+ *
+ * OPTIMISATION PAYLOAD (RISQUE 3) : Les images Base64 sont redimensionnées
+ * via smartResizeBase64() (Lanczos3 + sharpen, max 1024px) avant envoi
+ * pour éviter les erreurs "fetch failed" sur les payloads lourds.
  * ════════════════════════════════════════════════════════════════════════════
  */
+
+import { smartResizeBase64 } from "@/lib/image/smart-resize";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1";
 
@@ -55,49 +61,11 @@ function parseStrictJson<T>(rawText: string): T | null {
 }
 
 /**
- * Redimensionne un Base64 image à 1024×1024 max et compresse en JPEG q=80
- * pour ne pas dépasser la limite de payload des APIs OpenRouter / Gemini.
- * En cas d'échec (sharp absent ou erreur), retourne l'image d'origine inchangée.
+ * Wrapper local : délègue à smartResizeBase64 (Lanczos3 + sharpen).
+ * Conservé pour rétro-compatibilité avec les appels existants dans ce fichier.
  */
 async function resizeBase64ImageForCloud(base64: string): Promise<string> {
-  try {
-    const match = base64.match(/^data:([a-zA-Z0-9/+]+);base64,(.+)$/);
-    const mimeType = match?.[1] || "image/png";
-    const rawB64 = match?.[2] || base64;
-    const buffer = Buffer.from(rawB64, "base64");
-
-    const MAX_DIM = 1024;
-    const JPEG_QUALITY = 80;
-
-    // Dynamically import sharp — sharp's default export is a factory function.
-    // We avoid typing it as `typeof import("sharp")` which includes the namespace shape;
-    // instead we type it as `any` and cast the result for type safety downstream.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let sharpFactory: ((input: Buffer) => any) | null = null;
-    try {
-      const sharpModule = await import("sharp");
-      // sharp CJS default export is the factory function itself
-      sharpFactory = (sharpModule.default as unknown as (input: Buffer) => any);
-    } catch {
-      // sharp not available in this environment — return original unchanged
-      return base64.startsWith("data:") ? base64 : `data:${mimeType};base64,${rawB64}`;
-    }
-
-    if (!sharpFactory) {
-      return base64.startsWith("data:") ? base64 : `data:${mimeType};base64,${rawB64}`;
-    }
-
-    const resized: Buffer = await sharpFactory(buffer)
-      .resize(MAX_DIM, MAX_DIM, { fit: "inside", withoutEnlargement: true })
-      .jpeg({ quality: JPEG_QUALITY })
-      .toBuffer();
-
-    return `data:image/jpeg;base64,${resized.toString("base64")}`;
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.warn("[OpenRouter Bridge] resizeBase64ImageForCloud non-fatal:", msg);
-    return base64.startsWith("data:") ? base64 : `data:image/png;base64,${base64}`;
-  }
+  return smartResizeBase64(base64, { maxDimension: 1024, preserveText: true, quality: 85 });
 }
 
 /**

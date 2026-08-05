@@ -25,6 +25,24 @@ enum TransactionStatus {
   FAILED
 }
 
+// RISQUE 4 — Raisons d'échec du traitement de masque
+enum FailureReason {
+  DARK_CORRUPTED
+  TOO_LIGHT
+  BLURRY
+  RULED_LINES
+  COMPLEX_VALID
+}
+
+// RISQUE 5 — Étapes du pipeline de qualité
+enum ProcessingStage {
+  MASK_GENERATION
+  RULED_LINES_REMOVAL
+  RENDER_GENERATION
+  METADATA_EXTRACTION
+}
+
+
 model User {
   id             String        @id @default(uuid())
   email          String?       @unique
@@ -67,4 +85,36 @@ model RenderJob {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("render_jobs")
+}
+
+// RISQUE 4 — Logging des échecs de traitement de masque OpenCV
+model MaskProcessingFailure {
+  id               String        @id @default(uuid())
+  userId           String?       @map("user_id")
+  projectId        String?       @map("project_id")
+  failureReason    FailureReason @map("failure_reason")
+  blackPixelRatio  Float         @map("black_pixel_ratio")
+  edgeDensity      Float         @map("edge_density")
+  blurScore        Float?        @map("blur_score")
+  originalImagePath String?      @map("original_image_path")
+  maskImagePath    String?       @map("mask_image_path")
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  @@map("mask_processing_failures")
+}
+
+// RISQUE 5 — Métriques de qualité par étape du pipeline
+model QualityMetric {
+  id            String          @id @default(uuid())
+  projectId     String?         @map("project_id")
+  userId        String?         @map("user_id")
+  stage         ProcessingStage
+  success       Boolean
+  durationMs    Int             @map("duration_ms")
+  confidence    Float?
+  fallbackUsed  Boolean         @default(false) @map("fallback_used")
+  metadata      Json?
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  @@map("quality_metrics")
 }
