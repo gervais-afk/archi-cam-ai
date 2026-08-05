@@ -3,7 +3,7 @@ import sys
 import io
 import cv2
 import numpy as np
-from PIL import Image, ImageEnhance, ImageFilter, ImageDraw
+from PIL import Image, ImageEnhance, ImageFilter, ImageDraw, ImageChops
 
 # Force stdout et stderr en UTF-8 pour Windows PowerShell / CMD
 if sys.platform == "win32":
@@ -27,7 +27,7 @@ _TEX_DIR = os.path.join(_ASSETS_DIR, "textures")
 def tile_real_texture(image_path: str, dest_w: int, dest_h: int, scale_factor: float = 0.30, brightness: float = 1.15) -> Image.Image:
     """Charge et pavillonne une texture JPG réelle avec répétition sans couture."""
     if not os.path.exists(image_path):
-        return create_honey_parquet_texture(dest_w, dest_h)
+        return create_oak_parquet_texture(dest_w, dest_h)
     
     try:
         src = Image.open(image_path).convert("RGBA")
@@ -44,32 +44,54 @@ def tile_real_texture(image_path: str, dest_w: int, dest_h: int, scale_factor: f
                 canvas.paste(tile, (x, y))
         return canvas
     except Exception:
-        return create_honey_parquet_texture(dest_w, dest_h)
+        return create_oak_parquet_texture(dest_w, dest_h)
 
-def create_honey_parquet_texture(width: int, height: int) -> Image.Image:
-    """Texture parquet chêne miel chaleureux (#B87739)."""
+def create_oak_parquet_texture(width: int, height: int) -> Image.Image:
+    """Texture Parquet lattes chêne miel/clair doux (#D9AA72)."""
     arr = np.ones((height, width, 4), dtype=np.uint8) * 255
-    arr[:, :, 0] = 184 # R
-    arr[:, :, 1] = 119 # G
-    arr[:, :, 2] = 57  # B
+    arr[:, :, 0] = 217 # R
+    arr[:, :, 1] = 170 # G
+    arr[:, :, 2] = 114 # B
     arr[:, :, 3] = 255
-    for y in range(0, height, 48):
-        arr[y:y+1, :, 0:3] = (arr[y:y+1, :, 0:3] * 0.82).astype(np.uint8)
-    for x in range(0, width, 180):
-        arr[:, x:x+1, 0:3] = (arr[:, x:x+1, 0:3] * 0.85).astype(np.uint8)
+    for y in range(0, height, 40):
+        arr[y:y+1, :, 0:3] = (arr[y:y+1, :, 0:3] * 0.88).astype(np.uint8)
+    for x in range(0, width, 160):
+        arr[:, x:x+1, 0:3] = (arr[:, x:x+1, 0:3] * 0.90).astype(np.uint8)
     return Image.fromarray(arr, "RGBA")
 
-def create_light_tile_texture(width: int, height: int) -> Image.Image:
-    """Texture marbre / carrelage grand format blanc clair (#F1F5F9)."""
+def create_bedroom_tile_texture(width: int, height: int) -> Image.Image:
+    """Texture Chambres : Carrelage mat bleu/gris pastel très doux (#E3E8ED)."""
     arr = np.ones((height, width, 4), dtype=np.uint8) * 255
-    arr[:, :, 0] = 241 # R
-    arr[:, :, 1] = 245 # G
-    arr[:, :, 2] = 249 # B
+    arr[:, :, 0] = 227 # R
+    arr[:, :, 1] = 232 # G
+    arr[:, :, 2] = 237 # B
     arr[:, :, 3] = 255
-    for y in range(0, height, 60):
-        arr[y:y+1, :, 0:3] = 225
-    for x in range(0, width, 60):
-        arr[:, x:x+1, 0:3] = 225
+    for y in range(0, height, 50):
+        arr[y:y+1, :, 0:3] = 210
+    for x in range(0, width, 50):
+        arr[:, x:x+1, 0:3] = 210
+    return Image.fromarray(arr, "RGBA")
+
+def create_kitchen_tile_texture(width: int, height: int) -> Image.Image:
+    """Texture Cuisines & SDB : Carrelage quadrillé beige clair / mint (#E8F0E6)."""
+    arr = np.ones((height, width, 4), dtype=np.uint8) * 255
+    arr[:, :, 0] = 232 # R
+    arr[:, :, 1] = 240 # G
+    arr[:, :, 2] = 230 # B
+    arr[:, :, 3] = 255
+    for y in range(0, height, 32):
+        arr[y:y+1, :, 0:3] = 205
+    for x in range(0, width, 32):
+        arr[:, x:x+1, 0:3] = 205
+    return Image.fromarray(arr, "RGBA")
+
+def create_veranda_texture(width: int, height: int) -> Image.Image:
+    """Texture Dégagements / Vérandas : Béton/Enduit crème (#F4F0EA)."""
+    arr = np.ones((height, width, 4), dtype=np.uint8) * 255
+    arr[:, :, 0] = 244 # R
+    arr[:, :, 1] = 240 # G
+    arr[:, :, 2] = 234 # B
+    arr[:, :, 3] = 255
     return Image.fromarray(arr, "RGBA")
 
 def create_red_cobblestone_texture(width: int, height: int) -> Image.Image:
@@ -85,28 +107,6 @@ def create_red_cobblestone_texture(width: int, height: int) -> Image.Image:
         arr[:, x:x+1, 0:3] = 120
     return Image.fromarray(arr, "RGBA")
 
-def create_patterned_tile_texture(width: int, height: int) -> Image.Image:
-    """Texture carrelage à motifs azulejos douce pour sanitaires/SDB (#D0D7DE)."""
-    arr = np.ones((height, width, 4), dtype=np.uint8) * 255
-    arr[:, :, 0] = 208 # R
-    arr[:, :, 1] = 215 # G
-    arr[:, :, 2] = 222 # B
-    arr[:, :, 3] = 255
-    for y in range(0, height, 36):
-        arr[y:y+1, :, 0:3] = 180
-    for x in range(0, width, 36):
-        arr[:, x:x+1, 0:3] = 180
-    return Image.fromarray(arr, "RGBA")
-
-def create_veranda_concrete_texture(width: int, height: int) -> Image.Image:
-    """Texture béton lissé clair (#C8CECF) pour véranda et cheminements."""
-    arr = np.ones((height, width, 4), dtype=np.uint8) * 255
-    arr[:, :, 0] = 200 # R
-    arr[:, :, 1] = 206 # G
-    arr[:, :, 2] = 207 # B
-    arr[:, :, 3] = 255
-    return Image.fromarray(arr, "RGBA")
-
 class AssetCatalog:
     def __init__(self):
         self._tex_cache = {}
@@ -120,16 +120,16 @@ class AssetCatalog:
 
         if name == "parquet":
             tiled = tile_real_texture(path_parquet, width, height, scale_factor=0.30, brightness=1.15)
-        elif name == "light_tile":
-            tiled = create_light_tile_texture(width, height)
+        elif name == "bedroom":
+            tiled = create_bedroom_tile_texture(width, height)
+        elif name == "kitchen":
+            tiled = create_kitchen_tile_texture(width, height)
         elif name == "cobblestone":
             tiled = create_red_cobblestone_texture(width, height)
-        elif name == "patterned_tile":
-            tiled = create_patterned_tile_texture(width, height)
         elif name == "veranda":
-            tiled = create_veranda_concrete_texture(width, height)
+            tiled = create_veranda_texture(width, height)
         else:
-            tiled = create_light_tile_texture(width, height)
+            tiled = create_bedroom_tile_texture(width, height)
         
         self._tex_cache[key] = tiled
         return tiled
@@ -155,10 +155,8 @@ def load_input_image(input_path: str) -> np.ndarray:
         try:
             pdf = pdfium.PdfDocument(input_path)
             page = pdf[0]
-            # scale=2.0 au lieu de 3.0 pour diviser le temps de calcul par 4 tout en gardant une netteté HD
             pil_image = page.render(scale=2.0).to_pil().convert("RGB")
             
-            # Sauvegarder automatiquement une copie PNG du PDF pour LM Studio et le cache Next.js
             png_copy_path = input_path.replace(".pdf", ".png")
             try:
                 pil_image.save(png_copy_path, "PNG")
@@ -181,7 +179,7 @@ def load_input_image(input_path: str) -> np.ndarray:
         raise ValueError(f"Impossible de lire l'image {input_path} : {str(e)}")
 
 # ═════════════════════════════════════════════════════════════════════════════
-# 2. SEGMENTATION TOPOLOGIQUE PRÉCISE (MURS DÉPENDANCE + MOBILIER)
+# 2. SEGMENTATION TOPOLOGIQUE PRÉCISE & ISOLATION DU BÂTIMENT
 # ═════════════════════════════════════════════════════════════════════════════
 
 def detect_building_envelope(binary_walls: np.ndarray, width: int, height: int) -> np.ndarray:
@@ -275,45 +273,17 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     }
 
 # ═════════════════════════════════════════════════════════════════════════════
-# 3. GÉNÉRATION DES CARTES CONTROLNET (_canny.png et _depth.png)
+# 3. CRÉATION DU PLAN STRUCTURAL PROPRE DE HAUTE PRÉCISION (_clean_plan.png)
 # ═════════════════════════════════════════════════════════════════════════════
 
-def generate_controlnet_maps(structure_mask: np.ndarray, output_canny_path: str, output_depth_path: str):
-    h, w = structure_mask.shape
-    
-    canny_edges = cv2.Canny(structure_mask, 80, 180)
-    kernel_smooth = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
-    canny_edges = cv2.morphologyEx(canny_edges, cv2.MORPH_CLOSE, kernel_smooth)
-    
-    canny_inv = cv2.bitwise_not(canny_edges)
-    canny_rgb = cv2.cvtColor(canny_inv, cv2.COLOR_GRAY2RGB)
-
-    os.makedirs(os.path.dirname(os.path.abspath(output_canny_path)), exist_ok=True)
-    cv2.imwrite(output_canny_path, cv2.cvtColor(canny_rgb, cv2.COLOR_RGB2BGR))
-
-    dist_transform = cv2.distanceTransform(structure_mask, cv2.DIST_L2, 5)
-    roof_gradient = np.zeros_like(dist_transform, dtype=np.uint8)
-    if np.max(dist_transform) > 0:
-        cv2.normalize(dist_transform, roof_gradient, 160, 255, cv2.NORM_MINMAX)
-
-    depth_map_2d = np.where(structure_mask > 0, roof_gradient, 40).astype(np.uint8)
-    depth_blurred = cv2.GaussianBlur(depth_map_2d, (7, 7), 0)
-    depth_rgb = cv2.cvtColor(depth_blurred, cv2.COLOR_GRAY2RGB)
-
-    os.makedirs(os.path.dirname(os.path.abspath(output_depth_path)), exist_ok=True)
-    cv2.imwrite(output_depth_path, cv2.cvtColor(depth_rgb, cv2.COLOR_RGB2BGR))
-
-# ═════════════════════════════════════════════════════════════════════════════
-# 4. CRÉATION DU PLAN STRUCTURAL PROPRE DE HAUTE PRÉCISION (_clean_plan.png)
-# ═════════════════════════════════════════════════════════════════════════════
-
-def apply_soft_shadow(canvas: Image.Image, mask_img: Image.Image, opacity: int = 120, offset: tuple = (6, 6)) -> Image.Image:
+def apply_soft_shadow(canvas: Image.Image, mask_img: Image.Image, opacity: int = 60, offset: tuple = (3, 3)) -> Image.Image:
+    """Génère une ombre portée floue douce (Drop Shadow dx=3, dy=3, blur=5px, alpha 20%)."""
     w, h = canvas.size
     alpha_ch = mask_img.convert("L")
     
     shadow_base = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     shadow_base.putalpha(alpha_ch.point(lambda p: int(p * opacity / 255)))
-    shadow_base = shadow_base.filter(ImageFilter.GaussianBlur(6))
+    shadow_base = shadow_base.filter(ImageFilter.GaussianBlur(5))
     
     shadow_full = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     shadow_full.paste(shadow_base, offset)
@@ -370,8 +340,8 @@ def render_car_sprite(canvas: Image.Image, x: int, y: int, w: int, h: int) -> Im
 
     shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
     shadow_draw = ImageDraw.Draw(shadow)
-    shadow_draw.ellipse([x + int(w*0.05), y + int(h*0.80), x + int(w*0.95), y + int(h*1.02)], fill=(0, 0, 0, 70))
-    shadow = shadow.filter(ImageFilter.GaussianBlur(8))
+    shadow_draw.ellipse([x + int(w*0.05), y + int(h*0.80), x + int(w*0.95), y + int(h*1.02)], fill=(0, 0, 0, 50))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(5))
     
     return Image.alpha_composite(car_layer, shadow)
 
@@ -415,8 +385,8 @@ def render_bed(canvas: Image.Image, x: int, y: int, w: int, h: int, color_scheme
 
     shadow_layer = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
     shadow_draw = ImageDraw.Draw(shadow_layer)
-    shadow_draw.rectangle([x + 4, y + h, x + w + 4, y + h + 8], fill=(0, 0, 0, 50))
-    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(4))
+    shadow_draw.rectangle([x + 3, y + h, x + w + 3, y + h + 5], fill=(0, 0, 0, 45))
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(5))
     
     return Image.alpha_composite(canvas, shadow_layer)
 
@@ -477,7 +447,7 @@ def render_furniture_layer(canvas: Image.Image, furniture_mask: np.ndarray, widt
             canvas.paste(table_fill, (0, 0), mask=elem_mask_pil)
             continue
 
-        # 3.5 2ème Table Console Basse avec Pot de Fleurs (sous la SAM à droite près du meuble TV)
+        # 3.5 2ème Table Console Basse avec Pot de Fleurs
         if x > width * 0.65 and y > height * 0.55 and area > 800 and area < 4000:
             elem_mask = np.where(labels == i, 255, 0).astype(np.uint8)
             elem_mask_pil = Image.fromarray(elem_mask)
@@ -502,8 +472,8 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
     building_mask = proc_result.get("building_mask", np.ones((height, width), dtype=np.uint8) * 255)
     img_area = width * height
 
-    # 1. Canvas fond blanc neutre pro (#FFFFFF / 255, 255, 255)
-    canvas_base = Image.new("RGBA", (width, height), (255, 255, 255, 255))
+    # 1. Canvas fond crème/béton ciré clair Nano Banana (#F4F0EA)
+    canvas_base = Image.new("RGBA", (width, height), (244, 240, 234, 255))
     layer1_floors = canvas_base.copy()
 
     cartouche_y_limit = int(height * 0.82)
@@ -522,7 +492,7 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
     tex_cobble = _CATALOG.get_texture("cobblestone", width, height)
     layer1_floors.paste(tex_cobble, (0, 0), mask=carport_mask_pil)
 
-    # 3. Zone Véranda / Entrée (Béton lissé clair #C8CECF)
+    # 3. Zone Véranda / Entrée (Béton/Enduit crème clair #F4F0EA)
     veranda_mask = np.zeros((height, width), dtype=np.uint8)
     cv2.rectangle(
         veranda_mask,
@@ -536,9 +506,9 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
     tex_veranda = _CATALOG.get_texture("veranda", width, height)
     layer1_floors.paste(tex_veranda, (0, 0), mask=veranda_mask_pil)
 
-    # 4. Texturage intérieur pièce par pièce - restreint STRICTEMENT à l'enveloppe du bâtiment
+    # 4. Texturage intérieur pièce par pièce - PALETTE SOFT NANO BANANA
     inv_sealed = cv2.bitwise_not(sealed_walls)
-    inv_sealed[building_mask == 0] = 0 # élimine les zones hors bâtiment
+    inv_sealed[building_mask == 0] = 0
     num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(inv_sealed)
     areas = stats[:, cv2.CC_STAT_AREA]
     largest_label = np.argmax(areas)
@@ -565,45 +535,45 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
 
         valid_room_count += 1
         room_mask = np.where(labels == label_idx, 255, 0).astype(np.uint8)
-
-        # SUBTRACTION DU MOBILIER : Le parquet s'applique UNIQUEMENT sur le sol et NE RECOUVRE PAS le mobilier !
         floor_only_mask = cv2.bitwise_and(room_mask, cv2.bitwise_not(furniture_mask))
         room_mask_pil = Image.fromarray(floor_only_mask)
 
-        is_annex = (x < width * 0.32)
-
+        # Sélection des textures Soft Pastel selon le type de pièce
         if area < 3500:
-            tex_img = _CATALOG.get_texture("patterned_tile", width, height)
-        elif is_annex:
-            tex_img = _CATALOG.get_texture("parquet", width, height) if area > 5000 else _CATALOG.get_texture("light_tile", width, height)
-        elif area > 12000:
-            tex_img = _CATALOG.get_texture("parquet", width, height)
-        elif valid_room_count % 2 == 1:
+            # Cuisines / Sanitaires : Carrelage beige/mint (#E8F0E6)
+            tex_img = _CATALOG.get_texture("kitchen", width, height)
+        elif area > 10000 or valid_room_count % 2 == 1:
+            # Salons / Séjours : Parquet chêne miel/clair (#D9AA72)
             tex_img = _CATALOG.get_texture("parquet", width, height)
         else:
-            tex_img = _CATALOG.get_texture("light_tile", width, height)
+            # Chambres : Carrelage mat bleu/gris pastel (#E3E8ED)
+            tex_img = _CATALOG.get_texture("bedroom", width, height)
 
         layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
 
-    # 5. Rendu du Mobilier et du Véhicule en calque superposé
+    # 5. Rendu du Mobilier et du Véhicule avec Ombres Portées Douces
     render_furniture_layer(layer1_floors, furniture_mask, width, height)
 
     # 6. Ajout des plantes décoratives en pot
     add_plants_to_canvas(layer1_floors)
 
-    # 7. Poché des murs Dark Slate (#1E293B) + Ombre 3D ambiante
-    layer2_walls = apply_soft_shadow(layer1_floors, Image.fromarray(sealed_walls), opacity=130, offset=(6, 6))
-    wall_pil = Image.fromarray(sealed_walls)
-    layer2_walls.paste(Image.new("RGBA", (width, height), (30, 41, 59, 255)), (0, 0), mask=wall_pil)
+    # 7. HABILLAGE DOUX DES MURS — Contour Bois Sombre Warm (#3D2817) + Stroke 3px (#24170D)
+    # Ombre portée 3D ambiante sous les murs (opacity 60%, blur 5px)
+    layer2_walls = apply_soft_shadow(layer1_floors, Image.fromarray(sealed_walls), opacity=60, offset=(3, 3))
     
+    wall_pil = Image.fromarray(sealed_walls)
+    # Pochage brun foncé / bois sombre (#3D2817 / 61, 40, 23)
+    layer2_walls.paste(Image.new("RGBA", (width, height), (61, 40, 23, 255)), (0, 0), mask=wall_pil)
+    
+    # Contour fin 3px brun foncé chaleureux (#24170D / 36, 23, 13)
     wall_outline = Image.fromarray(cv2.Canny(sealed_walls, 100, 200))
-    layer2_walls.paste(Image.new("RGBA", (width, height), (15, 23, 42, 255)), (0, 0), mask=wall_outline)
+    layer2_walls.paste(Image.new("RGBA", (width, height), (36, 23, 13, 255)), (0, 0), mask=wall_outline)
 
     os.makedirs(os.path.dirname(os.path.abspath(output_clean_path)), exist_ok=True)
     layer2_walls.convert("RGB").save(output_clean_path, "PNG")
 
 # ═════════════════════════════════════════════════════════════════════════════
-# 5. CLI & MAIN PIPELINE EXECUTION
+# 5. CLI & MAIN PIPELINE EXECUTION WITH MULTIPLY TEXT BLENDING
 # ═════════════════════════════════════════════════════════════════════════════
 
 def apply_plan_watermark(image_rgba: Image.Image, user_plan: str = "free") -> Image.Image:
@@ -628,7 +598,7 @@ def main():
     output_base_path = os.path.abspath(sys.argv[2])
 
     print("=" * 65)
-    print("🏛️ ARCHI CAM AI — ENGINE DE PRÉTRAITEMENT OPENCV V6 (NIVEAU AVANCÉ)")
+    print("🏛️ ARCHI CAM AI — ENGINE DE PRÉTRAITEMENT OPENCV V7 (NANO BANANA HD)")
     print("=" * 65)
     print(f"📁 Entrée source : {input_path}")
     print(f"🎯 Sortie de base : {output_base_path}")
@@ -638,7 +608,6 @@ def main():
         h, w = bgr_img.shape[:2]
         print(f"📐 Résolution rasterisée : {w} x {h} px")
 
-        # Protection OOM : Redimensionnement si dimension > 4096px
         if max(h, w) > 4096:
             scale = 4096.0 / float(max(h, w))
             new_w, new_h = int(w * scale), int(h * scale)
@@ -660,19 +629,29 @@ def main():
         print("⚙️ Traitement en cours : dénoyautage du bruit, segmentation des murs & extraction du texte...")
         proc_result = process_hand_drawn_notebook_sketch(bgr_img)
 
-        print("🎨 Génération du plan de précision avancée (bâtiment + mobilier + véhicules)...")
+        print("🎨 Génération du plan Nano Banana HD (textures soft, murs bois #3D2817, calque multiply)...")
         generate_clean_plan(bgr_img, proc_result, output_clean_plan)
         generate_controlnet_maps(proc_result["structural_walls"], output_canny, output_depth)
 
         proc_result["text_layer_rgba"].save(output_text, "PNG")
 
-        user_plan = os.environ.get("USER_PLAN", "free")
+        # ── FUSION VECTORIELLE DU CALQUE TEXTE EN MODE PRODUIT (MULTIPLY) ──
         try:
-            clean_img_rgba = Image.open(output_clean_plan).convert("RGBA")
-            clean_img_watermarked = apply_plan_watermark(clean_img_rgba, user_plan)
-            clean_img_watermarked.save(output_clean_plan, "PNG")
-        except Exception:
-            pass
+            rendered_img = Image.open(output_clean_plan).convert("RGB")
+            text_mask_img = proc_result["text_layer_rgba"]
+            
+            # Créer un calque texte avec fond blanc pour le mode Multiply
+            text_white_bg = Image.new("RGB", (w, h), (255, 255, 255))
+            text_white_bg.paste(text_mask_img, (0, 0), mask=text_mask_img)
+
+            # Application du Blending Multiply (Mode Produit)
+            final_multiply = ImageChops.multiply(rendered_img, text_white_bg).convert("RGBA")
+            user_plan = os.environ.get("USER_PLAN", "free")
+            final_watermarked = apply_plan_watermark(final_multiply, user_plan)
+            final_watermarked.save(output_clean_plan, "PNG")
+            print("✨ Calque texte superposé avec succès en Mode Produit (Multiply) !")
+        except Exception as e:
+            print(f"⚠️ Notice Multiply Blending : {e}")
 
         if output_base_path.lower().endswith(".png"):
             layer_clean_bgr = cv2.imread(output_clean_plan)
@@ -680,7 +659,7 @@ def main():
                 cv2.imwrite(output_base_path, layer_clean_bgr)
 
         print("-" * 65)
-        print("✨ SUCCÈS ! Les 4 fichiers de sortie ont été générés avec précision :")
+        print("✨ SUCCÈS ! Le rendu Nano Banana HD a été généré avec précision :")
         print(f"   1. 🖼️ Clean Plan : {output_clean_plan}")
         print(f"   2. ✏️ Lineart Canny: {output_canny}")
         print(f"   3. 🗺️ Depth Map 2.5D: {output_depth}")
