@@ -43,7 +43,9 @@ export async function callControlNetBridge(params: {
     seed: Math.floor(Math.random() * 1000000),
   };
 
-  const endpoint = "https://api.replicate.com/v1/models/lucataco/sdxl-controlnet/predictions";
+  // Replicate: utiliser POST /v1/predictions avec version hash explicite
+  // lucataco/sdxl-controlnet@version stable confirmée
+  const endpoint = "https://api.replicate.com/v1/predictions";
 
   const res = await fetch(endpoint, {
     method: "POST",
@@ -52,6 +54,7 @@ export async function callControlNetBridge(params: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      version: "db2ffdbdc7a861a4a4dd5d9f49a58f5007b54f1c3a63da326bd5aef5ec52e3f9",
       input: inputPayload,
     }),
   });

@@ -35,11 +35,12 @@ export async function analyzePlanWithLMStudioVision(imageOrPdfPath: string): Pro
     const rawBuf = safeReadFileSync(targetImagePath);
     if (!rawBuf) return null;
 
-    // Optimisation VLM : Redimensionnement Sharp à max 1024px pour diviser le temps d'inférence LM Studio par 10
+    // Optimisation VLM : Redimensionnement Sharp à max 512px — vitesse x4 vs 1024px
+    // minicpm-v-2_6 traite en ~1.3 tokens/sec : 512px = ~2min vs ~8min en 1024px
     const sharp = require("sharp");
     const resizedBuf = await sharp(rawBuf)
-      .resize({ width: 1024, height: 1024, fit: "inside", withoutEnlargement: true })
-      .png({ quality: 80 })
+      .resize({ width: 512, height: 512, fit: "inside", withoutEnlargement: true })
+      .png({ quality: 75 })
       .toBuffer();
 
     const base64Data = resizedBuf.toString("base64");
@@ -75,13 +76,18 @@ Return raw JSON ONLY with no markdown commentary.
 `;
 
     const controller = new AbortController();
-    const TIMEOUT_MS = 360000; // 360 secondes (6 minutes) pour inférence VLM complète
+    const TIMEOUT_MS = 900000; // 900 secondes (15 minutes) — minicpm-v-2_6 à 1.3 tokens/sec
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    const http = require("http");
+    const agent = new http.Agent({ keepAlive: true, timeout: 920000 }); // socket keepAlive > abort timeout
 
     const res = await fetch(LM_STUDIO_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Connection": "keep-alive" },
       signal: controller.signal,
+      // @ts-ignore - Node.js agent to prevent premature socket closure
+      agent,
       body: JSON.stringify({
         model: process.env.LM_STUDIO_MODEL || "minicpm-v-2_6",
         messages: [
