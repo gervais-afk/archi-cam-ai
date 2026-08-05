@@ -13,12 +13,21 @@ MANDATORY GEOMETRY & PERSPECTIVE RULES:
   * Living & Bedrooms: Premium floor finishes matching the requested architectural style. Plush designer furniture, clean layout.
   * Kitchen & Corridors: Polished tiles/marble with sleek countertops.
   * Bathrooms & Wet Areas: Patterned ceramic tiles with clean white sanitary fixtures.
+- RULE FOR VERANDAS & PORCHES: Verandas, porches and balconies MUST BE OPEN TO THE OUTSIDE. NEVER place indoor dining tables, beds, or wardrobes in a veranda. VERANDAS MUST ONLY BE FURNISHED WITH: outdoor lounge armchairs, a small patio coffee table, or rattan sun loungers. Keep walls minimal or open for outdoor spaces.
 - ARCHITECTURAL COMPLIANCE: Dark anthracite walls (#1E293B) with smooth 3D ambient occlusion drop shadows. Preserve room names and surface areas.
 - NO HALLUCINATED ANNEXES OR VEHICLES: Do NOT add random cars, garages, or extra wings that are not in the input plan.
 `.trim();
 
 export const MASTER_NEGATIVE_PROMPT = 
-  "blurry, low quality, distorted, deformed furniture, 35-45 degree isometric, perspective view, 3/4 angle, hand-drawn, sketch, watercolor, white background, empty rooms, unfurnished, text errors, watermark, cropped";
+  "blurry, low quality, distorted, deformed furniture, 35-45 degree isometric, perspective view, 3/4 angle, hand-drawn, sketch, watercolor, white background, empty rooms, unfurnished, text errors, watermark, cropped, baked-in misspelled text, room label overlays inside generated image";
+
+export const PRESET_LUXE_TROPICAL_PAYSAGER = `
+Top-down 2D architectural masterplan floor plan. The house is surrounded by dense lush tropical greenery, palm tree leaves framing the image borders, dark stone paved driveway, soft outdoor sunlight with realistic drop shadows. Interior features warm oak parquet, marble kitchen counters, modern minimalist furniture, soft indoor potted plants. High-end architectural digest photography style.
+`.trim();
+
+export const PRESET_BOARD_ARCHITECTE_PRO = `
+Professional 2D architectural presentation board. Crisp thin dark charcoal walls (#2A2A2A) with precise geometric alignment. Clean off-white studio background with 15% outer margins. High-end interior design: Scandinavian light wood flooring, polished porcelain tiles in bathrooms, beige fabric sofas, elegant dining table, subtle green potted plants in corners. Soft ambient occlusion shadows. Ultra-clean, photorealistic 8K render.
+`.trim();
 
 export interface Neo4jRenderContext {
   city?: string;
@@ -71,7 +80,11 @@ TRUST THE CANNY MAP over any general knowledge.
   let styleSpecifics = "";
   const s = style.toLowerCase();
 
-  if (s.includes("moderne")) {
+  if (s.includes("paysager") || s.includes("luxe_tropical_paysager") || s.includes("luxe_tropical")) {
+    styleSpecifics = PRESET_LUXE_TROPICAL_PAYSAGER;
+  } else if (s.includes("pro") || s.includes("architect_pro") || s.includes("board_architecte_pro")) {
+    styleSpecifics = PRESET_BOARD_ARCHITECTE_PRO;
+  } else if (s.includes("moderne")) {
     styleSpecifics = "STYLE MODERNE SCANDINAVE: White bleached oak wood flooring in bedrooms, Nero Marquina black marble in kitchen, neutral grey linen sofas, minimalist black matte fixtures, sleek architectural geometry.";
   } else if (s.includes("commercial")) {
     styleSpecifics = "STYLE COMMERCIAL / BUREAUX: Dark anthracite commercial carpet tiles in open-space offices, glass partition walls, LED panel light fixtures, modern office desks with ergonomic chairs, conference rooms, executive suites.";
@@ -80,7 +93,7 @@ TRUST THE CANNY MAP over any general knowledge.
   } else if (s.includes("r_plus_2") || s.includes("r+2")) {
     styleSpecifics = "STYLE IMMEUBLE RESIDENTIEL R+2: Multi-family R+2 apartment complex layout with T3/T4 apartments, elevator shaft with stainless steel cabin, central staircase core, private balconies, covered parking bays.";
   } else {
-    styleSpecifics = "STYLE LUXE TROPICAL VILLA: Warm honey teak hardwood floors in living areas and bedrooms, polished white Calacatta marble tiles in kitchen and corridors, patterned ceramic tiles in bathrooms. Top-down 2D architectural floorplan, clean inner rooms, realistic wood and tile textures, no cars, no vehicles, no external parking, strictly match internal wall geometry.";
+    styleSpecifics = PRESET_BOARD_ARCHITECTE_PRO;
   }
 
   let neo4jPromptInject = "";
@@ -114,7 +127,7 @@ Soft ambient drop shadows under walls, clean architectural details, 8k resolutio
 `.trim();
 }
 
-export function buildMasterPrompt(renderMode: string, customPrompt?: string): string {
-  return buildRenderPrompt(renderMode, undefined);
+export function buildMasterPrompt(renderMode: string, customPrompt?: string, style: string = "ARCHITECT_PRO"): string {
+  return buildRenderPrompt(style, undefined);
 }
 

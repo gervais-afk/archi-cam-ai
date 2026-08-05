@@ -145,10 +145,10 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { prompt, style, renderMode, planUrl, pdfFilePath, imageBase64, mimeType } = body;
+    const { prompt, style, renderMode, planUrl, pdfFilePath, imageBase64, mimeType, stylePreset } = body;
 
     const modeKey = String(renderMode || "RENDER_3D_FURNISHED_LUXE_TROPICAL").toUpperCase();
-    const styleKey = String(style || "luxe_tropical").toLowerCase();
+    const styleKey = String(stylePreset || style || "ARCHITECT_PRO").toLowerCase();
 
     console.log(`[API Render Image LEAN] 🚀 Traitement pour User: ${session.userId} — Mode: '${modeKey}'`);
 
@@ -353,7 +353,7 @@ export async function POST(request: Request) {
 
     const maskPath = safeExistsSync(resolvedCleanPlanPath) ? resolvedCleanPlanPath : publicOutPath;
     const maskDataUri = fileToDataUri(maskPath);
-    let masterPrompt = buildMasterPrompt(modeKey, prompt);
+    let masterPrompt = buildMasterPrompt(modeKey, prompt, styleKey);
 
     let renderUrlResult: string | null = null;
     let engineUsed = "Local OpenCV 2.5D Fallback";

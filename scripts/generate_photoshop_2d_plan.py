@@ -340,6 +340,91 @@ def validate_mask_quality(binary_mask: np.ndarray) -> tuple:
     return True, "VALID"
 
 
+def autocrop_sheet(bgr_img: np.ndarray) -> np.ndarray:
+    """
+    Détecte la feuille blanche de plan sur une table sombre et effectue un rognage (crop) automatique.
+    Si aucune feuille n'est clairement détectée, applique un recadrage de repli de 5% sur tous les bords.
+    """
+    h, w = bgr_img.shape[:2]
+    gray = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    
+    # Binarisation d'Otsu pour isoler la zone claire (la feuille blanche)
+    _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    best_rect = None
+    max_area = 0
+    min_area = 0.15 * w * h  # La feuille doit représenter au moins 15% de l'image
+    
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        if area > min_area and area > max_area:
+            # Enveloppe approximative
+            peri = cv2.arcLength(cnt, True)
+            approx = cv2.approxPolyDP(cnt, 0.04 * peri, True)
+            # Accepter le rectangle englobant du plus grand contour clair trouvé
+            max_area = area
+            best_rect = cv2.boundingRect(cnt)
+            
+    if best_rect is not None:
+        x, y, bw, bh = best_rect
+        print(f"[Autocrop] Feuille détectée : x={x}, y={y}, w={bw}, h={bh} ({max_area / (w * h) * 100:.1f}% de la surface)")
+        if bw > 0.3 * w and bh > 0.3 * h:
+            # Rognage propre
+            return bgr_img[y:y+bh, x:x+bw]
+            
+    # Échenillage de repli : 5% sur tous les bords
+    print("[Autocrop] Feuille claire non détectée. Échenillage de repli (crop 5% sur les 4 bords).")
+    pad_y = int(h * 0.05)
+    pad_x = int(w * 0.05)
+    return bgr_img[pad_y:h-pad_y, pad_x:w-pad_x]
+
+def extract_dashed_lines(binary_img: np.ndarray) -> tuple:
+    """
+    Identifie et sépare les lignes interrompues / pointillés (- - -) des murs pleins.
+    Retourne (murs_propres, masque_pointilles)
+    """
+    h, w = binary_img.shape[:2]
+    dashed_mask = np.zeros_like(binary_img)
+    
+    # HoughLinesP avec un petit seuil pour trouver les petits segments
+    lines = cv2.HoughLinesP(
+        binary_img,
+        rho=1,
+        theta=np.pi / 180,
+        threshold=12,
+        minLineLength=6,
+        maxLineGap=18
+    )
+    
+    if lines is not None:
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            length = np.hypot(x2 - x1, y2 - y1)
+            if length < 8:
+                continue
+                
+            # Sample les points le long du segment pour inspecter le profil
+            num_samples = int(length)
+            xs = np.linspace(x1, x2, num_samples).astype(int)
+            ys = np.linspace(y1, y2, num_samples).astype(int)
+            xs = np.clip(xs, 0, w - 1)
+            ys = np.clip(ys, 0, h - 1)
+            
+            profile = binary_img[ys, xs]
+            transitions = np.sum(profile[:-1] != profile[1:])
+            
+            # S'il y a des transitions (alternance d'encre et de vide), c'est une ligne en pointillés !
+            if transitions >= 2:
+                cv2.line(dashed_mask, (x1, y1), (x2, y2), 255, thickness=2)
+                
+    # On nettoie l'image binarisée d'origine en soustrayant le masque des pointillés
+    murs_propres = cv2.subtract(binary_img, dashed_mask)
+    return murs_propres, dashed_mask
+
+
 def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     height, width = bgr_img.shape[:2]
 
@@ -362,10 +447,26 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     # pour ne pas supprimer les murs architecturaux horizontaux par erreur.
     binary = detect_and_remove_ruled_lines(binary, width)
 
+    # ── ÉTAPE 1.5 : EXTRACTION DES POINTILLÉS / LIGNES INTERROMPUES ───────────
+    # On isole les pointillés (- - -) avant la dilatation des murs pour éviter de
+    # fermer les ouvertures comme s'il s'agissait de cloisons opaques portantes.
+    binary, dashed_mask = extract_dashed_lines(binary)
+
     # ── GARDE-FOU ADAPTATIF : remplacement du seuil fixe 40% ──────────────────
-    # validate_mask_quality() analyse la densité de contours (Canny) et le flou
-    # pour différencier un masque corrompu d'un dessin complexe valide.
-    is_valid, quality_reason = validate_mask_quality(binary)
+    # validate_mask_quality() analyse la densité de contours (Canny) et le flou.
+    # On isole la zone active du dessin pour ne pas fausser les métriques avec le padding blanc.
+    pts = cv2.findNonZero(binary)
+    if pts is not None:
+        x_pts, y_pts, bw_pts, bh_pts = cv2.boundingRect(pts)
+        x_min = max(0, x_pts - 15)
+        y_min = max(0, y_pts - 15)
+        x_max = min(width, x_pts + bw_pts + 15)
+        y_max = min(height, y_pts + bh_pts + 15)
+        validation_target = binary[y_min:y_max, x_min:x_max]
+    else:
+        validation_target = binary
+
+    is_valid, quality_reason = validate_mask_quality(validation_target)
     if not is_valid:
         print(f"[Sketch] ⚠️ Masque invalide (raison: {quality_reason}). Fallback Lineart Canny propre.")
         # Retourner un Canny propre plutôt qu'un masque corrompu
@@ -376,13 +477,13 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     building_mask = detect_building_envelope(binary, width, height)
     binary_in_building = cv2.bitwise_and(binary, building_mask)
 
-    # ── ÉTAPE 2 : FERMETURE MORPHOLOGIQUE RENFORCÉE DES MURS (9x9) ─────────────
-    # Épaississement des traits de stylo pour boucher les micro-trous et éviter les fuites
-    # NOTE : La dilatation est appliquée APRÈS le retrait des lignes horizontales.
-    kernel_dilate = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
+    # ── ÉTAPE 2 : FERMETURE MORPHOLOGIQUE RENFORCÉE DES MURS FIN (3x3 / 4x4) ──
+    # Épaississement des traits de stylo pour boucher les micro-trous et éviter les fuites.
+    # Réduction à un noyau très fin de (3x3)/(4x4) pour des cloisons fines et élégantes.
+    kernel_dilate = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     binary_thickened = cv2.dilate(binary_in_building, kernel_dilate, iterations=1)
 
-    kernel_seal = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
+    kernel_seal = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
     sealed_walls = cv2.morphologyEx(binary_thickened, cv2.MORPH_CLOSE, kernel_seal)
 
     num_wall_comps, wall_labels, wall_stats, _ = cv2.connectedComponentsWithStats(sealed_walls)
@@ -422,6 +523,7 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
         "clean_text_mask": clean_text_mask,
         "text_layer_rgba": Image.fromarray(text_rgba, "RGBA"),
         "building_mask": building_mask,
+        "dashed_mask": dashed_mask,
         "width": width,
         "height": height
     }
@@ -623,22 +725,29 @@ def render_furniture_layer(canvas: Image.Image, furniture_mask: np.ndarray, widt
         outline_img = Image.fromarray(cv2.Canny(elem_mask, 100, 200))
         canvas.paste(Image.new("RGBA", (width, height), (71, 85, 105, 255)), (0, 0), mask=outline_img)
 
-def generate_controlnet_maps(structural_walls: np.ndarray, output_canny_path: str, output_depth_path: str):
+def generate_controlnet_maps(structural_walls: np.ndarray, dashed_mask: np.ndarray, output_canny_path: str, output_depth_path: str):
     """
-    Génère les cartes ControlNet (Canny & Depth wireframe) depuis les murs structuraux.
+    Génère les cartes ControlNet (Canny & Depth wireframe) depuis les murs structuraux et les pointillés.
     """
     try:
         if structural_walls is None or structural_walls.size == 0:
             print("⚠️ Notice ControlNet : Image de murs vide ou invalide.")
             return
 
-        # 1. Canny edge map
+        # 1. Canny edge map (on combine les murs et les pointillés)
         canny_img = cv2.Canny(structural_walls, 100, 200)
+        if dashed_mask is not None and dashed_mask.size > 0:
+            canny_img = cv2.bitwise_or(canny_img, dashed_mask)
+            
         os.makedirs(os.path.dirname(os.path.abspath(output_canny_path)), exist_ok=True)
         cv2.imwrite(output_canny_path, canny_img)
 
         # 2. Depth map (synthétique basée sur la distance aux bords)
-        dist_transform = cv2.distanceTransform(structural_walls, cv2.DIST_L2, 5)
+        combined_struct = structural_walls.copy()
+        if dashed_mask is not None and dashed_mask.size > 0:
+            combined_struct = cv2.bitwise_or(combined_struct, dashed_mask)
+            
+        dist_transform = cv2.distanceTransform(combined_struct, cv2.DIST_L2, 5)
         depth_normalized = cv2.normalize(dist_transform, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
         os.makedirs(os.path.dirname(os.path.abspath(output_depth_path)), exist_ok=True)
         cv2.imwrite(output_depth_path, depth_normalized)
@@ -715,6 +824,12 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
     # Ombre portée 3D ambiante sous les murs (opacity 60%, blur 5px)
     layer2_walls = apply_soft_shadow(layer1_floors, Image.fromarray(sealed_walls), opacity=60, offset=(3, 3))
     
+    # Rendu des pointillés sur un calque séparé (comme des ouvertures/poutres en gris moyen #475569) SANS gros pochage massif
+    dashed_mask = proc_result.get("dashed_mask")
+    if dashed_mask is not None and dashed_mask.size > 0:
+        dashed_pil = Image.fromarray(dashed_mask)
+        layer2_walls.paste(Image.new("RGBA", (width, height), (71, 85, 105, 255)), (0, 0), mask=dashed_pil)
+        
     wall_pil = Image.fromarray(sealed_walls)
     # Pochage brun foncé / bois sombre (#3D2817 / 61, 40, 23)
     layer2_walls.paste(Image.new("RGBA", (width, height), (61, 40, 23, 255)), (0, 0), mask=wall_pil)
@@ -759,14 +874,18 @@ def main():
 
     try:
         bgr_img = load_input_image(input_path)
-        h, w = bgr_img.shape[:2]
-        print(f"📐 Résolution rasterisée : {w} x {h} px")
+        
+        # 1. Autocrop du plan (élimination de la table sombre en fond)
+        bgr_img = autocrop_sheet(bgr_img)
+        h_crop, w_crop = bgr_img.shape[:2]
+        print(f"📐 Résolution après autocrop : {w_crop} x {h_crop} px")
 
-        if max(h, w) > 4096:
-            scale = 4096.0 / float(max(h, w))
-            new_w, new_h = int(w * scale), int(h * scale)
+        if max(h_crop, w_crop) > 4096:
+            scale = 4096.0 / float(max(h_crop, w_crop))
+            new_w, new_h = int(w_crop * scale), int(h_crop * scale)
             bgr_img = cv2.resize(bgr_img, (new_w, new_h), interpolation=cv2.INTER_AREA)
-            print(f"📐 Image haute résolution ajustée à max 4096px : {new_w} x {new_h} px")
+            h_crop, w_crop = bgr_img.shape[:2]
+            print(f"📐 Image haute résolution ajustée à max 4096px : {w_crop} x {h_crop} px")
 
         out_dir = os.path.dirname(output_base_path)
         os.makedirs(out_dir, exist_ok=True)
@@ -783,10 +902,61 @@ def main():
         print("⚙️ Traitement en cours : dénoyautage du bruit, segmentation des murs & extraction du texte...")
         proc_result = process_hand_drawn_notebook_sketch(bgr_img)
 
+        # 2. Ajout de la marge blanche (padding) de 15% pour donner de l'espace à l'IA pour la verdure
+        # On applique le padding après coup à tous les éléments de sortie de proc_result
+        pad_y = int(h_crop * 0.15)
+        pad_x = int(w_crop * 0.15)
+
+        bgr_img = cv2.copyMakeBorder(
+            bgr_img,
+            top=pad_y,
+            bottom=pad_y,
+            left=pad_x,
+            right=pad_x,
+            borderType=cv2.BORDER_CONSTANT,
+            value=[255, 255, 255] # Blanc
+        )
+        h, w = bgr_img.shape[:2]
+        print(f"📐 Résolution finale avec padding de 15% : {w} x {h} px")
+
+        proc_result["structural_walls"] = cv2.copyMakeBorder(
+            proc_result["structural_walls"],
+            top=pad_y, bottom=pad_y, left=pad_x, right=pad_x,
+            borderType=cv2.BORDER_CONSTANT, value=0
+        )
+        proc_result["furniture_mask"] = cv2.copyMakeBorder(
+            proc_result["furniture_mask"],
+            top=pad_y, bottom=pad_y, left=pad_x, right=pad_x,
+            borderType=cv2.BORDER_CONSTANT, value=0
+        )
+        proc_result["building_mask"] = cv2.copyMakeBorder(
+            proc_result["building_mask"],
+            top=pad_y, bottom=pad_y, left=pad_x, right=pad_x,
+            borderType=cv2.BORDER_CONSTANT, value=0
+        )
+        if proc_result.get("dashed_mask") is not None:
+            proc_result["dashed_mask"] = cv2.copyMakeBorder(
+                proc_result["dashed_mask"],
+                top=pad_y, bottom=pad_y, left=pad_x, right=pad_x,
+                borderType=cv2.BORDER_CONSTANT, value=0
+            )
+
+        proc_result["clean_text_mask"] = cv2.copyMakeBorder(
+            proc_result["clean_text_mask"],
+            top=pad_y, bottom=pad_y, left=pad_x, right=pad_x,
+            borderType=cv2.BORDER_CONSTANT, value=0
+        )
+        text_rgba = np.zeros((h, w, 4), dtype=np.uint8)
+        text_rgba[proc_result["clean_text_mask"] > 0] = (15, 23, 42, 255)
+        proc_result["text_layer_rgba"] = Image.fromarray(text_rgba, "RGBA")
+
+        proc_result["width"] = w
+        proc_result["height"] = h
+
         print("🎨 Génération du plan Nano Banana HD (textures soft, murs bois #3D2817, calque multiply)...")
         generate_clean_plan(bgr_img, proc_result, output_clean_plan)
         try:
-            generate_controlnet_maps(proc_result["structural_walls"], output_canny, output_depth)
+            generate_controlnet_maps(proc_result["structural_walls"], proc_result.get("dashed_mask"), output_canny, output_depth)
         except Exception as e:
             print(f"⚠️ Notice ControlNet Maps generation : {e}")
 

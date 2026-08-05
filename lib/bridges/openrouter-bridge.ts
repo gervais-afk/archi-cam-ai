@@ -143,11 +143,26 @@ Structure attendue :
     const parsed = parseStrictJson<PlanMetadataResult>(content);
 
     if (parsed && Array.isArray(parsed.rooms)) {
-      const totalSurface = parsed.totalSurface || parsed.rooms.reduce((sum, r) => sum + (r.surface_m2 || 0), 0);
+      // Force room type to 'outdoor_veranda' for veranda/porch/balcony/terrasse keywords
+      const mappedRooms = parsed.rooms.map((room: any) => {
+        const nameUpper = String(room.name || "").toUpperCase();
+        if (
+          nameUpper.includes("VERANDA") ||
+          nameUpper.includes("PORCH") ||
+          nameUpper.includes("BALCONY") ||
+          nameUpper.includes("TERRASSE") ||
+          nameUpper.includes("TERRACE")
+        ) {
+          return { ...room, type: "outdoor_veranda" };
+        }
+        return room;
+      });
+
+      const totalSurface = parsed.totalSurface || mappedRooms.reduce((sum, r) => sum + (r.surface_m2 || 0), 0);
       return {
-        rooms: parsed.rooms,
+        rooms: mappedRooms,
         totalSurface: Math.round(totalSurface * 10) / 10,
-        roomCount: parsed.rooms.length,
+        roomCount: mappedRooms.length,
         rawText: content,
       };
     }
@@ -180,6 +195,9 @@ export async function generateArchitecturalRender(
     imageBase64Mask.startsWith("data:") ? imageBase64Mask : `data:image/png;base64,${imageBase64Mask}`
   );
 
+  // Append negative prompt rules and text constraints to the prompt (Directeur Artistique & Senior OpenCV)
+  const enhancedPrompt = `${prompt}\nNEGATIVE CONSTRAINT: no baked-in misspelled text, no room label overlays inside generated image, no watermark, no text overlays, clean drawing.`;
+
   const candidateModels = [
     "google/gemini-2.5-flash-image",
     "google/gemini-3.1-flash-image",
@@ -201,7 +219,7 @@ export async function generateArchitecturalRender(
               role: "user",
               content: [
                 { type: "image_url", image_url: { url: imageUri } },
-                { type: "text", text: prompt },
+                { type: "text", text: enhancedPrompt },
               ],
             },
           ],
@@ -248,7 +266,7 @@ export async function generateArchitecturalRender(
         headers: getOpenRouterHeaders(),
         body: JSON.stringify({
           model,
-          prompt,
+          prompt: enhancedPrompt,
           image: imageUri,
           n: 1,
           size: "1024x1024",

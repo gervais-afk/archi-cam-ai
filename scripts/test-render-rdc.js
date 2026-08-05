@@ -6,6 +6,7 @@ const path = require("path");
 const payload = {
   pdfFilePath: "c:/Users/HP/Desktop/Archi Cam AI/projet 270525 _ RDC.pdf",
   renderMode: "RENDER_3D_FURNISHED_LUXE_TROPICAL",
+  stylePreset: "luxe_tropical_paysager",
   style: "luxe_tropical"
 };
 
