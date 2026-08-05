@@ -76,11 +76,11 @@ Return raw JSON ONLY with no markdown commentary.
 `;
 
     const controller = new AbortController();
-    const TIMEOUT_MS = 900000; // 900 secondes (15 minutes) — minicpm-v-2_6 à 1.3 tokens/sec
+    const TIMEOUT_MS = 1800000; // 1800 secondes (30 minutes) — garantit l'analyse complète sans coupure
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
     const http = require("http");
-    const agent = new http.Agent({ keepAlive: true, timeout: 920000 }); // socket keepAlive > abort timeout
+    const agent = new http.Agent({ keepAlive: true, timeout: 1860000 }); // socket keepAlive 31 min > abort timeout
 
     const res = await fetch(LM_STUDIO_ENDPOINT, {
       method: "POST",

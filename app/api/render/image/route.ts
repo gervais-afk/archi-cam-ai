@@ -20,7 +20,7 @@ import { callControlNetBridge } from "@/lib/bridges/controlnet-bridge";
 import { callOpenAIImageBridge } from "@/lib/bridges/openai-bridge";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 1800; // 30 minutes max pour inférence VLM + rendu complet
 
 // ── CONSTANTES DES CHEMINS SYSTÈME ───────────────────────────────────────────
 const CWD = process.cwd();
