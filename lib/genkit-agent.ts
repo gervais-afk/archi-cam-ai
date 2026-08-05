@@ -285,23 +285,21 @@ export async function runSingleSemanticAnalysis(
 ): Promise<UnifiedAnalysisResult> {
   console.log(`[Unified Pipeline] 🔍 Début analyse sémantique (PlanType: ${planType})...`);
 
-  // 1. YOLO (ultra-rapide pour bbox mobilier sur PDF net)
-  if (planType === "VECTOR_PDF") {
-    try {
-      const { segmentPlanWithYolo } = await import("@/lib/yolo-bridge");
-      const yoloRes = await segmentPlanWithYolo(planPath);
-      if (yoloRes && yoloRes.room_count > 0) {
-        console.log(`[Unified Pipeline] 🎯 Analyse retenue: YOLO (${yoloRes.room_count} pièces)`);
-        return {
-          analysisSource: "yolo",
-          analyzerUsed: "yolo",
-          planType,
-          rooms: yoloRes.rooms.map((r, idx) => ({ name: r.id || `Pièce ${idx + 1}`, area_m2: r.estimated_m2 })),
-        };
-      }
-    } catch (e) {
-      console.warn("[Unified Pipeline] Notice YOLO indisponible:", e);
+  // 1. YOLO (ultra-rapide pour segmentation et détection de pièces)
+  try {
+    const { segmentPlanWithYolo } = await import("@/lib/yolo-bridge");
+    const yoloRes = await segmentPlanWithYolo(planPath);
+    if (yoloRes && yoloRes.room_count > 0) {
+      console.log(`[Unified Pipeline] 🎯 Analyse retenue: YOLO (${yoloRes.room_count} pièces)`);
+      return {
+        analysisSource: "yolo",
+        analyzerUsed: "yolo",
+        planType,
+        rooms: yoloRes.rooms.map((r, idx) => ({ name: r.id || `Pièce ${idx + 1}`, area_m2: r.estimated_m2 })),
+      };
     }
+  } catch (e) {
+    console.warn("[Unified Pipeline] Notice YOLO indisponible:", e);
   }
 
   // 2. LM Studio (analyse complète locale)

@@ -75,7 +75,7 @@ Return raw JSON ONLY with no markdown commentary.
 `;
 
     const controller = new AbortController();
-    const TIMEOUT_MS = 120000; // 120 secondes (2 minutes) au lieu de 45s
+    const TIMEOUT_MS = 360000; // 360 secondes (6 minutes) pour inférence VLM complète
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
     const res = await fetch(LM_STUDIO_ENDPOINT, {
@@ -83,7 +83,7 @@ Return raw JSON ONLY with no markdown commentary.
       headers: { "Content-Type": "application/json" },
       signal: controller.signal,
       body: JSON.stringify({
-        model: "gemma-4-12b-qat",
+        model: process.env.LM_STUDIO_MODEL || "minicpm-v-2_6",
         messages: [
           {
             role: "user",

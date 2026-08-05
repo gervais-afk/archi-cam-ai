@@ -47,9 +47,10 @@ export async function segmentPlanWithYolo(
       buffer = imageBufferOrPath;
     }
 
-    // Timeout de sécurité de 3.5s sur l'appel au microservice FastAPI
+    // Timeout de sécurité étendu à 15s (15000ms) pour garantir l'inférence YOLOv8-Seg complète
+    const YOLO_TIMEOUT_MS = parseInt(process.env.YOLO_TIMEOUT_MS || "15000", 10);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const timeoutId = setTimeout(() => controller.abort(), YOLO_TIMEOUT_MS);
 
     const blob = new Blob([new Uint8Array(buffer)], { type: "image/png" });
     const formData = new FormData();
@@ -74,7 +75,7 @@ export async function segmentPlanWithYolo(
     }
   } catch (err: any) {
     if (err.name === "AbortError") {
-      console.warn("[YOLO Bridge] Timeout (3.5s) du microservice FastAPI. Basculement sur fallback OpenCV.");
+      console.warn(`[YOLO Bridge] Timeout (${YOLO_TIMEOUT_MS / 1000}s) du microservice FastAPI. Basculement sur fallback OpenCV.`);
     } else {
       console.warn("[YOLO Bridge] Microservice FastAPI non détecté sur le port 8000. Fallback OpenCV actif.");
     }

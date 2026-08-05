@@ -10,10 +10,17 @@ from archi_agents.designer.scot_planner import SpatialCoTPlanner
 from archi_agents.researcher.duckdb_bi_engine import DuckDBSovereignBIEngine
 from archi_agents.legal.compliance_engine import AutomatedComplianceEngine
 
-def run_pdf_analysis_test():
-    pdf_path = "../2D ETAGE.pdf"
-    if not os.path.exists(pdf_path):
-        pdf_path = "2D ETAGE.pdf"
+def run_pdf_analysis_test(target_pdf: str = None):
+    pdf_path = target_pdf or (sys.argv[1] if len(sys.argv) > 1 else None)
+    if not pdf_path or not os.path.exists(pdf_path):
+        for candidate in ["2D RDC.pdf", "../projet 270525 _ RDC.pdf", "2D ETAGE.pdf", "../2D ETAGE.pdf"]:
+            if os.path.exists(candidate):
+                pdf_path = candidate
+                break
+
+    if not pdf_path or not os.path.exists(pdf_path):
+        print(f"❌ Aucun fichier PDF valide trouvé.")
+        return
 
     print(f"==================================================")
     print(f"🚀 ARCHI CAM AI - TEST COMPLET PLAN 2D PDF")
