@@ -59,7 +59,10 @@ export async function POST(req: Request) {
     try {
       const mcpRes = await fetch(`${fastmcpUrl}/mcp`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+        },
         body: JSON.stringify({
           jsonrpc: "2.0",
           id: 1,

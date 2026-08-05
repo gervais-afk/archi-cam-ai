@@ -42,8 +42,10 @@ __pycache__/
 # database & build outputs
 *.db
 *.sqlite
+*.duckdb
+*.pdf
+/public/clean_output_*
 /tests/output/
-/public/out/
 /public/uploads/
 /public/renders/plan_rendered_*
 /public/renders/test_*

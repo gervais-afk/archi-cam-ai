@@ -2,7 +2,7 @@
 type: "ArchiCam Financial Estimate"
 title: "Devis Estimatif Mercuriale BTP 2025/2026"
 tags: ["Mercuriale-2025", "FCFA", "CEMAC-Legal"]
-timestamp: "2026-08-03T20:19:56.591Z"
+timestamp: "2026-08-05T15:01:27.528Z"
 ---
 
 # 💰 DÉCOMPOSITION FINANCIÈRE & DEVIS HORS TAXES

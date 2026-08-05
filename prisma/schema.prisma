@@ -7,26 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UserCredit {
-  id           String              @id @default(uuid())
-  userId       String              @unique @map("user_id")
-  balance      Int                 @default(0)
-  createdAt    DateTime            @default(now()) @map("created_at")
-  updatedAt    DateTime            @updatedAt @map("updated_at")
-  transactions CreditTransaction[]
-
-  @@map("user_credits")
+enum TransactionType {
+  CREDIT
+  DEBIT
 }
 
-model CreditTransaction {
-  id          String     @id @default(uuid())
-  userId      String     @map("user_id")
-  amount      Int
-  feature     String
-  createdAt   DateTime   @default(now()) @map("created_at")
-  userCredit  UserCredit @relation(fields: [userId], references: [userId], onDelete: Cascade)
+enum PaymentProvider {
+  STRIPE
+  ORANGE_MONEY
+  MTN_MOMO
+  SYSTEM
+}
 
-  @@map("credit_transactions")
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+model User {
+  id             String        @id @default(uuid())
+  email          String?       @unique
+  name           String?
+  creditsBalance Int           @default(10) @map("credits_balance")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  transactions   Transaction[]
+
+  @@map("users")
+}
+
+model Transaction {
+  id        String            @id @default(uuid())
+  userId    String            @map("user_id")
+  amount    Int
+  type      TransactionType
+  provider  PaymentProvider   @default(SYSTEM)
+  status    TransactionStatus @default(SUCCESS)
+  feature   String?
+  metadata  Json?
+  createdAt DateTime          @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
 }
 
 model RenderJob {

@@ -156,7 +156,8 @@ Access the executive dashboard and 3D IFC simulation suite at `http://localhost:
 ## 🔒 DevSecOps & Enterprise Security Policy
 
 * ❌ **Zero Secret Exposure**: Pre-commit linting and CI/CD pipelines enforce absolute exclusion of API keys, credentials, and JWT tokens.
-* 🛡️ **Data & Artifact Isolation**: Local configurations (`.env.local`), database volumes, storage buckets, and temporary CAD artifacts are segregated via `.gitignore`.
+* 🛡️ **Cryptographic Watermarking & EXIF Security**: Injects invisible SHA-256 EXIF metadata (`Copyright`, `Artist`, `XPComment` JSON) and dynamic verification QR Codes to prevent blueprint theft and guarantee authenticity.
+* 📐 **Sketch-to-Plan Risk Mitigation**: Includes interactive surface confirmation sliders (`InferredDimensionsConfirmation.tsx`), fuzzy OCR handwriting correction, spatial topology validation, and architectural ratio enforcement.
 * 🇨🇲 **Sovereign Compliance**: Guarantees compliance with national infrastructural security guidelines by processing structural mathematics offline.
 
 ---

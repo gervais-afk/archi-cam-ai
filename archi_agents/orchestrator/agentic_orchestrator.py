@@ -271,7 +271,10 @@ def call_fastmcp_tool(tool_name: str, params: Dict) -> Dict:
     req = urllib.request.Request(
         f"{FASTMCP_URL}/mcp",
         data=payload,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json, text/event-stream"
+        },
         method="POST"
     )
     try:

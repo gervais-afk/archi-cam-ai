@@ -3,7 +3,7 @@ type: "ArchiCam Architectural Project Index"
 title: "Duplex R+1 Contemporain — Maison d'Orientation"
 description: "Master Index OKF v0.2 for Duplex R+1 Contemporain — Maison d'Orientation (Reasoning Engine v2.5)"
 tags: ["OKF-v0.2", "BTP-Cameroun", "SCoT-Architectural", "R+1", "Bioclimatic-A+"]
-timestamp: "2026-08-03T20:19:56.591Z"
+timestamp: "2026-08-05T15:01:27.528Z"
 producer: "ArchiCam AI Knowledge Engine v2.5"
 metadata:
   total_surface_m2: 95.28

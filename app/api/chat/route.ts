@@ -3,6 +3,7 @@ import { query } from "@/lib/db";
 import { verifyFirebaseToken } from "@/lib/firebase-server";
 import { Pool } from "pg";
 import { queryGraphRAG } from "@/src/tools/graphRAGReasoner";
+import { routeLLM, type LLMMessage } from "@/lib/llm-router";
 
 // ── Pool PostgreSQL dédié aux prix mercuriale (Phase 3) ──────────────────────
 const _mercurialePool = new Pool({
@@ -137,7 +138,8 @@ export async function POST(req: NextRequest) {
     }
 
     if (!geminiApiKey) {
-      return NextResponse.json({ error: "Gemini API key is not configured inside .env.local" }, { status: 500 });
+      // Gemini non disponible — le routeur LLM basculera automatiquement sur OpenRouter
+      console.warn("[RAG API] GEMINI_API_KEY absente. Fallback vers OpenRouter activé.");
     }
 
     console.log(`[RAG API] Vectorizing user query for agent: ${agent}`);
@@ -296,76 +298,41 @@ export async function POST(req: NextRequest) {
     \`\`\`
     Réponds toujours de manière professionnelle pour confirmer l'action entreprise.`;
 
-    // 5. Structure Conversation Payload for Gemini API
-    const contentsArray: any[] = [];
-    
-    // Add history in standard user/model format
-    if (history && history.length > 0) {
-      history.forEach((msg: any) => {
-        contentsArray.push({
-          role: msg.role === "user" ? "user" : "model",
-          parts: [{ text: msg.content }]
-        });
-      });
-    }
 
-    // Add current user message
-    const currentUserParts: any[] = [];
-    if (attachment) {
-      currentUserParts.push({
-        inlineData: {
-          mimeType: attachment.mimeType,
-          data: attachment.data
-        }
-      });
-    }
-    if (message) {
-      currentUserParts.push({ text: message });
-    }
+    // ── 6. Routage LLM : LM Studio → Gemini → OpenRouter ────────────────────
+    const useGrounding = agent === "researcher";
+    const llmMessages: LLMMessage[] = [
+      ...( history && history.length > 0
+        ? history.map((msg: any) => ({
+            role: msg.role === "user" ? "user" : "assistant",
+            content: msg.content,
+          } as LLMMessage))
+        : []
+      ),
+      {
+        role: "user",
+        content: attachment
+          ? [
+              { type: "image_url", image_url: { url: `data:${attachment.mimeType};base64,${attachment.data}` } },
+              ...(message ? [{ type: "text", text: message }] : []),
+            ]
+          : (message || "Bonjour"),
+      } as LLMMessage,
+    ];
 
-    contentsArray.push({
-      role: "user",
-      parts: currentUserParts
+    console.log(`[RAG API] Routage LLM vers cascade (LM Studio → Gemini → OpenRouter)...`);
+
+    const llmResult = await routeLLM({
+      systemPrompt: finalSystemPrompt,
+      messages: llmMessages,
+      maxTokens: 2048,
+      useGrounding,
+      preferLocal: true,
+      attachmentData: attachment ? { mimeType: attachment.mimeType, data: attachment.data } : undefined,
     });
 
-    // Enforce an actual multimodal model for safety
-    const apiModel = "gemini-2.5-flash";
-    console.log(`[RAG API] Initiating content generation with ${apiModel}...`);
-
-    // 6. Request Gemini content generation
-    // ── Phase 3 : Google Search Grounding pour l'Agent Researcher ─────────────
-    const useGrounding = agent === "researcher";
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${geminiApiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [{ text: finalSystemPrompt }]
-          },
-          contents: contentsArray,
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 2048
-          },
-          // Grounding Search activé uniquement pour le Researcher (prix marché live)
-          ...(useGrounding && {
-            tools: [{ googleSearch: {} }],
-          }),
-        })
-      }
-    );
-
-    if (!geminiRes.ok) {
-      const errorText = await geminiRes.text();
-      throw new Error(`Gemini API returned status ${geminiRes.status}: ${errorText}`);
-    }
-
-    const geminiJson = await geminiRes.json();
-    const assistantResponse = geminiJson.candidates?.[0]?.content?.parts?.[0]?.text || "Désolé, je n'ai pas pu formuler de réponse.";
-
-    console.log("[RAG API] Successfully generated assistant response.");
+    const assistantResponse = llmResult.content || "Désolé, je n'ai pas pu formuler de réponse.";
+    console.log(`[RAG API] ✅ Réponse générée via ${llmResult.provider} — ${llmResult.modelUsed} (${llmResult.latencyMs ?? 0}ms)`);
 
     // 7. Backend execution of Database modification if detected
     const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/;
@@ -419,7 +386,8 @@ export async function POST(req: NextRequest) {
       agent,
       sources,
       usedRAG,
-      model
+      model: llmResult.modelUsed,
+      provider: llmResult.provider,
     });
 
   } catch (error: any) {

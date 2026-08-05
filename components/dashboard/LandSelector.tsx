@@ -289,8 +289,58 @@ export default function LandSelector({ onSelect, initialSelection }: LandSelecto
       <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 leading-relaxed flex items-start gap-2.5">
         <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
         <span>
-          <b>Notice technique</b> : Sélectionner un terrain côtier comme <i>Kribi</i> forcera l'agent Structure à durdir les exigences sur les fondations (air salin corrosif, enrobage des armatures acier fixé à 50mm min).
+          <b>Notice technique</b> : Sélectionner un terrain côtier comme <i>Kribi</i> forcera l'agent Structure à durcir les exigences sur les fondations (air salin corrosif, enrobage des armatures acier fixé à 50mm min).
         </span>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-3 pt-2">
+        <button
+          type="button"
+          onClick={async () => {
+            if (!selectedCoords) return;
+            setLoading(true);
+            try {
+              const [satRes, zoneRes] = await Promise.all([
+                fetch("/api/geo/satellite-diagnostic", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    latitude: selectedCoords.lat,
+                    longitude: selectedCoords.lng,
+                    city: detectedCity || "Yaoundé",
+                  }),
+                }),
+                fetch("/api/geo/zoning-info", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    latitude: selectedCoords.lat,
+                    longitude: selectedCoords.lng,
+                    city: detectedCity || "Yaoundé",
+                  }),
+                }),
+              ]);
+              if (satRes.ok && zoneRes.ok) {
+                const satData = await satRes.json();
+                const zoneData = await zoneRes.json();
+                alert(`🌐 AUDIT IA SATELLITE & ZONAGE GeoBIM (OpenRouter) :
+• Zone POS : ${zoneData.pos_zone} (Max: ${zoneData.max_height_floors})
+• Portance du sol estimée : ${zoneData.soil_bearing_capacity_mpa} MPa
+• Végétation : ${satData.vegetation_density}
+• Topographie : ${satData.slope_estimate}
+• Accès routier : ${satData.access_roads_status}`);
+              }
+            } catch (e) {
+              console.error(e);
+            } finally {
+              setLoading(false);
+            }
+          }}
+          className="w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 text-xs font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
+        >
+          <Navigation className="w-3.5 h-3.5" />
+          Lancer l'Analyse IA Satellite & Fiche de Zonage POS (OpenRouter)
+        </button>
       </div>
     </div>
   );

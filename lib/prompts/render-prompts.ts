@@ -8,13 +8,13 @@
 export const UNIVERSAL_GEOMETRY_RULES = `
 MANDATORY GEOMETRY & PERSPECTIVE RULES:
 - PERSPECTIVE: Strict 90-degree direct top-down orthographic overhead view (plan de masse / vue de dessus à plat). Absolutely NO 35-45 degree isometric or 3/4 perspective tilts.
-- GEOMETRY FIDELITY: Strictly preserve the exact wall layout, room partitioning, annex position, and carport location from the input lineart Canny map.
+- GEOMETRY FIDELITY: Strictly preserve the exact wall layout, room partitioning, annex position, and room arrangement from the input scribble/lineart map.
 - INTERIOR MATERIALS & FINISHES:
   * Living & Bedrooms: Premium floor finishes matching the requested architectural style. Plush designer furniture, clean layout.
   * Kitchen & Corridors: Polished tiles/marble with sleek countertops.
   * Bathrooms & Wet Areas: Patterned ceramic tiles with clean white sanitary fixtures.
-- VEHICLE & OUTDOORS: Red sedan car parked in the designated parking area on brick/cobblestone paving.
 - ARCHITECTURAL COMPLIANCE: Dark anthracite walls (#1E293B) with smooth 3D ambient occlusion drop shadows. Preserve room names and surface areas.
+- NO HALLUCINATED ANNEXES OR VEHICLES: Do NOT add random cars, garages, or extra wings that are not in the input plan.
 `.trim();
 
 export const MASTER_NEGATIVE_PROMPT = 

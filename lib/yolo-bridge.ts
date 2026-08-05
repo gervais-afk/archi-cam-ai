@@ -34,8 +34,9 @@ const YOLO_FASTAPI_URL = process.env.YOLO_SERVICE_URL || "http://localhost:8000/
 export async function segmentPlanWithYolo(
   imageBufferOrPath: Buffer | string
 ): Promise<YoloSegmentationResult | null> {
-  // Timeout de sécurité étendu à 15s pour garantir l'inférence YOLOv8-Seg complète
-  const YOLO_TIMEOUT_MS = parseInt(process.env.YOLO_TIMEOUT_MS || "15000", 10);
+  // Timeout configurable via YOLO_TIMEOUT_MS (défaut : 30 min = 1 800 000 ms)
+  // L'objectif est d'attendre le résultat YOLO complet avant tout fallback OpenCV.
+  const YOLO_TIMEOUT_MS = parseInt(process.env.YOLO_TIMEOUT_MS || "1800000", 10);
 
   try {
     let buffer: Buffer;

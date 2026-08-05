@@ -53,39 +53,35 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> np.ndarray:
 
 def detect_building_envelope(binary_walls: np.ndarray, width: int, height: int) -> np.ndarray:
     """
-    Isole le polygone englobant principal du bâtiment et efface les cotations extérieures.
+    Isole le polygone englobant principal du bâtiment et efface les cotations extérieures tout en préservant le cartouche.
     """
     building_mask = np.zeros((height, width), dtype=np.uint8)
-    cartouche_y_limit = int(height * 0.85)
+    cartouche_y_limit = int(height * 0.98)
 
-    # Zone de recherche principale (hors cartouche bas)
     search_zone = binary_walls.copy()
     search_zone[cartouche_y_limit:, :] = 0
 
-    # Marges extérieures (effacer les cotations sur 8% des bords)
-    margin_x = int(width * 0.07)
-    margin_y = int(height * 0.07)
+    margin_x = int(width * 0.04)
+    margin_y = int(height * 0.04)
     search_zone[:margin_y, :] = 0
     search_zone[:, :margin_x] = 0
     search_zone[:, width - margin_x:] = 0
 
     cnts, _ = cv2.findContours(search_zone, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if not cnts:
-        # Fallback si aucun contour majeur : autoriser le centre 85%
-        building_mask[margin_y:cartouche_y_limit, margin_x:width - margin_x] = 255
+        building_mask[margin_y:height - margin_y, margin_x:width - margin_x] = 255
         return building_mask
 
-    # Trier les contours par surface délimitée
-    large_cnts = [c for c in cnts if cv2.contourArea(c) > 2000]
+    large_cnts = [c for c in cnts if cv2.contourArea(c) > 1500]
     if large_cnts:
         all_pts = np.vstack(large_cnts)
         hull = cv2.convexHull(all_pts)
         cv2.drawContours(building_mask, [hull], -1, 255, -1)
-        # Dilater légèrement (15px) pour inclure les murs extérieurs d'enceinte
-        kernel_exp = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
+        kernel_exp = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (8, 8))
         building_mask = cv2.dilate(building_mask, kernel_exp)
+        building_mask[cartouche_y_limit:, :] = 255
     else:
-        building_mask[margin_y:cartouche_y_limit, margin_x:width - margin_x] = 255
+        building_mask[margin_y:height - margin_y, margin_x:width - margin_x] = 255
 
     return building_mask
 
@@ -173,7 +169,23 @@ def clean_and_separate_plan_layers(input_path: str, output_path: str):
     print(f"✨ Calque A (_clean_plan.png murs étanches) : {clean_plan_path}")
     print(f"✨ Calque B (_text.png annotations vectorielles) : {text_plan_path}")
     print(f"🖼️ Aperçu PNG Plan Source pour Comparateur     : {preview_plan_path}")
-    return True
+def generate_controlnet_maps(structural_walls: np.ndarray, output_canny_path: str, output_depth_path: str):
+    """
+    Génère les cartes ControlNet (Canny & Depth wireframe) depuis les murs structuraux.
+    """
+    try:
+        if structural_walls is None or structural_walls.size == 0:
+            return
+        canny_img = cv2.Canny(structural_walls, 100, 200)
+        os.makedirs(os.path.dirname(os.path.abspath(output_canny_path)), exist_ok=True)
+        cv2.imwrite(output_canny_path, canny_img)
+
+        dist_transform = cv2.distanceTransform(structural_walls, cv2.DIST_L2, 5)
+        depth_normalized = cv2.normalize(dist_transform, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+        os.makedirs(os.path.dirname(os.path.abspath(output_depth_path)), exist_ok=True)
+        cv2.imwrite(output_depth_path, depth_normalized)
+    except Exception as e:
+        print(f"⚠️ Notice ControlNet Maps generation (clean_plan) : {e}")
 
 if __name__ == "__main__":
     input_file = sys.argv[1] if len(sys.argv) > 1 else "2D_RDC.pdf"

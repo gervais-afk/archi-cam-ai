@@ -117,19 +117,23 @@ class AssetCatalog:
             return self._tex_cache[key]
         
         path_parquet = os.path.join(_TEX_DIR, "parquet.jpg")
+        path_marble = os.path.join(_TEX_DIR, "marble_tile.jpg")
+        path_azulejo = os.path.join(_TEX_DIR, "azulejo_tile.jpg")
+        path_concrete = os.path.join(_TEX_DIR, "concrete.jpg")
+        path_cobble = os.path.join(_TEX_DIR, "cobblestone.jpg")
 
         if name == "parquet":
-            tiled = tile_real_texture(path_parquet, width, height, scale_factor=0.30, brightness=1.15)
+            tiled = tile_real_texture(path_parquet, width, height, scale_factor=0.20, brightness=1.05)
         elif name == "bedroom":
-            tiled = create_bedroom_tile_texture(width, height)
+            tiled = tile_real_texture(path_marble, width, height, scale_factor=0.25, brightness=1.10)
         elif name == "kitchen":
-            tiled = create_kitchen_tile_texture(width, height)
+            tiled = tile_real_texture(path_azulejo, width, height, scale_factor=0.25, brightness=1.10)
         elif name == "cobblestone":
-            tiled = create_red_cobblestone_texture(width, height)
+            tiled = tile_real_texture(path_cobble, width, height, scale_factor=0.25, brightness=1.0)
         elif name == "veranda":
-            tiled = create_veranda_texture(width, height)
+            tiled = tile_real_texture(path_concrete, width, height, scale_factor=0.30, brightness=1.15)
         else:
-            tiled = create_bedroom_tile_texture(width, height)
+            tiled = tile_real_texture(path_marble, width, height, scale_factor=0.25, brightness=1.10)
         
         self._tex_cache[key] = tiled
         return tiled
@@ -183,54 +187,67 @@ def load_input_image(input_path: str) -> np.ndarray:
 # ═════════════════════════════════════════════════════════════════════════════
 
 def detect_building_envelope(binary_walls: np.ndarray, width: int, height: int) -> np.ndarray:
-    """Isole le polygone englobant principal du bâtiment et efface les cotations extérieures."""
+    """Isole le polygone englobant principal du bâtiment et efface les cotations extérieures tout en préservant le cartouche bas."""
     building_mask = np.zeros((height, width), dtype=np.uint8)
-    cartouche_y_limit = int(height * 0.82)
+    cartouche_y_limit = int(height * 0.98)
 
     search_zone = binary_walls.copy()
     search_zone[cartouche_y_limit:, :] = 0
 
-    margin_x = int(width * 0.06)
-    margin_y = int(height * 0.06)
+    margin_x = int(width * 0.04)
+    margin_y = int(height * 0.04)
     search_zone[:margin_y, :] = 0
     search_zone[:, :margin_x] = 0
     search_zone[:, width - margin_x:] = 0
 
     cnts, _ = cv2.findContours(search_zone, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if not cnts:
-        building_mask[margin_y:cartouche_y_limit, margin_x:width - margin_x] = 255
+        building_mask[margin_y:height - margin_y, margin_x:width - margin_x] = 255
         return building_mask
 
-    large_cnts = [c for c in cnts if cv2.contourArea(c) > 2000]
+    large_cnts = [c for c in cnts if cv2.contourArea(c) > 1500]
     if large_cnts:
         all_pts = np.vstack(large_cnts)
         hull = cv2.convexHull(all_pts)
         cv2.drawContours(building_mask, [hull], -1, 255, -1)
-        kernel_exp = cv2.getStructuringElement(cv2.MORPH_RECT, (12, 12))
+        kernel_exp = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (8, 8))
         building_mask = cv2.dilate(building_mask, kernel_exp)
+        # Conserver la zone du cartouche bas
+        building_mask[cartouche_y_limit:, :] = 255
     else:
-        building_mask[margin_y:cartouche_y_limit, margin_x:width - margin_x] = 255
+        building_mask[margin_y:height - margin_y, margin_x:width - margin_x] = 255
 
     return building_mask
 
 def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     height, width = bgr_img.shape[:2]
-    gray = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2GRAY)
 
-    clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8))
+    # ── ÉTAPE 1 : NETTOYAGE DU PAPIER MILLIMÉTRÉ / CAHIER QUADRILLÉ ───────────
+    # Filtrer l'encre bleue/cyan des lignes de grille du cahier
+    hsv = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
+    grid_blue_mask = cv2.inRange(hsv, (80, 20, 100), (140, 255, 255))
+    
+    cleaned_bgr = bgr_img.copy()
+    cleaned_bgr[grid_blue_mask > 0] = (255, 255, 255)
+
+    gray = cv2.cvtColor(cleaned_bgr, cv2.COLOR_BGR2GRAY)
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
     enhanced = clahe.apply(gray)
-
-    denoised = cv2.bilateralFilter(enhanced, d=5, sigmaColor=30, sigmaSpace=30)
+    denoised = cv2.bilateralFilter(enhanced, d=5, sigmaColor=35, sigmaSpace=35)
 
     _, binary = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
-    # 1. Détection de l'enveloppe du bâtiment pour éliminer les cotations extérieures
+    # Détection de l'enveloppe du bâtiment pour éliminer les cotations extérieures
     building_mask = detect_building_envelope(binary, width, height)
     binary_in_building = cv2.bitwise_and(binary, building_mask)
 
-    # 2. Fermeture morphologique 15x15 pour étanchéité parfaite des pièces (colmatage terrasses & portes)
-    kernel_seal = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
-    sealed_walls = cv2.morphologyEx(binary_in_building, cv2.MORPH_CLOSE, kernel_seal)
+    # ── ÉTAPE 2 : FERMETURE MORPHOLOGIQUE RENFORCÉE DES MURS (9x9) ─────────────
+    # Épaississement des traits de stylo pour boucher les micro-trous et éviter les fuites
+    kernel_dilate = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
+    binary_thickened = cv2.dilate(binary_in_building, kernel_dilate, iterations=1)
+    
+    kernel_seal = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
+    sealed_walls = cv2.morphologyEx(binary_thickened, cv2.MORPH_CLOSE, kernel_seal)
 
     num_wall_comps, wall_labels, wall_stats, _ = cv2.connectedComponentsWithStats(sealed_walls)
     structural_walls = np.zeros_like(sealed_walls, dtype=np.uint8)
@@ -243,6 +260,7 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
         if area >= 30 or comp_w >= 15 or comp_h >= 18:
             structural_walls[wall_labels == i] = 255
 
+    # ── ÉTAPE 4 : SÉPARATION DU TEXTE MANUSCRIT ET DU MOBILIER ─────────────────
     non_wall_ink = cv2.bitwise_and(binary_in_building, cv2.bitwise_not(structural_walls))
     num_ink_comps, ink_labels, ink_stats, _ = cv2.connectedComponentsWithStats(non_wall_ink)
     
@@ -465,6 +483,29 @@ def render_furniture_layer(canvas: Image.Image, furniture_mask: np.ndarray, widt
         outline_img = Image.fromarray(cv2.Canny(elem_mask, 100, 200))
         canvas.paste(Image.new("RGBA", (width, height), (71, 85, 105, 255)), (0, 0), mask=outline_img)
 
+def generate_controlnet_maps(structural_walls: np.ndarray, output_canny_path: str, output_depth_path: str):
+    """
+    Génère les cartes ControlNet (Canny & Depth wireframe) depuis les murs structuraux.
+    """
+    try:
+        if structural_walls is None or structural_walls.size == 0:
+            print("⚠️ Notice ControlNet : Image de murs vide ou invalide.")
+            return
+
+        # 1. Canny edge map
+        canny_img = cv2.Canny(structural_walls, 100, 200)
+        os.makedirs(os.path.dirname(os.path.abspath(output_canny_path)), exist_ok=True)
+        cv2.imwrite(output_canny_path, canny_img)
+
+        # 2. Depth map (synthétique basée sur la distance aux bords)
+        dist_transform = cv2.distanceTransform(structural_walls, cv2.DIST_L2, 5)
+        depth_normalized = cv2.normalize(dist_transform, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+        os.makedirs(os.path.dirname(os.path.abspath(output_depth_path)), exist_ok=True)
+        cv2.imwrite(output_depth_path, depth_normalized)
+        print(f"✨ Cartes ControlNet générées avec succès : Canny={output_canny_path}, Depth={output_depth_path}")
+    except Exception as e:
+        print(f"⚠️ Notice ControlNet Maps generation : {e}")
+
 def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_path: str):
     width, height = proc_result["width"], proc_result["height"]
     sealed_walls = proc_result["structural_walls"]
@@ -478,35 +519,7 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
 
     cartouche_y_limit = int(height * 0.82)
 
-    # 2. Zone Carport / Driveway (Pavés brique rouge #A84838)
-    carport_mask = np.zeros((height, width), dtype=np.uint8)
-    cv2.rectangle(
-        carport_mask,
-        (int(width * 0.04), int(height * 0.58)),
-        (int(width * 0.32), cartouche_y_limit - 10),
-        255,
-        -1
-    )
-    carport_mask = cv2.bitwise_and(carport_mask, building_mask)
-    carport_mask_pil = Image.fromarray(carport_mask)
-    tex_cobble = _CATALOG.get_texture("cobblestone", width, height)
-    layer1_floors.paste(tex_cobble, (0, 0), mask=carport_mask_pil)
-
-    # 3. Zone Véranda / Entrée (Béton/Enduit crème clair #F4F0EA)
-    veranda_mask = np.zeros((height, width), dtype=np.uint8)
-    cv2.rectangle(
-        veranda_mask,
-        (int(width * 0.33), int(height * 0.65)),
-        (int(width * 0.62), cartouche_y_limit - 10),
-        255,
-        -1
-    )
-    veranda_mask = cv2.bitwise_and(veranda_mask, building_mask)
-    veranda_mask_pil = Image.fromarray(veranda_mask)
-    tex_veranda = _CATALOG.get_texture("veranda", width, height)
-    layer1_floors.paste(tex_veranda, (0, 0), mask=veranda_mask_pil)
-
-    # 4. Texturage intérieur pièce par pièce - PALETTE SOFT NANO BANANA
+    # 2. Texturage intérieur pièce par pièce - PALETTE SOFT ARCHITECTURAL
     inv_sealed = cv2.bitwise_not(sealed_walls)
     inv_sealed[building_mask == 0] = 0
     num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(inv_sealed)
@@ -547,20 +560,10 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
             # Salons / Séjours : Parquet chêne miel/clair (#D9AA72)
             tex_img = _CATALOG.get_texture("parquet", width, height)
             layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
-            # Mobilier Salon : Table / Canapé au centre de la pièce avec ombre portée
-            if w > 60 and h > 60:
-                fw, fh = int(w * 0.45), int(h * 0.45)
-                fx, fy = x + int(w * 0.25), y + int(h * 0.25)
-                layer1_floors = render_bed(layer1_floors, fx, fy, fw, fh, "beige")
         else:
             # Chambres : Carrelage mat bleu/gris pastel (#E3E8ED)
             tex_img = _CATALOG.get_texture("bedroom", width, height)
             layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
-            # Mobilier Chambre : Lit double (Duvet + Oreillers) au centre avec ombre portée
-            if w > 60 and h > 60:
-                fw, fh = int(w * 0.50), int(h * 0.55)
-                fx, fy = x + int(w * 0.25), y + int(h * 0.20)
-                layer1_floors = render_bed(layer1_floors, fx, fy, fw, fh, "beige")
 
     # 5. Rendu du Mobilier et du Véhicule extraits ou superposés avec Ombres Portées Douces
     render_furniture_layer(layer1_floors, furniture_mask, width, height)
@@ -642,27 +645,22 @@ def main():
 
         print("🎨 Génération du plan Nano Banana HD (textures soft, murs bois #3D2817, calque multiply)...")
         generate_clean_plan(bgr_img, proc_result, output_clean_plan)
-        generate_controlnet_maps(proc_result["structural_walls"], output_canny, output_depth)
+        try:
+            generate_controlnet_maps(proc_result["structural_walls"], output_canny, output_depth)
+        except Exception as e:
+            print(f"⚠️ Notice ControlNet Maps generation : {e}")
 
         proc_result["text_layer_rgba"].save(output_text, "PNG")
 
-        # ── FUSION VECTORIELLE DU CALQUE TEXTE EN MODE PRODUIT (MULTIPLY) ──
+        # ── APPLICATION DU FILIGRANE PROPRE SUR LE PLAN HD ──
         try:
-            rendered_img = Image.open(output_clean_plan).convert("RGB")
-            text_mask_img = proc_result["text_layer_rgba"]
-            
-            # Créer un calque texte avec fond blanc pour le mode Multiply
-            text_white_bg = Image.new("RGB", (w, h), (255, 255, 255))
-            text_white_bg.paste(text_mask_img, (0, 0), mask=text_mask_img)
-
-            # Application du Blending Multiply (Mode Produit)
-            final_multiply = ImageChops.multiply(rendered_img, text_white_bg).convert("RGBA")
+            rendered_img = Image.open(output_clean_plan).convert("RGBA")
             user_plan = os.environ.get("USER_PLAN", "free")
-            final_watermarked = apply_plan_watermark(final_multiply, user_plan)
+            final_watermarked = apply_plan_watermark(rendered_img, user_plan)
             final_watermarked.save(output_clean_plan, "PNG")
-            print("✨ Calque texte superposé avec succès en Mode Produit (Multiply) !")
+            print("✨ Plan propre HD généré avec succès !")
         except Exception as e:
-            print(f"⚠️ Notice Multiply Blending : {e}")
+            print(f"⚠️ Notice Plan Watermarking : {e}")
 
         if output_base_path.lower().endswith(".png"):
             layer_clean_bgr = cv2.imread(output_clean_plan)

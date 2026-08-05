@@ -17,6 +17,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 import ProjectHistory from "@/components/dashboard/ProjectHistory";
+import VoiceAssistantWidget from "@/components/dashboard/VoiceAssistantWidget";
+import { FoncierAuditWidget } from "@/components/dashboard/FoncierAuditWidget";
+import { DigitalTwinViewer } from "@/components/3d-viewer/DigitalTwinViewer";
 import CreditsModal from "@/components/dashboard/CreditsModal";
 import type { GenerationOptions, RenderResult, UserMode } from "@/types";
 import { MOCK_RENDER_RESULT }         from "@/lib/mock-data";
@@ -462,6 +465,12 @@ export default function DashboardProPage() {
                        </p>
                     </div>
                   )}
+                </div>
+
+                <div className="mt-6 space-y-6">
+                  <DigitalTwinViewer buildingName="Projet Duplex BIM R+1 Bastos" totalRooms={8} totalAreaM2={240} />
+                  <VoiceAssistantWidget projectId="demo-project" />
+                  <FoncierAuditWidget />
                 </div>
                 
                 <ProjectHistory projects={projects} />

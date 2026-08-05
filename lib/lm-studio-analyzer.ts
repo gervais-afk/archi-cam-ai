@@ -105,18 +105,18 @@ export async function analyzePlanWithLMStudioVision(imageOrPdfPath: string): Pro
     const rawBuf = safeReadFileSync(targetImagePath);
     if (!rawBuf) return null;
 
-    // 1. REDIMENSIONNEMENT AGRESSIF JPEG 512x512 @ 70% (Divise par 4 le nombre de patchs VLM)
+    // 1. REDIMENSIONNEMENT ULTRALÉGER JPEG 384x384 @ 60% (Inférence ultra-rapide)
     const sharp = require("sharp");
     const resizedBuf = await sharp(rawBuf)
-      .resize({ width: 512, height: 512, fit: "inside", withoutEnlargement: true })
-      .jpeg({ quality: 70 })
+      .resize({ width: 384, height: 384, fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 60 })
       .toBuffer();
 
     const base64Data = resizedBuf.toString("base64");
     const imageSizeKb = resizedBuf.length / 1024;
 
-    if (imageSizeKb < 5) {
-      console.error(`[LM Studio Vision] ❌ Image source trop petite ou corrompue: ${imageSizeKb.toFixed(1)} Ko < 5 Ko`);
+    if (imageSizeKb < 3) {
+      console.error(`[LM Studio Vision] ❌ Image source trop petite ou corrompue: ${imageSizeKb.toFixed(1)} Ko < 3 Ko`);
       throw new Error("Image source invalide pour l'analyse visuelle");
     }
 
@@ -138,13 +138,10 @@ Analyze this floor plan image and return ONLY a valid raw JSON object listing th
 Return raw JSON ONLY with no markdown commentary or bounding boxes.
 `;
 
-    // 2. TIMEOUT HTTP ÉTENDU & AGENT KEEP-ALIVE
+    // 2. TIMEOUT HTTP ÉTENDU À 30 MINUTES (1 800 000 ms)
     const controller = new AbortController();
-    const TIMEOUT_MS = 600000; // 10 minutes max (600 000 ms)
+    const TIMEOUT_MS = 1800000; // 30 minutes max (1 800 000 ms)
     const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
-    const http = require("http");
-    const agent = new http.Agent({ keepAlive: true, timeout: 620000 });
 
     const res = await fetch(LM_STUDIO_ENDPOINT, {
       method: "POST",
@@ -153,8 +150,6 @@ Return raw JSON ONLY with no markdown commentary or bounding boxes.
         "Connection": "keep-alive" 
       },
       signal: controller.signal,
-      // @ts-ignore - Agent Node.js pour maintenir la connexion TCP active sans coupure client
-      agent,
       body: JSON.stringify({
         model: process.env.LM_STUDIO_MODEL || "minicpm-v-2_6",
         messages: [
@@ -167,7 +162,7 @@ Return raw JSON ONLY with no markdown commentary or bounding boxes.
           },
         ],
         temperature: 0.1,
-        max_tokens: 250,
+        max_tokens: 180,
       }),
     });
 

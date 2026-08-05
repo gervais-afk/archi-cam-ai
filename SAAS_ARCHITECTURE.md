@@ -57,6 +57,40 @@ Le système agit comme un **BIM Manager augmenté**.
 - **ResearcherAgent** : Veille économique et mise à jour des prix du marché.
 
 ## 5. Architecture Technique & Moteurs de Données 💻⚙️
+- **Frontend / Full-Stack** : Next.js 14 (App Router), TypeScript, Vanilla CSS + Tailwind, Framer Motion, Three.js (`DigitalTwinViewer`), Leaflet / Cesium Ion GeoBIM.
+- **Moteurs d'Ingénierie & Innovations Tier S / Tier A** :
+  - **Jumeau Numérique 3D (`DigitalTwinViewer.tsx`)** : Exploration 3D dynamique des niveaux (RDC, R+1, Toit) et audit interactif par pièce.
+  - **Calculateur Structural BAEL 91 & Eurocode 2 (`lib/structural/bael-calculator.ts`)** : Dimensionnement des poteaux, poutres, semelles, tonnage d'acier HA FeE500 et volume de béton C25/30.
+  - **Simulateur Bioclimatique ISO 7730 (`lib/simulation/bioclimatic-analyzer.ts`)** : Simulation des gains solaires et de la ventilation traversante (winds SW Mousson) avec économie de 15% à 30% sur la climatisation.
+  - **Moteur de Détection de Conflits BIM (`lib/bim/clash-detection.ts`)** : Détection des collisions physiques (Hard/Soft Clashes) selon la norme ISO 19650.
+  - **Générateur de Permis de Bâtir (`lib/legal/building-permit-generator.ts`)** : Résumé du formulaire PC1, vérification du CES $\le 0.50$ et de la conformité Mairie de Ville.
+- **Moteur Sketch-to-Plan & Mitigation des Risques** :
+  - **Confirmation Interactives des Surfaces (`InferredDimensionsConfirmation.tsx`)** : Sliders et gabarits de confirmation (Compact, Standard, Spacieux).
+  - **Correction Fuzzy OCR Manuscrite (`lib/ocr/handwriting-fuzzy-matcher.ts`)** : Tolérance et correction des fautes d'orthographe sur les croquis manuels.
+  - **Validateur de Topologie Spatiale (`lib/spatial/topology-validator.ts`)** : Détection des pièces isolées et ajout automatique de couloirs de circulation.
+  - **Validateur de Ratios Architecturaux (`lib/validation/architectural-ratios.ts`)** : Contrôle et harmonisation des proportions pièce/salon/SDB.
+- **Sécurité Visuelle, Traçabilité & Cryptographie EXIF** :
+  - **Injection EXIF Invisible (`lib/image/watermark-secure.ts`)** : Signature SHA-256 incoupable et métadonnées JSON d'authentification.
+  - **Filigrane Distribué Anti-Vol (`lib/image/watermark-pattern.ts`)** : Pattern semi-transparent répétitif pour compte démo gratuit.
+  - **Badges Stylisés (`lib/image/watermark-variants.ts`)** : Variantes 2D, 3D, Façade, Coupe, Masse avec cache mémoire LRU (`lib/cache/watermark-cache.ts`).
+- **Suite de Protection FinOps, Sécurité & Anti-Abus (7 Boucliers)** :
+  - **Défense Anti-Prompt Injection (`lib/ai/prompt-sanitizer.ts`)** : Neutralisation des attaques Jailbreak & ChatML.
+  - **Circuit Breaker IA (`lib/ai/circuit-breaker.ts`)** : Plafond budget par requête ($0.05 max) et basculement automatique sur le moteur OpenCV local en cas d'erreur.
+  - **Limiteur de Tokens Intelligent (`lib/ai/token-limiter.ts`)** : Tronquage intelligent préservant le contexte architectural critique.
+  - **Moniteur FinOps Live (`lib/monitoring/finops-tracker.ts`)** : Suivi des coûts en temps réel et alerte si > $5/h ou $50/j.
+  - **Moniteur de Solde OpenRouter (`lib/billing/openrouter-balance-monitor.ts`)** : Basculement automatique en mode local si le solde reste $< 1.00\$$.
+  - **Cache d'Embeddings Vectoriels RAG (`lib/rag/embedding-cache.ts`)** : Hashage SHA-256 éliminant les requêtes vectorielles répétitives payantes.
+  - **Détecteur de Bots & Anti-Abus (`lib/security/bot-detector.ts`)** : Filtrage par empreinte navigateur et limitation de fréquence.
+- **Inférence IA Hybride (Cloud & Souveraine)** :
+  - **Cloud (OpenRouter.ai)** : `google/gemini-2.5-flash` (VLM, Embeddings, Satellite), `deepseek/deepseek-v4-flash` (Métré DQE FCFA, DAO MINMAP), `google/nano-banana-pro` / `flux` (Rendu HD), `google/veo-3.1-lite` (Vidéo 3D 4s), `openai/gpt-audio-mini` (Assistant Vocal).
+  - **Moteur Souverain Local** : Script Python OpenCV (`generate_photoshop_2d_plan.py`) pour la binarisation morphologique, la découpe des pièces, le Canny map et les masques de textures réelles en < 2 secondes sans Internet.
+- **Gestion des Crédits & Portefeuille Virtuel** :
+  - Prisma ORM (`prisma/schema.prisma`) avec modèles `User` (`creditsBalance`) et `Transaction` (`CREDIT`/`DEBIT`).
+  - Protection des routes API via `lib/credits/credit-manager.ts` (1 Crédit Rendu / Devis / Voix / Comparateur, 2 Crédits Audit Foncier / Inspection, 5 Crédits Vidéo / DAO MINMAP).
+  - Passerelle Webhook Multi-Provider (`/api/webhooks/payments`) pour Stripe & Mobile Money Cameroun (Orange Money / MTN MoMo via Campay/Fapshi).
+- **RAG BTP Réglementaire & Economique** :
+  - Ingestion documentaire (`scripts/ingest_btp_docs.ts`) avec vectorisation via `google/gemini-embedding-2`.
+  - Base de connaissances locale (DuckDB & PostgreSQL `pgvector` / Neo4j) pour l'injection des tarifs MINMAP 2026, de la Loi 2004/003 et du BAEL 91 dans les prompts système.
 
 Pour garantir des réponses fiables et millimétrées (zéro-hallucination), la plateforme repose sur une architecture de données hybride :
 

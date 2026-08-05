@@ -234,7 +234,10 @@ export async function callFastMCPTool<T = unknown>(
 
     const response = await fetch(`${FASTMCP_BASE_URL}/mcp`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream",
+      },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: 1,
@@ -411,12 +414,12 @@ export async function runUnified10StepPipeline(req: UnifiedPipelineRequest) {
     analysis
   );
 
-  // ÉTAPE 7 — GÉNÉRATION IMAGE (OpenAI avec 3 clés rotation / Replicate / Gemini / OpenCV)
+  // ÉTAPE 7 — GÉNÉRATION IMAGE (OpenRouter Cloud / OpenCV local)
   let engineUsed = "opencv_local";
   try {
-    const { callOpenAIImageBridge } = await import("@/lib/bridges/openai-bridge");
-    await callOpenAIImageBridge({ prompt: enrichedPrompt });
-    engineUsed = "openai";
+    const { generateArchitecturalRender } = await import("@/lib/bridges/openrouter-bridge");
+    const renderUrl = await generateArchitecturalRender("", enrichedPrompt);
+    if (renderUrl) engineUsed = "openrouter_cloud";
   } catch {
     engineUsed = "opencv_local";
   }

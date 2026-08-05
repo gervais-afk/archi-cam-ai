@@ -3,7 +3,7 @@ type: "ArchiCam 3D Interior Metadata"
 title: "Rendu 3D Intérieur Photoréaliste"
 resource: "/images/interior_3d.png"
 tags: ["3D-Interior", "ControlNet", "SDXL-Flux"]
-timestamp: "2026-08-03T20:19:56.591Z"
+timestamp: "2026-08-05T15:01:27.528Z"
 ---
 
 # 🛋️ SPÉCIFICATIONS RENDU 3D INTÉRIEUR

@@ -3,7 +3,7 @@ type: "ArchiCam FloorPlan Execution 2D"
 title: "Plan d'Exécution & Surfacier 2D"
 resource: "/output_2d_etage_plan.png"
 tags: ["2D-Execution", "OpenCV-Mask", "OKF-Taxonomy"]
-timestamp: "2026-08-03T20:19:56.591Z"
+timestamp: "2026-08-05T15:01:27.528Z"
 ---
 
 # 📐 SPÉCIFICATIONS TECHNIQUES 2D & MATÉRIAUX SOLS

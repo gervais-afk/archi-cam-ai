@@ -3,7 +3,7 @@ type: "ArchiCam 3D Exterior Facade Metadata"
 title: "Élévation 3D Façade Extérieure"
 resource: "/images/facade_3d.png"
 tags: ["3D-Facade", "Bioclimatic", "Street-View"]
-timestamp: "2026-08-03T20:19:56.591Z"
+timestamp: "2026-08-05T15:01:27.528Z"
 ---
 
 # 🏛️ SPÉCIFICATIONS FAÇADE EXTÉRIEURE
