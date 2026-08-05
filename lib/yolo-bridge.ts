@@ -34,6 +34,9 @@ const YOLO_FASTAPI_URL = process.env.YOLO_SERVICE_URL || "http://localhost:8000/
 export async function segmentPlanWithYolo(
   imageBufferOrPath: Buffer | string
 ): Promise<YoloSegmentationResult | null> {
+  // Timeout de sécurité étendu à 15s pour garantir l'inférence YOLOv8-Seg complète
+  const YOLO_TIMEOUT_MS = parseInt(process.env.YOLO_TIMEOUT_MS || "15000", 10);
+
   try {
     let buffer: Buffer;
 
@@ -47,8 +50,6 @@ export async function segmentPlanWithYolo(
       buffer = imageBufferOrPath;
     }
 
-    // Timeout de sécurité étendu à 15s (15000ms) pour garantir l'inférence YOLOv8-Seg complète
-    const YOLO_TIMEOUT_MS = parseInt(process.env.YOLO_TIMEOUT_MS || "15000", 10);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), YOLO_TIMEOUT_MS);
 
