@@ -145,3 +145,33 @@ model ChatMessage {
   @@index([projectId])
   @@map("chat_messages")
 }
+
+// OPTIMISATION 1 — Versioning des rendus
+model RenderVersion {
+  id            String   @id @default(uuid())
+  projectId     String   @map("project_id")
+  versionNumber Int      @map("version_number") // 1, 2, 3...
+  imageUrl      String   @map("image_url")
+  renderMode    String   @map("render_mode")
+  stylePreset   String   @map("style_preset")
+  geometryHash  String   @map("geometry_hash")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@unique([projectId, versionNumber])
+  @@index([projectId, versionNumber])
+  @@map("render_versions")
+}
+
+// OPTIMISATION 2 — Retours utilisateurs (Rating System)
+model RenderFeedback {
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  renderId    String?  @map("render_id")
+  rating      Int      @map("rating")
+  feedback    String?  @db.Text
+  metadata    Json?    @map("metadata")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([projectId])
+  @@map("render_feedbacks")
+}
