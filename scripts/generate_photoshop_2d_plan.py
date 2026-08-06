@@ -340,89 +340,213 @@ def validate_mask_quality(binary_mask: np.ndarray) -> tuple:
     return True, "VALID"
 
 
-def autocrop_sheet(bgr_img: np.ndarray) -> np.ndarray:
+def autocrop_sheet_robust(image: np.ndarray) -> tuple:
     """
-    Détecte la feuille blanche de plan sur une table sombre et effectue un rognage (crop) automatique.
-    Si aucune feuille n'est clairement détectée, applique un recadrage de repli de 5% sur tous les bords.
+    Détecte et rogne la feuille de papier avec 3 stratégies de fallback.
+    Retourne (cropped_image, success_boolean)
     """
-    h, w = bgr_img.shape[:2]
-    gray = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    h, w = image.shape[:2]
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if len(image.shape) == 3 else image.copy()
     
-    # Binarisation d'Otsu pour isoler la zone claire (la feuille blanche)
-    _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # === STRATÉGIE 1 : Détection de contour sur binarisation Otsu ===
+    _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Inverser si le fond est plus clair que le contenu
+    if np.mean(binary) > 127:
+        binary = cv2.bitwise_not(binary)
     
-    best_rect = None
-    max_area = 0
-    min_area = 0.15 * w * h  # La feuille doit représenter au moins 15% de l'image
+    # Morphologie pour fermer les trous
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
+    closed = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
     
-    for cnt in contours:
-        area = cv2.contourArea(cnt)
-        if area > min_area and area > max_area:
-            # Enveloppe approximative
-            peri = cv2.arcLength(cnt, True)
-            approx = cv2.approxPolyDP(cnt, 0.04 * peri, True)
-            # Accepter le rectangle englobant du plus grand contour clair trouvé
-            max_area = area
-            best_rect = cv2.boundingRect(cnt)
+    # Trouver les contours
+    contours, _ = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    if contours:
+        # Prendre le plus grand contour
+        largest = max(contours, key=cv2.contourArea)
+        area_ratio = cv2.contourArea(largest) / (w * h)
+        
+        if area_ratio > 0.15:  # Au moins 15% de l'image
+            x, y, cw, ch = cv2.boundingRect(largest)
             
-    if best_rect is not None:
-        x, y, bw, bh = best_rect
-        print(f"[Autocrop] Feuille détectée : x={x}, y={y}, w={bw}, h={bh} ({max_area / (w * h) * 100:.1f}% de la surface)")
-        if bw > 0.3 * w and bh > 0.3 * h:
-            # Rognage propre
-            return bgr_img[y:y+bh, x:x+bw]
+            # Ajouter une marge de sécurité de 2%
+            margin = int(min(w, h) * 0.02)
+            x = max(0, x - margin)
+            y = max(0, y - margin)
+            cw = min(w - x, cw + 2 * margin)
+            ch = min(h - y, ch + 2 * margin)
             
-    # Échenillage de repli : 5% sur tous les bords
-    print("[Autocrop] Feuille claire non détectée. Échenillage de repli (crop 5% sur les 4 bords).")
-    pad_y = int(h * 0.05)
-    pad_x = int(w * 0.05)
-    return bgr_img[pad_y:h-pad_y, pad_x:w-pad_x]
-
-def extract_dashed_lines(binary_img: np.ndarray) -> tuple:
-    """
-    Identifie et sépare les lignes interrompues / pointillés (- - -) des murs pleins.
-    Retourne (murs_propres, masque_pointilles)
-    """
-    h, w = binary_img.shape[:2]
-    dashed_mask = np.zeros_like(binary_img)
+            cropped = image[y:y+ch, x:x+cw]
+            
+            print(f"✅ Autocrop Stratégie 1 (Contour) : {w}x{h} -> {cw}x{ch} ({area_ratio*100:.1f}% de l'image)")
+            return cropped, True
     
-    # HoughLinesP avec un petit seuil pour trouver les petits segments
-    lines = cv2.HoughLinesP(
-        binary_img,
-        rho=1,
-        theta=np.pi / 180,
-        threshold=12,
-        minLineLength=6,
-        maxLineGap=18
-    )
+    # === STRATÉGIE 2 : Détection de bords avec Canny + Hough Lines ===
+    edges = cv2.Canny(gray, 30, 100)
+    lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=100, minLineLength=int(min(w,h)*0.3), maxLineGap=20)
     
-    if lines is not None:
+    if lines is not None and len(lines) > 10:
+        # Trouver les lignes quasi-verticales et quasi-horizontales
+        vertical_xs = []
+        horizontal_ys = []
+        
         for line in lines:
             x1, y1, x2, y2 = line[0]
-            length = np.hypot(x2 - x1, y2 - y1)
-            if length < 8:
-                continue
-                
-            # Sample les points le long du segment pour inspecter le profil
-            num_samples = int(length)
-            xs = np.linspace(x1, x2, num_samples).astype(int)
-            ys = np.linspace(y1, y2, num_samples).astype(int)
-            xs = np.clip(xs, 0, w - 1)
-            ys = np.clip(ys, 0, h - 1)
+            angle = abs(np.arctan2(y2 - y1, x2 - x1) * 180 / np.pi)
             
-            profile = binary_img[ys, xs]
-            transitions = np.sum(profile[:-1] != profile[1:])
+            if angle < 10 or angle > 170:  # Horizontal
+                horizontal_ys.extend([y1, y2])
+            elif 80 < angle < 100:  # Vertical
+                vertical_xs.extend([x1, x2])
+        
+        if vertical_xs and horizontal_ys:
+            x_min, x_max = int(np.percentile(vertical_xs, 5)), int(np.percentile(vertical_xs, 95))
+            y_min, y_max = int(np.percentile(horizontal_ys, 5)), int(np.percentile(horizontal_ys, 95))
             
-            # S'il y a des transitions (alternance d'encre et de vide), c'est une ligne en pointillés !
-            if transitions >= 2:
-                cv2.line(dashed_mask, (x1, y1), (x2, y2), 255, thickness=2)
-                
-    # On nettoie l'image binarisée d'origine en soustrayant le masque des pointillés
-    murs_propres = cv2.subtract(binary_img, dashed_mask)
-    return murs_propres, dashed_mask
+            if (x_max - x_min) > w * 0.3 and (y_max - y_min) > h * 0.3:
+                cropped = image[y_min:y_max, x_min:x_max]
+                print(f"✅ Autocrop Stratégie 2 (Hough) : {w}x{h} -> {x_max-x_min}x{y_max-y_min}")
+                return cropped, True
+    
+    # === STRATÉGIE 3 : Fallback - Crop 5% des bords ===
+    margin_x = int(w * 0.05)
+    margin_y = int(h * 0.05)
+    cropped = image[margin_y:h-margin_y, margin_x:w-margin_x]
+    
+    print(f"⚠️ Autocrop Fallback (5% crop) : {w}x{h} -> {cropped.shape[1]}x{cropped.shape[0]}")
+    return cropped, False
+
+
+def detect_stroke_thickness(binary_image: np.ndarray) -> int:
+    """
+    Détecte l'épaisseur moyenne des traits dans l'image.
+    """
+    dist_transform = cv2.distanceTransform(binary_image, cv2.DIST_L2, 5)
+    stroke_pixels = dist_transform[binary_image > 0]
+    
+    if len(stroke_pixels) == 0:
+        return 2  # Défaut
+        
+    avg_thickness = np.mean(stroke_pixels) * 2
+    return int(avg_thickness)
+
+
+def get_adaptive_kernels(binary_image: np.ndarray) -> tuple:
+    """
+    Retourne les noyaux de dilatation/fermeture adaptés à l'épaisseur des traits.
+    """
+    thickness = detect_stroke_thickness(binary_image)
+    print(f"📏 Épaisseur moyenne des traits détectée : {thickness}px")
+    
+    if thickness <= 2:
+        dilate_kernel = (3, 3)
+        close_kernel = (4, 4)
+        print("🖊️ Mode : Stylo fin")
+    elif thickness <= 4:
+        dilate_kernel = (5, 5)
+        close_kernel = (6, 6)
+        print("✏️ Mode : Stylo standard")
+    else:
+        dilate_kernel = (7, 7)
+        close_kernel = (9, 9)
+        print("🖍️ Mode : Marqueur épais")
+        
+    return dilate_kernel, close_kernel
+
+
+def is_dashed_line(line_segment: tuple, binary_image: np.ndarray, threshold_gaps: int = 3) -> bool:
+    """
+    Détermine si une ligne est en pointillés en analysant son profil d'intensité.
+    """
+    x1, y1, x2, y2 = line_segment
+    length = int(np.sqrt((x2 - x1)**2 + (y2 - y1)**2))
+    
+    if length < 30:
+        return False
+        
+    x_coords = np.linspace(x1, x2, length).astype(int)
+    y_coords = np.linspace(y1, y2, length).astype(int)
+    
+    h, w = binary_image.shape[:2]
+    valid_indices = (x_coords >= 0) & (x_coords < w) & (y_coords >= 0) & (y_coords < h)
+    x_coords = x_coords[valid_indices]
+    y_coords = y_coords[valid_indices]
+    
+    if len(x_coords) == 0:
+        return False
+        
+    profile = binary_image[y_coords, x_coords]
+    transitions = np.diff(profile.astype(int))
+    gaps = np.sum(np.abs(transitions) > 100)
+    
+    duty_cycle = np.sum(profile > 0) / len(profile)
+    is_dashed = gaps >= threshold_gaps and 0.3 <= duty_cycle <= 0.7
+    
+    if is_dashed:
+        print(f"  🔍 Pointillés détectés : {gaps} gaps, duty cycle={duty_cycle*100:.1f}%")
+        
+    return is_dashed
+
+
+def extract_dashed_lines(binary_image: np.ndarray) -> tuple:
+    """
+    Extrait les lignes pointillées de l'image.
+    Retourne (binary_clean, dashed_mask)
+    """
+    lines = cv2.HoughLinesP(
+        binary_image,
+        rho=1,
+        theta=np.pi/180,
+        threshold=50,
+        minLineLength=30,
+        maxLineGap=5
+    )
+    
+    if lines is None:
+        return binary_image, np.zeros_like(binary_image)
+        
+    mask_dashed = np.zeros_like(binary_image)
+    dashed_count = 0
+    solid_count = 0
+    
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        if is_dashed_line((x1, y1, x2, y2), binary_image):
+            cv2.line(mask_dashed, (x1, y1), (x2, y2), 255, 2)
+            dashed_count += 1
+        else:
+            solid_count += 1
+            
+    print(f"📊 Analyse Hough : {solid_count} segments continus, {dashed_count} pointillés détectés")
+    binary_clean = cv2.subtract(binary_image, mask_dashed)
+    return binary_clean, mask_dashed
+
+
+def add_smart_padding(image: np.ndarray, target_padding_ratio: float = 0.15, max_padding_px: int = 150) -> tuple:
+    """
+    Ajoute un padding blanc adaptatif plafonné en pixels.
+    Retourne (padded_image, padding_pixels)
+    """
+    h, w = image.shape[:2]
+    padding_px = int(min(w, h) * target_padding_ratio)
+    padding_px = min(padding_px, max_padding_px)
+    
+    padded = cv2.copyMakeBorder(
+        image,
+        top=padding_px,
+        bottom=padding_px,
+        left=padding_px,
+        right=padding_px,
+        borderType=cv2.BORDER_CONSTANT,
+        value=[255, 255, 255]
+    )
+    
+    actual_ratio = padding_px / min(w, h)
+    print(f"🖼️ Padding appliqué : {padding_px}px de chaque côté ({actual_ratio*100:.1f}%)")
+    print(f"   Dimensions : {w}x{h} -> {padded.shape[1]}x{padded.shape[0]}")
+    
+    return padded, padding_px
 
 
 def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
@@ -477,13 +601,14 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     building_mask = detect_building_envelope(binary, width, height)
     binary_in_building = cv2.bitwise_and(binary, building_mask)
 
-    # ── ÉTAPE 2 : FERMETURE MORPHOLOGIQUE RENFORCÉE DES MURS FIN (3x3 / 4x4) ──
+    # ── ÉTAPE 2 : FERMETURE MORPHOLOGIQUE ADAPTATIVE DES MURS ──
     # Épaississement des traits de stylo pour boucher les micro-trous et éviter les fuites.
-    # Réduction à un noyau très fin de (3x3)/(4x4) pour des cloisons fines et élégantes.
-    kernel_dilate = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    # Choix dynamique des noyaux selon l'épaisseur détectée pour s'adapter aux stylos fins ou marqueurs épais.
+    dilate_size, close_size = get_adaptive_kernels(binary_in_building)
+    kernel_dilate = cv2.getStructuringElement(cv2.MORPH_RECT, dilate_size)
     binary_thickened = cv2.dilate(binary_in_building, kernel_dilate, iterations=1)
 
-    kernel_seal = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
+    kernel_seal = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, close_size)
     sealed_walls = cv2.morphologyEx(binary_thickened, cv2.MORPH_CLOSE, kernel_seal)
 
     num_wall_comps, wall_labels, wall_stats, _ = cv2.connectedComponentsWithStats(sealed_walls)
@@ -876,9 +1001,9 @@ def main():
         bgr_img = load_input_image(input_path)
         
         # 1. Autocrop du plan (élimination de la table sombre en fond)
-        bgr_img = autocrop_sheet(bgr_img)
+        bgr_img, autocrop_success = autocrop_sheet_robust(bgr_img)
         h_crop, w_crop = bgr_img.shape[:2]
-        print(f"📐 Résolution après autocrop : {w_crop} x {h_crop} px")
+        print(f"📐 Résolution après autocrop : {w_crop} x {h_crop} px (Succès: {autocrop_success})")
 
         if max(h_crop, w_crop) > 4096:
             scale = 4096.0 / float(max(h_crop, w_crop))
@@ -902,22 +1027,12 @@ def main():
         print("⚙️ Traitement en cours : dénoyautage du bruit, segmentation des murs & extraction du texte...")
         proc_result = process_hand_drawn_notebook_sketch(bgr_img)
 
-        # 2. Ajout de la marge blanche (padding) de 15% pour donner de l'espace à l'IA pour la verdure
+        # 2. Ajout de la marge blanche (padding) adaptative pour donner de l'espace à l'IA pour la verdure
         # On applique le padding après coup à tous les éléments de sortie de proc_result
-        pad_y = int(h_crop * 0.15)
-        pad_x = int(w_crop * 0.15)
-
-        bgr_img = cv2.copyMakeBorder(
-            bgr_img,
-            top=pad_y,
-            bottom=pad_y,
-            left=pad_x,
-            right=pad_x,
-            borderType=cv2.BORDER_CONSTANT,
-            value=[255, 255, 255] # Blanc
-        )
+        bgr_img, padding_px = add_smart_padding(bgr_img, target_padding_ratio=0.15, max_padding_px=150)
+        pad_y = padding_px
+        pad_x = padding_px
         h, w = bgr_img.shape[:2]
-        print(f"📐 Résolution finale avec padding de 15% : {w} x {h} px")
 
         proc_result["structural_walls"] = cv2.copyMakeBorder(
             proc_result["structural_walls"],

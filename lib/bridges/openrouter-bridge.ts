@@ -182,7 +182,8 @@ Structure attendue :
  */
 export async function generateArchitecturalRender(
   imageBase64Mask: string,
-  prompt: string
+  prompt: string,
+  negativePrompt?: string
 ): Promise<string | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey || apiKey.length < 10) {
@@ -196,7 +197,9 @@ export async function generateArchitecturalRender(
   );
 
   // Append negative prompt rules and text constraints to the prompt (Directeur Artistique & Senior OpenCV)
-  const enhancedPrompt = `${prompt}\nNEGATIVE CONSTRAINT: no baked-in misspelled text, no room label overlays inside generated image, no watermark, no text overlays, clean drawing.`;
+  const enhancedPrompt = negativePrompt
+    ? `${prompt}\nNEGATIVE CONSTRAINT: ${negativePrompt}`
+    : `${prompt}\nNEGATIVE CONSTRAINT: no baked-in misspelled text, no room label overlays inside generated image, no watermark, no text overlays, clean drawing.`;
 
   const candidateModels = [
     "google/gemini-2.5-flash-image",
@@ -270,6 +273,7 @@ export async function generateArchitecturalRender(
           image: imageUri,
           n: 1,
           size: "1024x1024",
+          ...(negativePrompt ? { negative_prompt: negativePrompt } : {}),
         }),
       });
 

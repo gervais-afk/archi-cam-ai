@@ -353,7 +353,13 @@ export async function POST(request: Request) {
 
     const maskPath = safeExistsSync(resolvedCleanPlanPath) ? resolvedCleanPlanPath : publicOutPath;
     const maskDataUri = fileToDataUri(maskPath);
-    let masterPrompt = buildMasterPrompt(modeKey, prompt, styleKey);
+    const promptObject = buildMasterPrompt({ rooms: [] }, styleKey as any);
+    let positivePrompt = promptObject.positive;
+    const negativePrompt = promptObject.negative;
+    
+    if (prompt && typeof prompt === "string" && prompt.trim().length > 0) {
+      positivePrompt = `${positivePrompt}\nUSER ADDITIONAL CONSTRAINTS: ${prompt}`;
+    }
 
     let renderUrlResult: string | null = null;
     let engineUsed = "Local OpenCV 2.5D Fallback";
@@ -391,13 +397,22 @@ export async function POST(request: Request) {
         } catch {}
 
         if (extractedMetadata.rooms.length > 0) {
-          const roomsDesc = extractedMetadata.rooms.map((r) => `${r.name} (${r.surface_m2}m²)`).join(", ");
-          masterPrompt += `\nPièces: ${roomsDesc}. Surface: ${extractedMetadata.totalSurface}m².`;
+          const mappedRooms = extractedMetadata.rooms.map((r) => ({
+            name: r.name,
+            type: r.type,
+            area: r.surface_m2 || 0,
+          }));
+          const updatedPromptObject = buildMasterPrompt({ rooms: mappedRooms }, styleKey as any);
+          positivePrompt = updatedPromptObject.positive;
+          
+          if (prompt && typeof prompt === "string" && prompt.trim().length > 0) {
+            positivePrompt = `${positivePrompt}\nUSER ADDITIONAL CONSTRAINTS: ${prompt}`;
+          }
         }
 
         // 1.2 Génération Rendu HD
         const renderStartTime = Date.now();
-        renderUrlResult = await generateArchitecturalRender(maskDataUri, masterPrompt);
+        renderUrlResult = await generateArchitecturalRender(maskDataUri, positivePrompt, negativePrompt);
         const renderDuration = Date.now() - renderStartTime;
 
         try {
