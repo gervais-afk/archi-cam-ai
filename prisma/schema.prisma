@@ -199,3 +199,16 @@ model ApiKey {
   @@index([userId])
   @@map("api_keys")
 }
+
+// OPENBIM & INTEGRATIONS — Cache d'analyse IFC
+model IFCAnalysisCache {
+  id            String   @id @default(uuid())
+  fileHash      String   @unique @map("file_hash") // SHA-256 du fichier IFC
+  userId        String   @map("user_id")
+  results       String   // JSON text des résultats (volumes, surfaces, etc.)
+  fileSizeBytes Int      @map("file_size_bytes")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([fileHash])
+  @@map("ifc_analysis_caches")
+}
