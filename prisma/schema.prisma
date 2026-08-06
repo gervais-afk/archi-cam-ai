@@ -212,3 +212,28 @@ model IFCAnalysisCache {
   @@index([fileHash])
   @@map("ifc_analysis_caches")
 }
+
+// OPENBIM & INTEGRATIONS — Cache de conversion de format CAO vers IFC
+model IFCConversionCache {
+  id               String   @id @default(uuid())
+  originalFileHash String   @unique @map("original_file_hash")
+  originalFileName String   @map("original_file_name")
+  ifcPath          String   @map("ifc_path")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([originalFileHash])
+  @@map("ifc_conversion_caches")
+}
+
+// OPENBIM & INTEGRATIONS — Audit log de conversion
+model IFCConversionLog {
+  id             String   @id @default(uuid())
+  fileName       String   @map("file_name")
+  inputFormat    String   @map("input_format")
+  status         String   // COMPLETED, FAILED
+  processingTime Float    @map("processing_time")
+  costUSD        Float    @map("cost_usd")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("ifc_conversion_logs")
+}
