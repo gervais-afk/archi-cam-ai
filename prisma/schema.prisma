@@ -131,3 +131,17 @@ model GeometryCache {
   @@index([projectId])
   @@map("geometry_caches")
 }
+
+// CHAT MULTI-AGENTS — Historique et Widgets de discussion
+model ChatMessage {
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  sender      String   // Router, Metreur, User, Engineer, Legal, etc.
+  text        String   @db.Text
+  widgetType  String?  @map("widget_type") // DEVIS_TABLE, STRUCTURAL_SCHEMA, LEGAL_RADAR
+  widgetData  Json?    @map("widget_data")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([projectId])
+  @@map("chat_messages")
+}

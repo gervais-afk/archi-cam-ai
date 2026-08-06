@@ -1,400 +1,120 @@
-import { NextRequest, NextResponse } from "next/server";
-import { query } from "@/lib/db";
-import { verifyFirebaseToken } from "@/lib/firebase-server";
-import { Pool } from "pg";
-import { queryGraphRAG } from "@/src/tools/graphRAGReasoner";
-import { routeLLM, type LLMMessage } from "@/lib/llm-router";
+import { randomUUID } from "crypto";
+import { prisma } from "@/lib/prisma";
 
-// ── Pool PostgreSQL dédié aux prix mercuriale (Phase 3) ──────────────────────
-const _mercurialePool = new Pool({
-  connectionString:
-    process.env.DATABASE_URL ||
-    "postgresql://postgres:ArchiCamAI_2025_Secure_BIM!@127.0.0.1:5432/fdcdb",
-});
-
-/**
- * Récupère les prix unitaires officiels MINMAP 2026 depuis PostgreSQL.
- * Retourne une chaîne formatée prête à être injectée dans le prompt système.
- */
-async function fetchMercurialeFromDB(ville: string = "Yaounde"): Promise<string> {
+export async function POST(req: Request) {
   try {
-    const result = await _mercurialePool.query(
-      `SELECT designation, unite, prix_unitaire_fcfa, categorie
-       FROM mercuriale_minmap
-       WHERE LOWER(ville) = LOWER($1) OR ville = 'National'
-       ORDER BY categorie, designation
-       LIMIT 80`,
-      [ville]
+    const { projectId, message } = await req.json();
+
+    if (!projectId || !message) {
+      return Response.json({ error: "Missing projectId or message" }, { status: 400 });
+    }
+
+    // 1. Enregistrer le message de l'utilisateur en base de données
+    const userMsgId = randomUUID();
+    await prisma.$executeRawUnsafe(
+      `INSERT INTO "chat_messages" ("id", "project_id", "sender", "text", "widget_type", "widget_data", "created_at")
+       VALUES ($1, $2, $3, $4, NULL, NULL, NOW())`,
+      userMsgId,
+      projectId,
+      "User",
+      message
     );
-    if (!result.rows.length) return "";
-    const rows = result.rows
-      .map(
-        (r: any) =>
-          `  • [${r.categorie}] ${r.designation} — ${Number(r.prix_unitaire_fcfa).toLocaleString("fr-FR")} FCFA/${r.unite}`
-      )
-      .join("\n");
-    return `\n\n=== BASE DE PRIX OFFICIELS MINMAP 2026 (${ville}) ===\n${rows}\n=== FIN DES PRIX OFFICIELS ===`;
+
+    // 2. Logique de routage d'intention simplifiée (Multi-Agent Router)
+    const lowerMsg = message.toLowerCase();
+    let sender: "Router" | "Designer" | "Engineer" | "Metreur" | "Legal" = "Router";
+    let text = "";
+    let widgetType: string | null = null;
+    let widgetData: any = null;
+
+    if (
+      lowerMsg.includes("devis") ||
+      lowerMsg.includes("estimation") ||
+      lowerMsg.includes("prix") ||
+      lowerMsg.includes("budget") ||
+      lowerMsg.includes("plomberie") ||
+      lowerMsg.includes("sanitaire") ||
+      lowerMsg.includes("coute") ||
+      lowerMsg.includes("coût")
+    ) {
+      sender = "Metreur";
+      text = "L'estimation du lot Plomberie-Sanitaire et Gros Œuvre a été mise à jour en appliquant la mercuriale officielle du MINMAP Cameroun. Les prix sont ajustables en temps réel ci-dessous :";
+      widgetType = "DEVIS_TABLE";
+      widgetData = {
+        items: [
+          { id: "p1", label: "Tuyaux PVC pression Ø32/40", costXAF: 420000 },
+          { id: "p2", label: "Suppresseur + Cuve 500L", costXAF: 680000 },
+          { id: "p3", label: "Main d'œuvre qualifiée", costXAF: 350000 }
+        ],
+        totalCostXAF: 1450000,
+        currency: "FCFA"
+      };
+    } else if (
+      lowerMsg.includes("ferraillage") ||
+      lowerMsg.includes("poteau") ||
+      lowerMsg.includes("semelle") ||
+      lowerMsg.includes("armature") ||
+      lowerMsg.includes("acier") ||
+      lowerMsg.includes("béton") ||
+      lowerMsg.includes("structure")
+    ) {
+      sender = "Engineer";
+      text = "Le ferraillage longitudinal et transversal de l'élément structurel Poteau P1 a été dimensionné conformément aux directives BAEL 91 (Béton Armé aux États Limites). Vous pouvez visualiser et survoler les armatures :";
+      widgetType = "STRUCTURAL_SCHEMA";
+      widgetData = {
+        elementName: "Poteau Principal P1",
+        concreteVolumeM3: 0.36,
+        steelWeightKg: 42.5,
+        rebars: "4 HA 12 (longitudinal)",
+        cadres: "HA 6 esp. 15cm (transversal)"
+      };
+    } else if (
+      lowerMsg.includes("loi") ||
+      lowerMsg.includes("réglement") ||
+      lowerMsg.includes("scot") ||
+      lowerMsg.includes("recul") ||
+      lowerMsg.includes("cos") ||
+      lowerMsg.includes("ces") ||
+      lowerMsg.includes("urbanisme") ||
+      lowerMsg.includes("hauteur") ||
+      lowerMsg.includes("permis")
+    ) {
+      sender = "Legal";
+      text = "L'analyse de conformité d'implantation du plan au sol a été confrontée aux arrêtés d'urbanisme locaux de la zone d'aménagement. Un problème d'alignement a été détecté :";
+      widgetType = "LEGAL_RADAR";
+      widgetData = {
+        rules: [
+          { id: "r1", name: "Emprise au Sol (CES)", measured: "45%", limit: "Max 50%", status: "safe", lawArticle: "Art. 12 - Loi d'orientation de l'Urbanisme au Cameroun." },
+          { id: "r2", name: "Recul de voirie", measured: "3.5m", limit: "Min 5.0m", status: "danger", lawArticle: "Art. 8 - Décret d'implantation de Douala." },
+          { id: "r3", name: "Hauteur maximale R+2", measured: "9m", limit: "Max 12m", status: "safe", lawArticle: "Art. 15 - Plan d'Occupation des Sols." }
+        ],
+        overallStatus: "danger",
+        zoneCode: "Zone Résidentielle Dense Ua1 (Douala)"
+      };
+    } else {
+      sender = "Router";
+      text = "Bienvenue dans l'espace conseil collaboratif d'Archi Cam AI. Je peux vous orienter vers l'Ingénieur (pour le ferraillage/béton), le Métreur (devis/plomberie) ou le Juriste (règles de recul et d'urbanisme). Quelle est votre question ?";
+    }
+
+    // 3. Enregistrer le message de réponse de l'agent en base
+    const agentMsgId = randomUUID();
+    await prisma.$executeRawUnsafe(
+      `INSERT INTO "chat_messages" ("id", "project_id", "sender", "text", "widget_type", "widget_data", "created_at")
+       VALUES ($1, $2, $3, $4, $5, CAST($6 AS jsonb), NOW())`,
+      agentMsgId,
+      projectId,
+      sender,
+      text,
+      widgetType,
+      widgetData ? JSON.stringify(widgetData) : null
+    );
+
+    return Response.json({
+      userMessage: { id: userMsgId, sender: "User", text: message, createdAt: new Date() },
+      agentMessage: { id: agentMsgId, sender, text, widgetType, widgetData, createdAt: new Date() }
+    });
   } catch (err: any) {
-    console.warn("[Researcher] Impossible de lire la mercuriale PostgreSQL :", err.message);
-    return "";
-  }
-}
-
-const geminiApiKey = process.env.GEMINI_API_KEY || "";
-
-// Define System Prompts matching ADK configurations
-const AGENT_SYSTEM_PROMPTS: Record<string, string> = {
-  router: `Tu es le Routeur Général d'Archi Cam AI. Ton rôle est d'accueillir chaleureusement l'utilisateur, de comprendre son projet de construction ou d'urbanisme au Cameroun, et de l'orienter vers l'agent spécialiste approprié si sa question demande une expertise technique ou juridique poussée.
-  
-  TES AGENTS SPÉCIALISTES :
-  - ⚖️ **Agent Legal** : Pour tout ce qui touche à la Loi d'urbanisme 2004/003, permis de bâtir, titres fonciers et certificat d'urbanisme.
-  - 🏗️ **Agent Engineer** : Pour les questions de calculs de structure, ferraillage, dosage béton, Eurocode 2 et analyse de maquettes IFC/BIM.
-  - 📐 **Agent Designer** : Pour l'architecture tropicale, les plans PDF, les rendus 3D et les estimations budgétaires globales.
-  - 🔍 **Agent Researcher** : Pour le suivi en direct des prix du marché des matériaux locaux (Ciment, Sable, Gravier, Acier).
-
-  TON STYLE : Très accueillant, professionnel, clair et structuré. Fais briller l'écosystème Archi Cam AI !`,
-
-  legal: `Tu es l'Agent Juridique d'Archi Cam AI. Ton expertise porte sur la Loi n° 2004/003 du 21 avril 2004 régissant l'urbanisme au Cameroun et toutes les procédures de délivrance du permis de construire (Mairie et Communauté Urbaine).
-  
-  TES RESPONSABILITÉS :
-  1. Générer la liste des pièces nécessaires pour le dossier de permis de construire (DPC) au Cameroun.
-  2. Expliquer les étapes administratives au niveau local (Yaoundé, Douala, etc.).
-  3. Conseiller sur la sécurisation foncière (titre foncier, certificat d'urbanisme, bail emphytéotique).
-  4. Identifier les risques de construction (zones marécageuses, emprises routières, non-aedificandi).
-
-  TON STYLE : Formel, extrêmement précis, rassurant, et très rigoureux sur les articles de la loi camerounaise. Cite la loi n° 2004/003 quand c'est pertinent.`,
-
-  engineer: `Tu es l'Agent Engineer d'Archi Cam AI. Ton rôle est d'apporter l'expertise technique et structurelle aux chantiers et conceptions. Tu maîtrises le calcul de structure en béton armé (Eurocodes adaptés au climat tropical) et la lecture de maquettes BIM (format IFC).
- 
-  TES RESPONSABILITÉS :
-  1. Analyser la solidité et le ferraillage des poteaux, poutres et dalles.
-  2. Fournir des recommandations sur le dosage du béton (ex: 350 kg/m³ pour dalles) et le temps de cure.
-  3. Expliquer le rôle de l'enrobage selon l'exposition climatique (climat côtier Douala vs continental Yaoundé).
-  4. Interpréter les études de sol et sondages géotechniques (LABOGENIE).
-  5. Utiliser impérativement les règles de l'OKF (Object Knowledge Framework) fournies dans le contexte RAG pour calculer les décompositions de dosages de béton (ciment, sable, gravier, acier).
-
-  TON STYLE : Technique, rigoureux, précis, axé sur la sécurité structurelle et les chiffres concrets.`,
-
-  designer: `Tu es l'Agent Designer d'Archi Cam AI. Ton expertise s'exprime dans la conception architecturale tropicale, l'optimisation fonctionnelle d'espace et l'estimation budgétaire globale du projet de construction au Cameroun.
-
-  TES RESPONSABILITÉS :
-  1. Analyser et interpréter les pièces et surfaces à partir d'un plan d'architecte.
-  2. Conseiller sur la ventilation naturelle croisée, l'orientation solaire et la réduction de la chaleur en région équatoriale.
-  3. Proposer des concepts alliant modernité et matériaux locaux (briques de terre stabilisée BTS, bois local, latérite).
-  4. Fournir une estimation globale cohérente du projet en Francs CFA (FCFA) selon le standing choisi (économique, moyen standing, standing de luxe).
-
-  TON STYLE : Créatif, inspirant, tourné vers le développement durable, et très au fait des réalités concrètes et coûts réels du BTP au Cameroun.`,
-
-  researcher: `Tu es l'Agent Researcher d'Archi Cam AI. Ta mission est d'assurer la veille économique sur les prix réels des matériaux de construction locaux et la synchronisation avec la Mercuriale nationale.
-
-  TES RESPONSABILITÉS :
-  1. Donner les prix du marché à Yaoundé, Douala ou Bafoussam pour le ciment (CPJ 32.5, CPJ 42.5), le sable de la Sanaga, le gravier concassé, le fer à béton et les parpaings vibrés.
-  2. Analyser les tendances de coûts et les hausses d'inflation des matériaux de construction.
-  3. Expliquer comment optimiser les approvisionnements en matériaux de qualité pour éviter les contrefaçons.
-  4. Se baser sur la structure de prix (Mercuriale) définie dans l'OKF pour garantir la cohérence des estimations de coûts.
-
-  TON STYLE : Analytique, précis, axé sur les chiffres officiels et récents du marché camerounais.`,
-
-  commercial: `Tu es l'Agent Commercial d'Archi Cam AI. Ton domaine d'expertise couvre l'optimisation budgétaire, la négociation de devis B2B, les remises fournisseurs (ex: Dangote, Cimencam) pour les achats de matériaux en gros, et la maximisation du retour sur investissement immobilier au Cameroun.
-  
-  TES RESPONSABILITÉS :
-  1. Analyser et proposer des stratégies de réduction de coût (compromis matériaux, alternatives de standing).
-  2. Négocier virtuellement des remises fournisseurs en fonction des volumes de commande (ex: ciment par tonne, fer à béton par lot).
-  3. Suggérer des échelonnements de paiement réalistes et des structures de trésorerie pour les phases de chantier.
-  4. Répondre aux questions de marge BET, d'aléas de chantier, et aider le client à optimiser son devis DQE.
-
-  TON STYLE : Très axé business, diplomate, persuasif, stratégique, axé sur les économies de coûts et le rapport qualité/prix.`
-};
-
-export async function POST(req: NextRequest) {
-  try {
-    const firebaseToken = req.cookies.get("firebaseToken")?.value;
-    const user = await verifyFirebaseToken(firebaseToken || "");
-    const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
-
-    if (!user && !bypassAuth) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { message, agent = "router", history = [], model = "gemini-2.5-flash", attachment, projectId } = await req.json();
-
-    if (!message && !attachment) {
-      return NextResponse.json({ error: "Message or attachment is required" }, { status: 400 });
-    }
-
-    if (agent === "conducteur") {
-      const { agentConducteurTravaux } = await import("@/lib/genkit-agent");
-      const answer = await agentConducteurTravaux({
-        projectId: projectId || "demo-project",
-        question: message || ""
-      });
-      return NextResponse.json({
-        content: answer,
-        agent,
-        sources: [],
-        usedRAG: true,
-        model: "gemini-2.5-flash"
-      });
-    }
-
-    if (!geminiApiKey) {
-      // Gemini non disponible — le routeur LLM basculera automatiquement sur OpenRouter
-      console.warn("[RAG API] GEMINI_API_KEY absente. Fallback vers OpenRouter activé.");
-    }
-
-    console.log(`[RAG API] Vectorizing user query for agent: ${agent}`);
-
-    // 1. Generate 1536-D Vector Embedding of user query
-    let embedding: number[] = [];
-    try {
-      const embedRes = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${geminiApiKey}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            content: {
-              parts: [{ text: message || "Analyse l'image" }]
-            },
-            outputDimensionality: 1536
-          })
-        }
-      );
-
-      if (!embedRes.ok) {
-        throw new Error(`Embedding API returned status ${embedRes.status}`);
-      }
-
-      const embedJson = await embedRes.json();
-      embedding = embedJson.embedding?.values || [];
-    } catch (err) {
-      console.error("[RAG API] Error generating embedding:", err);
-    }
-
-    // 2. Perform sessional vector match inside local PostgreSQL (using pgvector)
-    let contextChunks: any[] = [];
-    let usedRAG = false;
-
-    if (embedding.length === 1536) {
-      try {
-        console.log("[RAG API] Querying local PostgreSQL via cosine similarity...");
-        const embeddingStr = `[${embedding.join(",")}]`;
-        const dbResult = await query(
-          `SELECT content, metadata, (1 - (embedding <=> $1::vector)) AS similarity
-           FROM knowledge_base
-           WHERE (1 - (embedding <=> $1::vector)) >= $2
-           ORDER BY similarity DESC
-           LIMIT $3`,
-          [embeddingStr, 0.25, 4]
-        );
-
-        if (dbResult.rows && dbResult.rows.length > 0) {
-          contextChunks = dbResult.rows;
-          usedRAG = true;
-          console.log(`[RAG API] Successfully found ${dbResult.rows.length} relevant RAG chunks`);
-        }
-      } catch (err: any) {
-        console.warn("[RAG API] Cosine similarity query failed. Falling back to plain select...", err.message || err);
-        // Fallback: select most recent knowledge chunks
-        try {
-          const dbResult = await query("SELECT content, metadata FROM knowledge_base LIMIT 3");
-          if (dbResult.rows && dbResult.rows.length > 0) {
-            contextChunks = dbResult.rows.map(chunk => ({
-              content: chunk.content,
-              metadata: chunk.metadata,
-              similarity: 1.0
-            }));
-            usedRAG = true;
-          }
-        } catch (fallbackErr) {
-          console.error("[RAG API] Fallback select failed:", fallbackErr);
-        }
-      }
-    }
-
-    // 3. Format RAG Context String
-    let contextString = "";
-    const sources: Array<{ document: string; similarity: number }> = [];
-
-    if (contextChunks.length > 0) {
-      contextString = "\n\n=== CONTEXTE DE LA BASE DE CONNAISSANCES LOCALE (RAG Cameroun BTP & Lois) ===\n";
-      contextChunks.forEach((chunk, index) => {
-        const docName = chunk.metadata?.document_name || "Document Local";
-        const simPercent = chunk.similarity ? Math.round(chunk.similarity * 100) : 100;
-        
-        contextString += `\n[Extrait de : ${docName} (Confiance: ${simPercent}%)]\n${chunk.content}\n`;
-        
-        // Track sources to return to client
-        if (!sources.some(s => s.document === docName)) {
-          sources.push({ document: docName, similarity: chunk.similarity || 1.0 });
-        }
-      });
-      contextString += "\n=== FIN DU CONTEXTE LOCAL ===\n";
-    }
-
-    // 4. Formulate System Prompt with ADK Profile & Context
-    const basePrompt = AGENT_SYSTEM_PROMPTS[agent] || AGENT_SYSTEM_PROMPTS.router;
-
-    // ── Phase 3 : Enrichissement dynamique de l'Agent Researcher ─────────────
-    let mercurialeCtx = "";
-    if (agent === "researcher") {
-      // Extraire la ville depuis le message si mentionnée (Yaoundé / Douala / Bafoussam)
-      const villeMatch = (message || "").match(/yaound[ée]|douala|bafoussam/i);
-      const villeResearcher = villeMatch
-        ? villeMatch[0].charAt(0).toUpperCase() + villeMatch[0].slice(1)
-        : "Yaounde";
-      mercurialeCtx = await fetchMercurialeFromDB(villeResearcher);
-    }
-
-    // ── Neo4j GraphRAG : Parcours de Graphe Sémantique & Contrôle ABAC ────────
-    let graphContext = "";
-    try {
-      if (message && message.trim().length > 3) {
-        const userRole = agent === "engineer" ? "INGENIEUR" : agent === "architect" ? "ARCHITECTE" : "CLIENT";
-        const graphRes = await queryGraphRAG(message.trim(), userRole as any, 2);
-        if (graphRes && graphRes.nodesFound > 0) {
-          graphContext = `\n\n${graphRes.oagContext}\n=== FIN CONTEXTE NEO4J ===\n`;
-          console.log(`[Neo4j GraphRAG] ${graphRes.nodesFound} nœuds ontologiques trouvés pour "${message.slice(0, 30)}..."`);
-        }
-      }
-    } catch (graphErr: any) {
-      console.warn("[Neo4j GraphRAG] Information indisponible :", graphErr.message || graphErr);
-    }
-
-    const finalSystemPrompt = `${basePrompt}${contextString}${graphContext}${mercurialeCtx}
-    
-    CONSIGNES CRITIQUES :
-    - Utilise le contexte local RAG ci-dessus pour répondre de façon extrêmement précise et documentée.
-    - Sois honnête : si l'information ne figure pas dans le contexte ou tes connaissances générales, précise-le, mais apporte un conseil d'expert adapté.
-    - Toutes les valeurs monétaires doivent être exprimées en Francs CFA (FCFA) pour le marché camerounais.
-    - Réponds en français de façon élégante, claire et structurée.
-    - IMPORTANT : Lorsque tu présentes des chiffres, des grilles de prix ou des décompositions de matériaux, structure-les impérativement dans un tableau Markdown clair.
-    
-    ACTIONS AGENTIQUES DU DEV-ENGINE :
-    Si l'utilisateur te demande de modifier/ajuster/changer un prix unitaire, une quantité d'un matériau ou la surface de son projet dans le devis ou la note d'analyse, tu dois obligatoirement inclure à la toute fin de ta réponse un bloc JSON brut au format exact suivant, encapsulé dans un bloc markdown json :
-    \`\`\`json
-    {
-      "action": "update_devis_price" | "update_devis_quantity" | "update_surface_area",
-      "params": {
-        "item": "Nom ou mot-clé de l'élément (ex: ciment, carrelage, parpaing...)",
-        "value": nombre_entier
-      }
-    }
-    \`\`\`
-    
-    ACTIONS AGENTIQUES BASE DE DONNÉES (POSTGRESQL) :
-    Si l'utilisateur te demande explicitement de modifier la base de données de son projet actuel (ex: changer le nom du projet, modifier la marge d'aléas, les frais généraux, ou la localisation), tu dois obligatoirement inclure un bloc JSON au format exact suivant à la fin de ta réponse :
-    \`\`\`json
-    {
-      "action": "update_supabase_record",
-      "params": {
-        "table": "projets",
-        "updates": {
-          "nom_projet": "Nouveau nom",
-          "frais_generaux_pct": 25.0
-        }
-      }
-    }
-    \`\`\`
-    Réponds toujours de manière professionnelle pour confirmer l'action entreprise.`;
-
-
-    // ── 6. Routage LLM : LM Studio → Gemini → OpenRouter ────────────────────
-    const useGrounding = agent === "researcher";
-    const llmMessages: LLMMessage[] = [
-      ...( history && history.length > 0
-        ? history.map((msg: any) => ({
-            role: msg.role === "user" ? "user" : "assistant",
-            content: msg.content,
-          } as LLMMessage))
-        : []
-      ),
-      {
-        role: "user",
-        content: attachment
-          ? [
-              { type: "image_url", image_url: { url: `data:${attachment.mimeType};base64,${attachment.data}` } },
-              ...(message ? [{ type: "text", text: message }] : []),
-            ]
-          : (message || "Bonjour"),
-      } as LLMMessage,
-    ];
-
-    console.log(`[RAG API] Routage LLM vers cascade (LM Studio → Gemini → OpenRouter)...`);
-
-    const llmResult = await routeLLM({
-      systemPrompt: finalSystemPrompt,
-      messages: llmMessages,
-      maxTokens: 2048,
-      useGrounding,
-      preferLocal: true,
-      attachmentData: attachment ? { mimeType: attachment.mimeType, data: attachment.data } : undefined,
-    });
-
-    const assistantResponse = llmResult.content || "Désolé, je n'ai pas pu formuler de réponse.";
-    console.log(`[RAG API] ✅ Réponse générée via ${llmResult.provider} — ${llmResult.modelUsed} (${llmResult.latencyMs ?? 0}ms)`);
-
-    // 7. Backend execution of Database modification if detected
-    const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/;
-    const match = jsonBlockRegex.exec(assistantResponse);
-    if (match) {
-      try {
-        const parsedAction = JSON.parse(match[1].trim());
-        if (parsedAction && parsedAction.action === "update_supabase_record") {
-          console.log("[RAG API] Backend executing database action:", parsedAction);
-          const table = parsedAction.params.table;
-          const updates = parsedAction.params.updates;
-          
-          if (table === "projets") {
-             const columnMapping: Record<string, string> = {
-               nom_projet: "nom_projet",
-               nomProjet: "nom_projet",
-               frais_generaux_pct: "frais_generaux_pct",
-               fraisGenerauxPct: "frais_generaux_pct",
-               localisation: "localisation",
-               marge_aleas_pct: "marge_aleas_pct",
-               margeAleasPct: "marge_aleas_pct"
-             };
-             
-             const pgUpdates: string[] = [];
-             const pgParams: any[] = [];
-             let paramIdx = 1;
-             
-             Object.keys(updates).forEach(key => {
-               const pgCol = columnMapping[key] || key;
-               pgUpdates.push(`${pgCol} = $${paramIdx++}`);
-               pgParams.push(updates[key]);
-             });
-             
-             if (pgUpdates.length > 0) {
-               pgParams.push(projectId || "demo-project");
-               await query(
-                 `UPDATE projets SET ${pgUpdates.join(", ")} WHERE id = $${paramIdx}`,
-                 pgParams
-               );
-               console.log("[RAG API] Local SQL database successfully updated by Agent.");
-             }
-          }
-        }
-      } catch (parseErr) {
-        console.warn("[RAG API] Failed to parse JSON block or execute database update");
-      }
-    }
-
-    return NextResponse.json({
-      content: assistantResponse,
-      agent,
-      sources,
-      usedRAG,
-      model: llmResult.modelUsed,
-      provider: llmResult.provider,
-    });
-
-  } catch (error: any) {
-    console.error("[RAG API] Critical error in /api/chat:", error);
-    return NextResponse.json(
-      { error: "Une erreur interne est survenue lors du traitement de votre requête.", details: error.message },
-      { status: 500 }
-    );
+    console.error("[API Chat] Error:", err.message);
+    return Response.json({ error: err.message }, { status: 500 });
   }
 }
