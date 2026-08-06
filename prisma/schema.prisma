@@ -118,3 +118,16 @@ model QualityMetric {
 
   @@map("quality_metrics")
 }
+
+// RISQUE 2 — Cache géométrique partagé entre modes de rendu
+model GeometryCache {
+  id          String   @id @default(uuid())
+  imageHash   String   @unique @map("image_hash") // SHA-256 de l'image
+  projectId   String?  @map("project_id")
+  geometry    String   // JSON de la géométrie extraite (rooms, totalSurface, roomCount)
+  extractedAt DateTime @default(now()) @map("extracted_at")
+
+  @@index([imageHash])
+  @@index([projectId])
+  @@map("geometry_caches")
+}

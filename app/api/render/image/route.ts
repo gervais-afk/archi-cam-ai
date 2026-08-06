@@ -18,6 +18,9 @@ import {
   generateArchitecturalRender,
 } from "@/lib/bridges/openrouter-bridge";
 import { deductCredits } from "@/lib/credits/credit-manager";
+import { GeometryCache } from "@/lib/geometry/geometry-cache";
+import { compressPrompt } from "@/lib/ai/prompt-compressor";
+import { GeometryValidator } from "@/lib/validation/geometry-validator";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300; // 5 minutes max
@@ -377,9 +380,20 @@ export async function POST(request: Request) {
       try {
         console.log("[API Render Image LEAN] ☁️ ÉTAPE 1 (CLOUD UNIQUE) — OpenRouter...");
         
-        // 1.1 Extraction Métadonnées VLM (< 1.5s)
+        // 1.1 Extraction Métadonnées VLM (avec Cache Géométrique SHA-256)
         const metaStartTime = Date.now();
-        extractedMetadata = await extractPlanMetadata(maskDataUri);
+        const bufferForHash = inputSourceBuffer || Buffer.from(maskDataUri);
+        const cachedGeom = await GeometryCache.extractAndCache(bufferForHash, maskDataUri, body.projectId || undefined);
+        
+        extractedMetadata = {
+          rooms: cachedGeom.rooms.map((r) => ({
+            name: r.name,
+            type: r.type,
+            surface_m2: r.surface_m2
+          })),
+          totalSurface: cachedGeom.totalSurface,
+          roomCount: cachedGeom.roomCount
+        };
         const metaDuration = Date.now() - metaStartTime;
 
         try {
@@ -410,9 +424,12 @@ export async function POST(request: Request) {
           }
         }
 
-        // 1.2 Génération Rendu HD
+        // 1.2 Compression du Prompt & Génération Rendu HD
+        const compressedPositive = compressPrompt(positivePrompt);
+        const compressedNegative = compressPrompt(negativePrompt);
+
         const renderStartTime = Date.now();
-        renderUrlResult = await generateArchitecturalRender(maskDataUri, positivePrompt, negativePrompt);
+        renderUrlResult = await generateArchitecturalRender(maskDataUri, compressedPositive, compressedNegative);
         const renderDuration = Date.now() - renderStartTime;
 
         try {
@@ -432,6 +449,13 @@ export async function POST(request: Request) {
         if (renderUrlResult) {
           engineUsed = "OpenRouter Cloud Engine (nano-banana-pro / flux)";
           console.log("[API Render Image LEAN] ✨ Succès ÉTAPE 1 CLOUD !");
+
+          // 1.3 Validation de Cohérence Géométrique Post-Rendu
+          const validation = GeometryValidator.validate(cachedGeom, renderUrlResult);
+          console.log(`[GeometryValidator] Score de cohérence : ${validation.score}/100. Valide: ${validation.isValid}`);
+          if (validation.errors.length > 0) {
+            console.warn("[GeometryValidator] Anomalies détectées :", JSON.stringify(validation.errors));
+          }
         }
       } catch (cloudErr) {
         console.warn("[API Render Image LEAN] ⚠️ ÉTAPE 1 CLOUD échouée, basculement ÉTAPE 2:", cloudErr);
