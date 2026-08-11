@@ -26,7 +26,7 @@ In African construction and public bidding (MINMAP), manual construction estimat
 Archi Cam AI establishes an industry-first **Hybrid Neuro-Symbolic Architecture** bridging Generative AI with deterministic civil engineering mathematics:
 * ⚡ **99.2% Estimation Acceleration**: Transforms complex 3D IFC models, 2D PDF architectural sketches, and blueprints into bankable, 6-sheet **NDA Family Excel BOQs in under 45 seconds** (from days to seconds).
 * 🎯 **Zero-Hallucination & Legal Compliance**: Millimeter-accurate deduction algorithms ($>0.50m^2$ door/window openings) integrated with official **MINMAP 2026 public contract price indexes** and **BAEL 91** concrete stress compliance via Neo4j GraphRAG.
-* 🛡️ **Souveraineté Hybride & Résilience Hors-ligne** : Piloté par les **APIs Google Gemini** (Gemini 2.5/1.5 Flash) pour un traitement cloud haute performance, avec basculement automatique (failover) vers **Google Gemma 4 12B QAT** en local via LM Studio pour garantir le fonctionnement hors-ligne sur les chantiers isolés.
+* 🛡️ **Hybrid Sovereignty & Offline Resilience**: Powered by **Google Gemini APIs** (Gemini 2.5/1.5 Flash) for high-performance cloud processing, with automatic failover to local **Google Gemma 4 12B QAT** via LM Studio to guarantee offline operation on isolated construction sites.
 * 📈 **Proven MLOps Precision ($R^2 = 0.9872$)**: Machine learning costing prediction trained and continuously evaluated on **400 real African construction project budgets** using MLflow.
 
 ---
@@ -86,10 +86,10 @@ graph TD
 ### 1. Why Hybrid Neuro-Symbolic over Pure Generative AI?
 Large Language Models inherently hallucinate floating-point computations and coordinate volume abstractions. Archi Cam AI adopts a **neuro-symbolic design**:
 * **Symbolic / Deterministic Execution**: All volumetric geometry, concrete reinforcement sizing, and $>0.50m^2$ aperture subtractions are delegated exclusively to a sandboxed Python runtime executing **IfcOpenShell** and vectorized NumPy matrices.
-* **Neuro / Semantic Reasoning**: **Firebase Genkit** et les LLMs (**Gemini / Gemma**) se concentrent strictement sur le raisonnement en langage naturel, l'interprétation des cahiers des charges ambigus et l'association des lignes de devis aux ontologies **Uniclass 2015** et **MINMAP** dans Neo4j.
+* **Neuro / Semantic Reasoning**: **Firebase Genkit** and LLMs (**Gemini / Gemma**) focus strictly on natural language reasoning, interpreting ambiguous specifications, and mapping estimation line items to **Uniclass 2015** and **MINMAP** ontologies in Neo4j.
 
-### 2. Résilience Hybride Cloud/Edge & Protection ControlNet
-* **Continuité Hors-ligne** : L'intégration hybride avec l'API Cloud Gemini en principal et le basculement automatique sur **Gemma 4 12B QAT** localement via LM Studio garantit une résilience opérationnelle totale dans les bureaux de chantier africains à bande passante instable.
+### 2. Hybrid Cloud/Edge Resilience & ControlNet Protection
+* **Offline Continuity**: Hybrid integration with the Gemini Cloud API as primary and automatic failover to local **Gemma 4 12B QAT** via LM Studio guarantees total operational resilience in African construction site offices with unstable bandwidth.
 * **Structural Hallucination Suppression**: When synthesizing structural visual enhancements using **Google Imagen 3.0**, a 3-layer depth and edge **ControlNet locking mechanism** enforces geometric boundaries so architectural openings (windows/doors) and load-bearing columns cannot be shifted or invented.
 
 ---
@@ -98,7 +98,7 @@ Large Language Models inherently hallucinate floating-point computations and coo
 
 ### 🤖 AI & Agentic Framework
 * **Agentic Orchestration**: **Firebase Genkit** (`src/genkit/`) coordinating `@agent-metreur`, `@agent-devis`, `@agent-structure`, and `@agent-design`.
-* **Moteur d'IA Hybride** : **Google Gemini (2.5 & 1.5 Flash)** pour l'orchestration cloud et les embeddings, couplé avec **Google Gemma 4 (12B QAT)** localement via LM Studio comme passerelle de secours hors-ligne (AI Gateway).
+* **Hybrid AI Engine**: **Google Gemini (2.5 & 1.5 Flash)** for cloud orchestration and embeddings, coupled with **Google Gemma 4 (12B QAT)** locally via LM Studio as an offline backup gateway (AI Gateway).
 * **Multimodal Vision & Rendering**: Google Gemini 1.5 Pro / Flash & Google Imagen 3.0 + ControlNet.
 * **MLOps Evaluation Pipeline**: **MLflow Model Tracking** (`scripts/train_cost_predictor.py`), tracking data drift and material inflation across 400 regional construction datasets.
 
