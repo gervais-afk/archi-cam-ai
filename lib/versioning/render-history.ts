@@ -58,7 +58,7 @@ export class RenderVersionManager {
    */
   static async getVersionHistory(projectId: string) {
     try {
-      const rows = await prisma.$queryRawUnsafe<any[]>(
+      const rows = (await (prisma as any).$queryRawUnsafe(
         `SELECT id, "project_id" as "projectId", "version_number" as "versionNumber", "image_url" as "imageUrl", 
                 "render_mode" as "renderMode", "style_preset" as "stylePreset", "geometry_hash" as "geometryHash", 
                 "created_at" as "createdAt"
@@ -66,7 +66,7 @@ export class RenderVersionManager {
          WHERE "project_id" = $1 
          ORDER BY "version_number" DESC`,
         projectId
-      );
+      )) as any[];
       return rows;
     } catch (err: any) {
       console.error("[RenderVersionManager] Erreur historique versions :", err.message);
@@ -78,11 +78,11 @@ export class RenderVersionManager {
    * Effectue un rollback vers une version spécifique.
    */
   static async rollbackToVersion(projectId: string, versionId: string) {
-    const rows = await prisma.$queryRawUnsafe<any[]>(
+    const rows = (await (prisma as any).$queryRawUnsafe(
       `SELECT id, "project_id", "version_number", "image_url", "render_mode", "style_preset", "geometry_hash", "created_at"
        FROM "render_versions" WHERE id = $1 LIMIT 1`,
       versionId
-    );
+    )) as any[];
 
     if (!rows || rows.length === 0) {
       throw new Error("Version introuvable");
@@ -91,7 +91,7 @@ export class RenderVersionManager {
     const version = rows[0];
 
     // Mettre à jour le RenderJob actuel
-    await prisma.$executeRawUnsafe(
+    await (prisma as any).$executeRawUnsafe(
       `UPDATE "render_jobs" SET "media_url" = $1, "updated_at" = NOW() 
        WHERE "project_id" = $2`,
       version.image_url,
@@ -114,10 +114,10 @@ export class RenderVersionManager {
 
   private static async getNextVersionNumber(projectId: string): Promise<number> {
     try {
-      const rows = await prisma.$queryRawUnsafe<any[]>(
+      const rows = (await (prisma as any).$queryRawUnsafe(
         `SELECT MAX("version_number") as max_val FROM "render_versions" WHERE "project_id" = $1`,
         projectId
-      );
+      )) as any[];
       if (rows && rows.length > 0 && rows[0].max_val !== null) {
         return Number(rows[0].max_val) + 1;
       }

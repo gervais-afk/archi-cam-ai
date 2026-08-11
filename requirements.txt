@@ -11,3 +11,8 @@ ultralytics==8.2.0
 python-dotenv==1.0.1
 httpx==0.27.0
 uvicorn==0.30.1
+# ── Options C1/C2 (installées automatiquement)
+ezdxf>=1.2.0
+reportlab>=4.2.0
+qrcode>=7.4
+easyocr>=1.7.0

@@ -149,7 +149,7 @@ export class AntygravityConverter {
 
     const uploadResponse = await fetch(uploadUrl, {
       method: "PUT",
-      body: fileBuffer,
+      body: fileBuffer as any,
       headers: {
         "Content-Type": "application/octet-stream",
         "Content-Length": String(fileBuffer.length)

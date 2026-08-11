@@ -38,7 +38,7 @@ export async function GET() {
     const rollback = await RenderVersionManager.rollbackToVersion(projectId, v1.id);
 
     // Vérifier la mise à jour
-    const checkJob = await prisma.$queryRawUnsafe<any[]>(
+    const checkJob: any = await (prisma as any).$queryRawUnsafe(
       `SELECT "media_url" FROM "render_jobs" WHERE "project_id" = $1 LIMIT 1`,
       projectId
     );

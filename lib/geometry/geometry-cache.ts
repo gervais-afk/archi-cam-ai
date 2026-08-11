@@ -20,24 +20,29 @@ export class GeometryCache {
   static async extractAndCache(
     imageBuffer: Buffer,
     maskDataUri: string,
-    projectId?: string
+    projectId?: string,
+    forceRefresh?: boolean
   ): Promise<CachedGeometry> {
     // 1. Calculer le hash SHA-256 de l'image
     const imageHash = createHash("sha256").update(imageBuffer).digest("hex");
 
     // 2. Tenter de lire dans le cache SQL
-    try {
-      const cachedRows = await prisma.$queryRawUnsafe<any[]>(
-        `SELECT geometry FROM "geometry_caches" WHERE "image_hash" = $1 LIMIT 1`,
-        imageHash
-      );
+    if (!forceRefresh) {
+      try {
+        const cachedRows = (await (prisma as any).$queryRawUnsafe(
+          `SELECT geometry FROM "geometry_caches" WHERE "image_hash" = $1 LIMIT 1`,
+          imageHash
+        )) as any[];
 
-      if (cachedRows && cachedRows.length > 0) {
-        console.log("✅ [GeometryCache] Hit ! Géométrie lue du cache SQL.");
-        return JSON.parse(cachedRows[0].geometry) as CachedGeometry;
+        if (cachedRows && cachedRows.length > 0) {
+          console.log("✅ [GeometryCache] Hit ! Géométrie lue du cache SQL.");
+          return JSON.parse(cachedRows[0].geometry) as CachedGeometry;
+        }
+      } catch (dbErr: any) {
+        console.warn("[GeometryCache] Erreur lecture cache SQL :", dbErr.message);
       }
-    } catch (dbErr: any) {
-      console.warn("[GeometryCache] Erreur lecture cache SQL :", dbErr.message);
+    } else {
+      console.log("🔄 [GeometryCache] Cache bypass demandé par forceRefresh.");
     }
 
     // 3. Extraire avec le VLM d'OpenRouter si absent du cache
@@ -54,21 +59,24 @@ export class GeometryCache {
       roomCount: metadata.roomCount || 0
     };
 
-    // 4. Écrire le résultat dans le cache SQL
+    // 4. Écrire le résultat dans le cache SQL (avec mise à jour si conflit de hash)
     try {
       const id = randomUUID();
       await prisma.$executeRawUnsafe(
         `INSERT INTO "geometry_caches" ("id", "image_hash", "project_id", "geometry", "extracted_at") 
-         VALUES ($1, $2, $3, $4, NOW())`,
+         VALUES ($1, $2, $3, $4, NOW())
+         ON CONFLICT ("image_hash") 
+         DO UPDATE SET "geometry" = EXCLUDED."geometry", "extracted_at" = NOW(), "project_id" = COALESCE(EXCLUDED."project_id", "geometry_caches"."project_id")`,
         id,
         imageHash,
         projectId || null,
         JSON.stringify(result)
       );
-      console.log("💾 [GeometryCache] Nouvelle géométrie stockée avec succès.");
+      console.log("💾 [GeometryCache] Nouvelle géométrie stockée et mise à jour avec succès.");
     } catch (saveErr: any) {
       console.warn("[GeometryCache] Impossible de sauvegarder en BDD :", saveErr.message);
     }
+
 
     return result;
   }

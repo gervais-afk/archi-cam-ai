@@ -10,9 +10,25 @@ const nextConfig = {
         protocol: "https",
         hostname: "firebasestorage.googleapis.com",
       },
+      {
+        protocol: "https",
+        hostname: "**.fal.media",
+      },
+      {
+        protocol: "https",
+        hostname: "v3b.fal.media",
+      },
+      {
+        protocol: "https",
+        hostname: "v3.fal.media",
+      },
     ],
   },
   transpilePackages: ["@react-pdf/renderer"],
+  serverComponentsExternalPackages: ["@resvg/resvg-js"],
+  experimental: {
+    serverComponentsExternalPackages: ["@resvg/resvg-js"],
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },

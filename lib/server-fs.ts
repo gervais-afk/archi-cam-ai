@@ -48,7 +48,13 @@ export function safeMkdirSync(dirPath: string): void {
 export function safeWriteFileSync(filePath: string, data: Buffer | string): void {
   try {
     const fs = getNativeFs();
-    if (fs) fs.writeFileSync(filePath, data);
+    if (fs) {
+      const parentDir = path.dirname(filePath);
+      if (!fs.existsSync(parentDir)) {
+        fs.mkdirSync(parentDir, { recursive: true });
+      }
+      fs.writeFileSync(filePath, data);
+    }
   } catch (e) {
     console.warn("safeWriteFileSync error:", e);
   }

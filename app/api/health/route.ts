@@ -40,17 +40,17 @@ export async function GET() {
   const checkHttpService = async (url: string): Promise<boolean> => {
     try {
       const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-      return res.ok || res.status === 404;
+      return res.ok || res.status === 404 || res.status === 405 || res.status === 406;
     } catch {
       return false;
     }
   };
 
-  const FASTMCP_URL = process.env.FASTMCP_BASE_URL || "http://127.0.0.1:8000";
+  const FASTMCP_URL = process.env.FASTMCP_BASE_URL || "http://127.0.0.1:8001";
   const LM_STUDIO_URL = process.env.LM_STUDIO_BASE_URL || "http://127.0.0.1:1234";
 
   const [fastmcpOk, lmStudioOk] = await Promise.all([
-    checkHttpService(`${FASTMCP_URL}/health`),
+    checkHttpService(`${FASTMCP_URL}/mcp`),
     checkHttpService(`${LM_STUDIO_URL}/v1/models`),
   ]);
 

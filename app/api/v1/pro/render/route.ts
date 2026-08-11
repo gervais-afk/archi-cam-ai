@@ -73,12 +73,12 @@ export async function GET(req: Request) {
     }
 
     // Récupérer le dernier RenderJob pour ce projet
-    const rows = await prisma.$queryRawUnsafe<any[]>(
+    const rows = (await (prisma as any).$queryRawUnsafe(
       `SELECT id, "project_id" as "projectId", "media_url" as "mediaUrl", status, "created_at" as "createdAt"
        FROM "render_jobs"
        WHERE "project_id" = $1 LIMIT 1`,
       projectId
-    );
+    )) as any[];
 
     if (!rows || rows.length === 0) {
       return Response.json({ error: "Projet introuvable" }, { status: 404 });

@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export const PIPELINE_STEPS = [
+const PIPELINE_STEPS = [
   { step: 1, label: "Réception et déduplication DuckDB...", icon: "database" },
   { step: 2, label: "Détection du type de plan (PDF / Scan)...", icon: "file-search" },
   { step: 3, label: "Géolocalisation & altitude Cesium Ion...", icon: "globe" },

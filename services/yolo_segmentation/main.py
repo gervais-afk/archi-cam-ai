@@ -12,6 +12,8 @@ import sys
 import gc
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import numpy as np
+import cv2
 from pydantic import BaseModel
 
 from inference import yolo_segmenter
@@ -41,24 +43,26 @@ def health_check():
     }
 
 @app.post("/segment")
-async def segment_plan(file: UploadFile = File(...)):
-    """
-    Segmentation sémantique d'un plan d'architecte (_clean_plan.png).
-    Retourne les masques vectoriels et la liste des pièces segmentées.
-    """
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Le fichier doit être une image (PNG/JPG).")
-
+async def segment_plan(
+    file: UploadFile = File(...),
+    confidence: float = 0.5,
+    input_type: str = "digital"
+):
     try:
         contents = await file.read()
-        result = yolo_segmenter.segment(contents)
+        nparr = np.frombuffer(contents, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
-        # Nettoyage explicite de la mémoire
+        if img is None:
+            raise ValueError("Impossible de décoder le flux. Le fichier n'est pas une image valide.")
+
+        result = yolo_segmenter.segment(img, confidence=confidence, input_type=input_type)
         gc.collect()
         return result
     except Exception as e:
         gc.collect()
-        raise HTTPException(status_code=500, detail=f"Erreur d'inférence : {str(e)}")
+        print(f"[ERREUR FATALE YOLO] : {str(e)}")
+        raise HTTPException(status_code=400, detail=f"I/O Error: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

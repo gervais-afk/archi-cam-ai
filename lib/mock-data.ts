@@ -11,13 +11,14 @@ export const MOCK_USER: UserProfile = {
 };
 
 export const GENERATION_STEPS: GenerationStep[] = [
-  { id: 1, label: "Extraction des pièces & sémantique 2D/3D...", duration: 4000 },
-  { id: 2, label: "Détection des volumes et façades SCoT...",     duration: 5000 },
-  { id: 3, label: "Calcul déterministe DuckDB 1.5.5 (BAEL 91)...", duration: 4000 },
-  { id: 4, label: "Audit de conformité ONAC & SynthID...",       duration: 4000 },
-  { id: 5, label: "Génération du plan 2D SCoT & Rendu 4K...",    duration: 6000 },
-  { id: 6, label: "Calcul du planning Gantt Météo-Conscient...", duration: 4000 },
+  { id: 1, label: "Analyse structurelle du plan (YOLO + OpenCV)...",    duration: 4000 },
+  { id: 2, label: "Reconstruction topologique des murs (Shapely)...",    duration: 4500 },
+  { id: 3, label: "Validation géométrique des pièces fermées...",        duration: 3000 },
+  { id: 4, label: "Raisonnement spatial SCoT (Règles BTP Cameroun)...", duration: 4000 },
+  { id: 5, label: "Génération du rendu réaliste (Fal.ai ControlNet)...", duration: 8000 },
+  { id: 6, label: "Post-compositing : textes, cotations & filigrane...", duration: 3000 },
 ];
+
 
 export const MOCK_RENDER_RESULT: RenderResult = {
   id:          "render-duplex-r1-001",

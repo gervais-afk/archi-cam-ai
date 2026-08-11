@@ -43,6 +43,13 @@ def _get_db():
         raise ImportError(
             "DuckDB n'est pas installé. Exécutez : pip install duckdb"
         )
+    except Exception as e:
+        if "IO Error" in str(e) or "used by another process" in str(e):
+            print(f"\n[INFO] La base DuckDB ({DUCKDB_PATH}) est actuellement verrouillée par un autre processus en cours d'exécution.")
+            print("[INFO] Cela est normal si un autre terminal ou l'API Next.js est déjà lancé.")
+            import sys
+            sys.exit(0)
+        raise e
 
 
 class DuckDBManager:

@@ -12,10 +12,10 @@ export class ConversionCache {
       const fileBuffer = fs.readFileSync(originalFilePath);
       const fileHash = createHash("sha256").update(fileBuffer).digest("hex");
 
-      const rows = await prisma.$queryRawUnsafe<any[]>(
+      const rows = (await (prisma as any).$queryRawUnsafe(
         `SELECT "ifc_path", "created_at" FROM "ifc_conversion_caches" WHERE "original_file_hash" = $1 LIMIT 1`,
         fileHash
-      );
+      )) as any[];
 
       if (rows && rows.length > 0) {
         const cached = rows[0];

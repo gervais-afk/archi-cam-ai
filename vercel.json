@@ -1,17 +1,13 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "env": {
-    "NODE_ENV": "production"
-  },
   "functions": {
-    "app/api/render/image/route.ts": {
-      "maxDuration": 300
+    "app/api/generate-image/route.ts": {
+      "maxDuration": 60
     },
-    "app/api/bim/upload-ifc/route.ts": {
-      "maxDuration": 300
+    "app/api/btp/vectorize/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/btp/estimate/route.ts": {
+      "maxDuration": 60
     }
-  },
-  "regions": ["cdg1"]
+  }
 }

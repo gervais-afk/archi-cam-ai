@@ -106,7 +106,7 @@ def extract_wall_segments(
         return segments
 
     for i, line in enumerate(lines):
-        x1, y1, x2, y2 = line[0]
+        x1, y1, x2, y2 = line.ravel()
 
         length_px = float(np.sqrt((x2-x1)**2 + (y2-y1)**2))
         length_m  = length_px / scale_px_per_m

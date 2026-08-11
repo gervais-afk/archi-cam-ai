@@ -103,6 +103,12 @@ export default function ResultsPanel({ result, mode, onReset }: ResultsPanelProp
 
   useEffect(() => {
     setCurrentResult(result);
+    if (result.imageUrl || result.renderUrl) {
+      setCurrentImageUrl(result.imageUrl || result.renderUrl || "");
+    }
+    if (result.videoUrl) {
+      setVideoUrl(result.videoUrl);
+    }
   }, [result]);
 
   useEffect(() => {

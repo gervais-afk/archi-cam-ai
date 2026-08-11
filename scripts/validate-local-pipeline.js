@@ -85,6 +85,7 @@ async function runLocalValidation() {
       console.log("\n  🏆 PIPELINE LOCAL TOTALEMENT VALIDÉ SANS ERREUR !");
     } else {
       console.log("\n  ⚠️ Remarque : La route API a répondu avec le statut " + res.status);
+      console.log("  📦 Payload Réponse :", JSON.stringify(res.data, null, 2));
     }
   } catch (err) {
     console.warn("  Notice lors du test local:", err.message);

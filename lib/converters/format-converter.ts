@@ -113,9 +113,9 @@ export class FormatConverter {
     const writer = fs.createWriteStream(outputPath);
     fileStream.pipe(writer);
 
-    await new Promise((resolve, reject) => {
-      writer.on("finish", resolve);
-      writer.on("error", reject);
+    await new Promise<void>((resolve, reject) => {
+      writer.on("finish", () => resolve());
+      writer.on("error", (err) => reject(err));
     });
 
     return outputPath;

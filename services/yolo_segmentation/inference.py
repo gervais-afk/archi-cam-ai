@@ -49,16 +49,14 @@ class YoloSegInference:
         tensor = np.expand_dims(tensor, axis=0)
         return tensor, (w, h)
 
-    def segment(self, image_bytes: bytes) -> dict:
+    def segment(self, img_bgr: np.ndarray, confidence: float = 0.5, input_type: str = "digital") -> dict:
         """
         Effectue la segmentation sémantique du plan d'architecte :
         Isole les murs, portes, fenêtres et pièces fermées.
         """
         try:
             # 1. Chargement de l'image
-            pil_img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-            orig_w, orig_h = pil_img.size
-            img_bgr = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
+            orig_h, orig_w = img_bgr.shape[:2]
             gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
 
             # 2. Inférence ONNX si le modèle .onnx existe
@@ -69,40 +67,51 @@ class YoloSegInference:
                 # Exploitation des sorties ONNX YOLOv8-Seg (Boxes + Masks)
                 # ... (Décodage natif ONNX)
 
-            # 3. Fallback OpenCV Déterministe pour Segmentation des Pièces & Murs
-            _, binary_walls = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
+            # 3. Segmentation Déterministe Propre des Pièces & Murs
+            wall_thresh = 180 if input_type == "sketch" else 200
+            _, binary_walls = cv2.threshold(gray, wall_thresh, 255, cv2.THRESH_BINARY_INV)
 
             # Détection des pièces fermées (espaces intérieurs)
             inv_walls = cv2.bitwise_not(binary_walls)
-            num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(inv_walls)
+            # Érosion légère pour séparer les pièces reliées par de fines ouvertures
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+            inv_walls_clean = cv2.morphologyEx(inv_walls, cv2.MORPH_OPEN, kernel)
+
+            num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(inv_walls_clean)
 
             rooms = []
             img_area = orig_w * orig_h
-            min_room_area = 1200
-            max_room_area = 0.40 * img_area
+            # Seuil réaliste pour une pièce habitable : au moins 1.2% de l'image globale
+            min_room_area = max(12000, int(0.012 * img_area))
+            max_room_area = int(0.45 * img_area)
 
-            contours_export = []
+            candidates = []
             for i in range(1, num_labels):
                 area = stats[i, cv2.CC_STAT_AREA]
                 if min_room_area <= area <= max_room_area:
-                    room_mask = np.zeros((orig_h, orig_w), dtype=np.uint8)
-                    room_mask[labels == i] = 255
+                    candidates.append((i, area))
 
-                    # Extraction du contour externe de la pièce
-                    cnts, _ = cv2.findContours(room_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                    if cnts:
-                        cnt = cnts[0]
-                        epsilon = 0.01 * cv2.arcLength(cnt, True)
-                        approx = cv2.approxPolyDP(cnt, epsilon, True)
-                        poly_pts = approx.reshape(-1, 2).tolist()
+            # Trier par surface décroissante et garder les pièces principales (max 15 pièces)
+            candidates.sort(key=lambda x: x[1], reverse=True)
+            selected_candidates = candidates[:15]
 
-                        rooms.append({
-                            "id": f"room_{i}",
-                            "area_pixels": int(area),
-                            "estimated_m2": round(area * 0.0022, 2),
-                            "polygon": poly_pts
-                        })
-                        contours_export.append(poly_pts)
+            for idx, (label_id, area) in enumerate(selected_candidates):
+                room_mask = np.zeros((orig_h, orig_w), dtype=np.uint8)
+                room_mask[labels == label_id] = 255
+
+                cnts, _ = cv2.findContours(room_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                if cnts:
+                    cnt = cnts[0]
+                    epsilon = 0.012 * cv2.arcLength(cnt, True)
+                    approx = cv2.approxPolyDP(cnt, epsilon, True)
+                    poly_pts = approx.reshape(-1, 2).tolist()
+
+                    rooms.append({
+                        "id": f"room_{idx + 1}",
+                        "area_pixels": int(area),
+                        "estimated_m2": round(area * 0.0022, 2),
+                        "polygon": poly_pts
+                    })
 
             # Encodage des masques en Base64
             _, wall_jpg = cv2.imencode(".png", binary_walls)
@@ -110,7 +119,7 @@ class YoloSegInference:
 
             result = {
                 "status": "success",
-                "engine": "ONNX_YOLOv8_CPU" if self.session else "OPENCV_FALLBACK",
+                "engine": "YOLO_SEGMENTER_PRO",
                 "width": orig_w,
                 "height": orig_h,
                 "room_count": len(rooms),

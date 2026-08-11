@@ -49,6 +49,11 @@ export default function DashboardProPage() {
   // ── Utilisateur courant (mock auth prototype) ──
   const { user, projects } = useCurrentUser();
 
+  // ── Détection intelligente de maquette BIM ──
+  const isIfc = Boolean(
+    file && (file.name.toLowerCase().endsWith(".ifc") || file.name.toLowerCase().endsWith(".ifczip"))
+  );
+
   // ── Géolocalisation souveraine (navigator.geolocation + Nominatim OSM) ──
   const geo = useGeolocation();
 
@@ -371,107 +376,119 @@ export default function DashboardProPage() {
                   </button>
                 </div>
 
-                <div className="card-premium p-8 animate-slide-up">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 rounded-lg bg-wood-gradient flex items-center justify-center text-white font-black text-sm shadow-lg shadow-wood-ocre/20">
-                      1
-                    </div>
-                    <h2 className="text-white font-bold text-lg tracking-tight">
-                      Maquette BIM (IFC)
-                    </h2>
-                  </div>
-                  <DropZone file={file} onFileAccepted={handleFileAccepted} onFileRemoved={handleReset} mode={mode} />
-                </div>
-
-                {state === "file-ready" && (
                   <div className="card-premium p-8 animate-slide-up">
-                    <div className="flex items-center gap-3 mb-8">
+                    <div className="flex items-center gap-3 mb-6">
                       <div className="w-8 h-8 rounded-lg bg-wood-gradient flex items-center justify-center text-white font-black text-sm shadow-lg shadow-wood-ocre/20">
-                        2
+                        1
                       </div>
                       <h2 className="text-white font-bold text-lg tracking-tight">
-                        Style & Configuration
+                        {isIfc ? "Maquette OpenBIM (IFC 3D)" : file ? "Plan Architectural 2D" : "Maquette BIM (IFC) ou Plan 2D"}
                       </h2>
                     </div>
-                    <StyleSelector options={options} onChange={setOptions} />
+                    <DropZone file={file} onFileAccepted={handleFileAccepted} onFileRemoved={handleReset} mode={mode} />
                   </div>
-                )}
-              </div>
-
-              <div className="lg:col-span-4">
-                <div className="card-premium p-8 sticky top-40 border-wood-ocre/10">
-                  <h2 className="font-display font-black text-white text-xl mb-8 tracking-tight border-b border-white/5 pb-4">
-                    Résumé Studio
-                  </h2>
-
-                  <div className="space-y-6 mb-8">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-anthracite-500 font-bold uppercase tracking-widest text-[10px]">Source</span>
-                      <span className={file ? "text-wood-ocre font-bold" : "text-anthracite-700"}>
-                        {file ? file.name.slice(0, 15) + "..." : "Attente..."}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-anthracite-500 font-bold uppercase tracking-widest text-[10px]">Style</span>
-                      <span className="text-white font-bold uppercase text-[10px] tracking-widest">
-                        {options.style.replace('-', ' ')}
-                      </span>
-                    </div>
-                    
-                    <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-3">
-                       <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.15em]">
-                          <span className="text-anthracite-500">Métré Auto</span>
-                          <span className="text-ai-glow">Inclus</span>
-                       </div>
-                       <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.15em]">
-                          <span className="text-anthracite-500">Devis FCFA</span>
-                          <span className="text-ai-glow">Inclus</span>
-                       </div>
-                    </div>
-
-                    <div className="flex justify-between items-center pt-4 border-t border-white/5">
-                      <span className="text-anthracite-500 text-[10px] font-black uppercase tracking-widest">Coût Studio</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-white font-black text-2xl">1</span>
-                        <span className="text-anthracite-600 text-xs font-bold uppercase">Crédit</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleGenerate}
-                    disabled={state !== "file-ready"}
-                    className={`
-                      w-full relative overflow-hidden flex items-center justify-center gap-3 py-5 px-6 rounded-2xl
-                      font-black text-sm uppercase tracking-[0.2em] transition-all duration-500
-                      ${state === "file-ready"
-                        ? "bg-wood-gradient text-white shadow-[0_15px_30px_-10px_rgba(197,160,89,0.5)] hover:shadow-[0_20px_40px_-10px_rgba(197,160,89,0.6)] hover:-translate-y-1"
-                        : "bg-white/5 text-anthracite-700 cursor-not-allowed border border-white/5"
-                      }
-                    `}
-                  >
-                    <Sparkles
-                      className={`w-5 h-5 ${state === "file-ready" ? "text-white animate-pulse" : ""}`}
-                    />
-                    Lancer l&apos;IA
-                  </button>
-
 
                   {state === "file-ready" && (
-                    <div className="mt-6 p-3 rounded-xl bg-ai-glow/5 border border-ai-glow/20 flex items-center gap-3 animate-fade-in">
-                       <div className="w-2 h-2 rounded-full bg-ai-glow animate-ping" />
-                       <p className="text-ai-glow text-[10px] font-bold uppercase tracking-wider">
-                         Prêt pour analyse vision 1.5
-                       </p>
+                    <div className="card-premium p-8 animate-slide-up">
+                      <div className="flex items-center gap-3 mb-8">
+                        <div className="w-8 h-8 rounded-lg bg-wood-gradient flex items-center justify-center text-white font-black text-sm shadow-lg shadow-wood-ocre/20">
+                          2
+                        </div>
+                        <h2 className="text-white font-bold text-lg tracking-tight">
+                          {isIfc ? "Configuration & Finitions BIM" : "Style & Configuration"}
+                        </h2>
+                      </div>
+                      <StyleSelector options={options} onChange={setOptions} mode={mode} file={file} />
                     </div>
                   )}
                 </div>
 
-                <div className="mt-6 space-y-6">
-                  <DigitalTwinViewer buildingName="Projet Duplex BIM R+1 Bastos" totalRooms={8} totalAreaM2={240} />
-                  <VoiceAssistantWidget projectId="demo-project" />
-                  <FoncierAuditWidget />
-                </div>
+                <div className="lg:col-span-4">
+                  <div className="card-premium p-8 sticky top-40 border-wood-ocre/10">
+                    <h2 className="font-display font-black text-white text-xl mb-8 tracking-tight border-b border-white/5 pb-4">
+                      Résumé Studio Pro
+                    </h2>
+
+                    <div className="space-y-6 mb-8">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-anthracite-500 font-bold uppercase tracking-widest text-[10px]">Source</span>
+                        <span className={file ? "text-wood-ocre font-bold truncate max-w-[160px]" : "text-anthracite-700"}>
+                          {file ? file.name : "Attente..."}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-anthracite-500 font-bold uppercase tracking-widest text-[10px]">Format</span>
+                        <span className={isIfc ? "text-ai-glow font-bold text-xs" : file ? "text-white font-semibold text-xs" : "text-anthracite-700 text-xs"}>
+                          {isIfc ? "OpenBIM (.ifc)" : file ? "Plan 2D" : "—"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-anthracite-500 font-bold uppercase tracking-widest text-[10px]">Finition</span>
+                        <span className="text-white font-bold uppercase text-[10px] tracking-widest">
+                          {options.style.replace('-', ' ')}
+                        </span>
+                      </div>
+                      
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-3">
+                         <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.15em]">
+                            <span className="text-anthracite-500">{isIfc ? "Métré IFC Exact" : "Métré Auto"}</span>
+                            <span className="text-ai-glow">Inclus (IfcOpenShell)</span>
+                         </div>
+                         <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.15em]">
+                            <span className="text-anthracite-500">{isIfc ? "Descente Charges" : "Audit Structure"}</span>
+                            <span className="text-ai-glow">BAEL 91</span>
+                         </div>
+                         <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.15em]">
+                            <span className="text-anthracite-500">Bordereau MINMAP</span>
+                            <span className="text-ai-glow">Inclus (FCFA)</span>
+                         </div>
+                      </div>
+
+                      <div className="flex justify-between items-center pt-4 border-t border-white/5">
+                        <span className="text-anthracite-500 text-[10px] font-black uppercase tracking-widest">Coût Studio</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-white font-black text-2xl">1</span>
+                          <span className="text-anthracite-600 text-xs font-bold uppercase">Crédit</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleGenerate}
+                      disabled={state !== "file-ready"}
+                      className={`
+                        w-full relative overflow-hidden flex items-center justify-center gap-3 py-5 px-6 rounded-2xl
+                        font-black text-xs uppercase tracking-[0.15em] transition-all duration-500 cursor-pointer
+                        ${state === "file-ready"
+                          ? "bg-wood-gradient text-white shadow-[0_15px_30px_-10px_rgba(197,160,89,0.5)] hover:shadow-[0_20px_40px_-10px_rgba(197,160,89,0.6)] hover:-translate-y-1"
+                          : "bg-white/5 text-anthracite-700 cursor-not-allowed border border-white/5"
+                        }
+                      `}
+                    >
+                      <Sparkles
+                        className={`w-5 h-5 ${state === "file-ready" ? "text-white animate-pulse" : ""}`}
+                      />
+                      {isIfc ? "Lancer l'Analyse BIM & Structure" : "Lancer l'IA & Devis"}
+                    </button>
+
+
+                    {state === "file-ready" && (
+                      <div className="mt-6 p-3 rounded-xl bg-ai-glow/5 border border-ai-glow/20 flex items-center gap-3 animate-fade-in">
+                         <div className="w-2 h-2 rounded-full bg-ai-glow animate-ping shrink-0" />
+                         <p className="text-ai-glow text-[10px] font-bold uppercase tracking-wider">
+                           {isIfc 
+                             ? "⚡ Moteur IfcOpenShell + BAEL 91 Prêt" 
+                             : "⚡ Prêt pour analyse vision sémantique"}
+                         </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-6 space-y-6">
+                    <DigitalTwinViewer buildingName="Projet Duplex BIM R+1 Bastos" totalRooms={8} totalAreaM2={240} />
+                    <VoiceAssistantWidget projectId="demo-project" />
+                    <FoncierAuditWidget />
+                  </div>
                 
                 <ProjectHistory projects={projects} />
               </div>

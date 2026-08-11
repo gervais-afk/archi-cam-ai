@@ -37,9 +37,9 @@ const BIM_STEPS: (GenerationStep & { icon: React.ReactNode })[] = [
 ];
 
 const FINALIZATION_MESSAGES = [
-  "L'IA applique les finitions photoréalistes et textures 2.5D...",
-  "Calcul déterministe DuckDB & Mercuriale BTP Cameroun en cours...",
-  "Optimisation de l'affichage HD et préparation du tableau de bord..."
+  "Fal.ai génère les textures photoréalistes (ControlNet @ 0.75)...",
+  "Vérification topologique finale des polygones (Shapely)...",
+  "Assemblage du rapport PDF & Devis Mercuriale MINMAP 2026...",
 ];
 
 // ─── Composant principal ─────────────────────────────────────────────────────
@@ -213,12 +213,12 @@ export default function LoadingOverlay({ onComplete, mode }: LoadingOverlayProps
             {/* Titre + sous-titre */}
             <div className="text-center mb-7">
               <h3 className="text-white font-black text-xl tracking-tight">
-                {mode === "b2b" ? "BIM Scan en cours" : "Génération en cours"}
+                {mode === "b2b" ? "BIM Scan en cours" : "Analyse Architecturale"}
               </h3>
               <p className="mt-1 text-sm" style={{ color: "#52525B" }}>
                 {mode === "b2b"
                   ? "Analyse structurelle • Métré précis • DQE automatique"
-                  : "Notre IA analyse et construit votre rendu 4K"}
+                  : "Reconstruction topologique → Rendu ControlNet Fal.ai"}
               </p>
             </div>
 
@@ -348,7 +348,7 @@ export default function LoadingOverlay({ onComplete, mode }: LoadingOverlayProps
                   </div>
                   <div>
                     <p className="text-xs font-black text-white tracking-wide flex items-center gap-1.5">
-                      Finalisation du Rendu 4K & Devis
+                      {mode === "b2b" ? "Finalisation du Rendu 4K & Devis" : "Rendu ControlNet en cours (GPU Fal.ai)"}
                     </p>
                     <AnimatePresence mode="wait">
                       <motion.p
@@ -391,7 +391,7 @@ export default function LoadingOverlay({ onComplete, mode }: LoadingOverlayProps
             <p className="text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: "#52525B" }}>
               {mode === "b2b"
                 ? "Archi-Cam AI Engine v2.5 • Analyse BIM IFC Certifiée OKF"
-                : "Ne fermez pas cette fenêtre • Rendu 4K & Devis Mercuriale BTP"}
+                : "Ne fermez pas cette fenêtre • VIM Topology + ControlNet Fal.ai"}
             </p>
           </div>
 

@@ -15,7 +15,7 @@ export async function callControlNetBridge(params: {
   apiToken: string;
 }): Promise<string> {
   console.warn("[ControlNet Bridge] ⚠️ Bridge obsolète appelé — Redirection vers OpenRouter Bridge...");
-  const result = await generateArchitecturalRender(params.cannyImage, params.prompt);
+  const result = await generateArchitecturalRender(params.cannyImage, null, params.prompt);
   if (!result) throw new Error("Rendu ControlNet indisponible. Utiliser OpenRouter Bridge.");
   return result;
 }

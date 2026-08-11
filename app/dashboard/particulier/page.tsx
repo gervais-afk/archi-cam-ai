@@ -300,7 +300,7 @@ export default function DashboardParticulierPage() {
                         Style & Configuration
                       </h2>
                     </div>
-                    <StyleSelector options={options} onChange={setOptions} />
+                    <StyleSelector options={options} onChange={setOptions} mode={mode} file={file} />
                   </div>
                 )}
               </div>

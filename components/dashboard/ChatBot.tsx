@@ -244,8 +244,9 @@ export default function ChatBot({ projectId = "demo-project" }: ChatBotProps) {
   };
 
   // Helper to render basic markdown bold and bullet points
-  const renderFormattedContent = (content: string) => {
-    return content.split("\n").map((line, lineIdx) => {
+  const renderFormattedContent = (content: any) => {
+    const textContent = typeof content === "string" ? content : (content ? JSON.stringify(content) : "");
+    return textContent.split("\n").map((line, lineIdx) => {
       let formattedLine = line;
       
       // Bold Markdown replacement

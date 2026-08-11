@@ -10,10 +10,10 @@ export class IFCAnalysisCache {
 
     // 1. Rechercher en cache PostgreSQL
     try {
-      const rows = await prisma.$queryRawUnsafe<any[]>(
+      const rows = (await (prisma as any).$queryRawUnsafe(
         `SELECT results, "created_at" FROM "ifc_analysis_caches" WHERE "file_hash" = $1 LIMIT 1`,
         fileHash
-      );
+      )) as any[];
 
       if (rows && rows.length > 0) {
         const cached = rows[0];
@@ -59,7 +59,7 @@ export class IFCAnalysisCache {
     try {
       const response = await fetch("http://localhost:8001/ifc/analyze", {
         method: "POST",
-        body: ifcBuffer,
+        body: ifcBuffer as any,
         headers: { "Content-Type": "application/octet-stream" }
       });
       if (response.ok) {

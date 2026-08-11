@@ -254,7 +254,7 @@ def detect_and_remove_ruled_lines(binary_img: np.ndarray, width: int) -> np.ndar
     # 3. Filtrer les lignes quasi-horizontales (angle < 2°)
     horizontal_lines = []
     for line in lines:
-        x1, y1, x2, y2 = line[0]
+        x1, y1, x2, y2 = line.ravel()
         angle = abs(np.arctan2(y2 - y1, x2 - x1) * 180 / np.pi)
         if angle < 2.0:
             horizontal_lines.append((x1, y1, x2, y2))
@@ -290,53 +290,40 @@ def detect_and_remove_ruled_lines(binary_img: np.ndarray, width: int) -> np.ndar
 
 def validate_mask_quality(binary_mask: np.ndarray) -> tuple:
     """
-    Remplace le seuil fixe 40% par une analyse adaptative multi-critères.
+    Analyse adaptative de la qualité du masque binaire de murs (255 = murs, 0 = fond).
     Retourne (is_valid: bool, reason: str)
-
-    Catégories :
-      - DARK_CORRUPTED : Beaucoup de noir + peu de contours (fond sombre uniforme)
-      - TOO_LIGHT      : Presque tout blanc (masque vide ou surexposé)
-      - BLURRY         : Forte zone grise + flou Laplacien < 100
-      - COMPLEX_VALID  : Ratio élevé MAIS beaucoup de contours (coupe/façade détaillée)
-      - VALID          : Cas normal bien exploitable
     """
     h, w = binary_mask.shape[:2]
     total_pixels = h * w
+    if total_pixels == 0:
+        return False, "EMPTY_IMAGE"
 
-    black_pixels = np.sum(binary_mask == 0)
-    black_ratio = black_pixels / total_pixels
+    white_pixels = np.sum(binary_mask > 0)
+    white_ratio = white_pixels / total_pixels
+    black_ratio = 1.0 - white_ratio
 
-    # Densité de contours via Canny
     edges = cv2.Canny(binary_mask, 50, 150)
     edge_pixels = int(np.sum(edges > 0))
     edge_density = edge_pixels / total_pixels
 
-    print(f"[MaskQuality] Noir={black_ratio*100:.1f}%, Contours={edge_density*100:.2f}%")
+    print(f"[MaskQuality] Murs (blanc)={white_ratio*100:.1f}%, Fond (noir)={black_ratio*100:.1f}%, Contours={edge_density*100:.2f}%")
 
-    # Règle 1 : Très noir ET peu de détails → fond sombre corrompu
-    if black_ratio > 0.70 and edge_density < 0.03:
-        print("[MaskQuality] ⚠️ DARK_CORRUPTED : fond très sombre et peu de contours")
-        return False, "DARK_CORRUPTED"
+    # Règle 1 : Moins de 0.5% de murs → masque quasi-vide
+    if white_ratio < 0.005:
+        print("[MaskQuality] ⚠️ TOO_EMPTY : masque sans murs détectés (< 0.5%)")
+        return False, "TOO_EMPTY"
 
-    # Règle 2 : Presque tout blanc → masque vide
-    if black_ratio < 0.05:
-        print("[MaskQuality] ⚠️ TOO_LIGHT : masque quasi-vide")
-        return False, "TOO_LIGHT"
+    # Règle 2 : CORRECTION BUG RACINE — Un plan sur fond blanc a naturellement 70-90% blanc (NORMAL)
+    # On ne rejette QUE si blanc uniforme ET aucun contour (vrai masque corrompu)
+    if white_ratio > 0.65 and edge_density < 0.003:
+        print("[MaskQuality] ⚠️ SOLID_WHITE_CORRUPTED : blanc uniforme sans contours de murs détectés")
+        return False, "SOLID_WHITE_CORRUPTED"
 
-    # Règle 3 : Ratio élevé MAIS beaucoup de contours → dessin complexe valide
-    if 0.40 < black_ratio < 0.65 and edge_density > 0.08:
-        print("[MaskQuality] ✅ COMPLEX_VALID : dessin complexe (coupe/façade détaillée)")
-        return True, "COMPLEX_VALID"
+    if white_ratio > 0.65 and edge_density >= 0.003:
+        print(f"[MaskQuality] ✅ VALID (plan fond blanc normal) : {white_ratio*100:.1f}% blanc mais {edge_density*100:.2f}% contours actifs")
+        return True, "VALID"
 
-    # Règle 4 : Zone grise + score flou bas → photo floue
-    if black_ratio > 0.40:
-        blur_score = float(cv2.Laplacian(binary_mask, cv2.CV_64F).var())
-        print(f"[MaskQuality] Score flou Laplacien : {blur_score:.1f}")
-        if blur_score < 100.0:
-            print("[MaskQuality] ⚠️ BLURRY : photo floue détectée")
-            return False, "BLURRY"
-
-    print("[MaskQuality] ✅ VALID : masque exploitable")
+    print("[MaskQuality] ✅ VALID : masque de murs binaire exploitable")
     return True, "VALID"
 
 
@@ -392,7 +379,7 @@ def autocrop_sheet_robust(image: np.ndarray) -> tuple:
         horizontal_ys = []
         
         for line in lines:
-            x1, y1, x2, y2 = line[0]
+            x1, y1, x2, y2 = line.ravel()
             angle = abs(np.arctan2(y2 - y1, x2 - x1) * 180 / np.pi)
             
             if angle < 10 or angle > 170:  # Horizontal
@@ -462,18 +449,19 @@ def is_dashed_line(line_segment: tuple, binary_image: np.ndarray, threshold_gaps
     x1, y1, x2, y2 = line_segment
     length = int(np.sqrt((x2 - x1)**2 + (y2 - y1)**2))
     
-    if length < 30:
+    if length < 30 or length > 1000:
         return False
         
-    x_coords = np.linspace(x1, x2, length).astype(int)
-    y_coords = np.linspace(y1, y2, length).astype(int)
+    num_samples = min(25, length)
+    x_coords = np.linspace(x1, x2, num_samples).astype(int)
+    y_coords = np.linspace(y1, y2, num_samples).astype(int)
     
     h, w = binary_image.shape[:2]
     valid_indices = (x_coords >= 0) & (x_coords < w) & (y_coords >= 0) & (y_coords < h)
     x_coords = x_coords[valid_indices]
     y_coords = y_coords[valid_indices]
     
-    if len(x_coords) == 0:
+    if len(x_coords) < 5:
         return False
         
     profile = binary_image[y_coords, x_coords]
@@ -481,11 +469,8 @@ def is_dashed_line(line_segment: tuple, binary_image: np.ndarray, threshold_gaps
     gaps = np.sum(np.abs(transitions) > 100)
     
     duty_cycle = np.sum(profile > 0) / len(profile)
-    is_dashed = gaps >= threshold_gaps and 0.3 <= duty_cycle <= 0.7
+    is_dashed = gaps >= threshold_gaps and 0.25 <= duty_cycle <= 0.75
     
-    if is_dashed:
-        print(f"  🔍 Pointillés détectés : {gaps} gaps, duty cycle={duty_cycle*100:.1f}%")
-        
     return is_dashed
 
 
@@ -511,7 +496,7 @@ def extract_dashed_lines(binary_image: np.ndarray) -> tuple:
     solid_count = 0
     
     for line in lines:
-        x1, y1, x2, y2 = line[0]
+        x1, y1, x2, y2 = line.ravel()
         if is_dashed_line((x1, y1, x2, y2), binary_image):
             cv2.line(mask_dashed, (x1, y1), (x2, y2), 255, 2)
             dashed_count += 1
@@ -549,15 +534,158 @@ def add_smart_padding(image: np.ndarray, target_padding_ratio: float = 0.15, max
     return padded, padding_px
 
 
+def detect_text_and_cartouche_regions(bgr_img: np.ndarray) -> tuple:
+    """
+    Détecte les boîtes englobantes des textes (OCR/morphologie) et du cartouche (grand rectangle en bas).
+    Retourne (text_boxes, cartouche_box)
+    Chaque boîte est un tuple (x, y, w, h).
+    """
+    height, width = bgr_img.shape[:2]
+    gray = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2GRAY)
+    
+    # 1. Détection du cartouche en bas (y > height * 0.70)
+    cartouche_box = None
+    
+    # Binarisation pour trouver les contours rectangulaires
+    _, thresh_c = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
+    contours_c, _ = cv2.findContours(thresh_c, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    best_area = 0
+    for c in contours_c:
+        x, y, w, h = cv2.boundingRect(c)
+        area = w * h
+        # Doit être dans la zone du bas (y > height * 0.70) et avoir une taille significative
+        if y > height * 0.70 and w > width * 0.15 and h > height * 0.03:
+            if area > best_area:
+                best_area = area
+                cartouche_box = (x, y, w, h)
+                
+    # Si aucun grand rectangle n'est détecté par contour, on définit un cartouche par défaut (les 12% du bas)
+    if cartouche_box is None:
+        cartouche_box = (0, int(height * 0.88), width, int(height * 0.12))
+        print(f"[OCR] Cartouche non détecté par contour. Zone par défaut : {cartouche_box}")
+    else:
+        print(f"[OCR] Cartouche détecté par contour : {cartouche_box}")
+
+    # 2. Détection des textes et cotations
+    text_boxes = []
+    
+    # Option A: Pytesseract
+    pytesseract_success = False
+    try:
+        import pytesseract
+        d = pytesseract.image_to_data(gray, output_type=pytesseract.Output.DICT)
+        n_boxes = len(d['level'])
+        for i in range(n_boxes):
+            conf = float(d['conf'][i]) if 'conf' in d else -1
+            if conf > 10:
+                tx, ty, tw, th = d['left'][i], d['top'][i], d['width'][i], d['height'][i]
+                if tw < width * 0.3 and th < height * 0.15:
+                    text_boxes.append((tx, ty, tw, th))
+        if len(text_boxes) > 0:
+            pytesseract_success = True
+            print(f"[OCR] Pytesseract a détecté {len(text_boxes)} blocs de texte.")
+    except Exception as e:
+        print(f"[OCR] Pytesseract indisponible ou en erreur ({e}). Fallback morphologique OpenCV.")
+
+    # Option B: Fallback morphologique OpenCV
+    if not pytesseract_success:
+        _, thresh_t = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        
+        # Fermeture horizontale large pour fusionner les caractères en blocs
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25, 6))
+        morphed = cv2.morphologyEx(thresh_t, cv2.MORPH_CLOSE, kernel)
+        
+        contours_t, _ = cv2.findContours(morphed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for c in contours_t:
+            x, y, w, h = cv2.boundingRect(c)
+            # Les blocs de texte ou de cotations sont généralement de petite ou moyenne taille
+            if 5 < w < width * 0.25 and 5 < h < height * 0.12:
+                # Éviter de capturer des éléments sous le cartouche
+                if y >= cartouche_box[1]:
+                    continue
+                text_boxes.append((x, y, w, h))
+        print(f"[OCR] Fallback morphologique OpenCV a détecté {len(text_boxes)} blocs de texte/cotation.")
+        
+    return text_boxes, cartouche_box
+
+
+def extract_balcony_guardrails(binary_img: np.ndarray) -> tuple:
+    """
+    Isole les traits fins correspondants aux balcons, terrasses et garde-corps.
+    Retourne (cleaned_binary, balcony_guardrail_mask)
+    """
+    height, width = binary_img.shape[:2]
+    dist_transform = cv2.distanceTransform(binary_img, cv2.DIST_L2, 5)
+    
+    avg_t = detect_stroke_thickness(binary_img)
+    max_radius = max(1.5, avg_t * 0.45)
+    
+    # Masque des lignes fines (traits fins)
+    thin_lines = (binary_img > 0) & (dist_transform < max_radius)
+    thin_lines_mask = thin_lines.astype(np.uint8) * 255
+    
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(thin_lines_mask)
+    balcony_guardrail_mask = np.zeros_like(thin_lines_mask)
+    
+    for i in range(1, num_labels):
+        area = stats[i, cv2.CC_STAT_AREA]
+        w = stats[i, cv2.CC_STAT_WIDTH]
+        h = stats[i, cv2.CC_STAT_HEIGHT]
+        
+        # Filtre linéaire (les garde-corps/lignes de balcons ont une longueur minimale)
+        if area > 15 and (w > 20 or h > 20 or area > 50):
+            balcony_guardrail_mask[labels == i] = 255
+            
+    # Retirer les garde-corps du masque des murs porteurs
+    cleaned_binary = cv2.subtract(binary_img, balcony_guardrail_mask)
+    
+    return cleaned_binary, balcony_guardrail_mask
+
+
 def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     height, width = bgr_img.shape[:2]
 
-    # ── ÉTAPE 0 : NETTOYAGE DES COULEURS (bleu cahier HSV) ───────────────────
-    # Supprimer l'encre bleue/cyan des lignes de grille (HSV H:80-140)
+    # ── ÉTAPE 0.1 : NETTOYAGE DES COULEURS (bleu cahier HSV) ───────────────────
     hsv = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
     grid_blue_mask = cv2.inRange(hsv, (80, 20, 100), (140, 255, 255))
     cleaned_bgr = bgr_img.copy()
     cleaned_bgr[grid_blue_mask > 0] = (255, 255, 255)
+
+    # === ÉTAPE 0.2 : OCR ET GOMMAGE DU CARTOUCHE ===
+    text_boxes, cartouche_box = detect_text_and_cartouche_regions(cleaned_bgr)
+    
+    text_cartouche_mask = np.zeros((height, width), dtype=np.uint8)
+    for (x, y, w, h) in text_boxes:
+        mx = max(0, x - 4)
+        my = max(0, y - 4)
+        mw = min(width - mx, w + 8)
+        mh = min(height - my, h + 8)
+        cv2.rectangle(text_cartouche_mask, (mx, my), (mx + mw, my + mh), 255, -1)
+        
+    cx, cy, cw, ch = cartouche_box
+    mcx = max(0, cx - 4)
+    mcy = max(0, cy - 4)
+    mcw = min(width - mcx, cw + 8)
+    mch = min(height - mcy, ch + 8)
+    cv2.rectangle(text_cartouche_mask, (mcx, mcy), (mcx + mcw, mcy + mch), 255, -1)
+    
+    # Récupérer l'encre de texte propre
+    gray_orig = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2GRAY)
+    _, binary_orig = cv2.threshold(gray_orig, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    
+    clean_text_mask = np.zeros((height, width), dtype=np.uint8)
+    for (x, y, w, h) in text_boxes:
+        if y >= cartouche_box[1]:
+            continue
+        mx = max(0, x - 2)
+        my = max(0, y - 2)
+        mw = min(width - mx, w + 4)
+        mh = min(height - my, h + 4)
+        clean_text_mask[my:my+mh, mx:mx+mw] = binary_orig[my:my+mh, mx:mx+mw]
+
+    # Blanchir le texte et le cartouche avant extraction des murs
+    cleaned_bgr[text_cartouche_mask > 0] = (255, 255, 255)
 
     gray = cv2.cvtColor(cleaned_bgr, cv2.COLOR_BGR2GRAY)
     clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
@@ -567,18 +695,15 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     _, binary = cv2.threshold(denoised, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
     # ── ÉTAPE 1 : SUPPRESSION DES LIGNES HORIZONTALES DU CAHIER (adapt. Hough) ───
-    # Utilise detect_and_remove_ruled_lines() qui valide la régularité des espacements
-    # pour ne pas supprimer les murs architecturaux horizontaux par erreur.
     binary = detect_and_remove_ruled_lines(binary, width)
 
     # ── ÉTAPE 1.5 : EXTRACTION DES POINTILLÉS / LIGNES INTERROMPUES ───────────
-    # On isole les pointillés (- - -) avant la dilatation des murs pour éviter de
-    # fermer les ouvertures comme s'il s'agissait de cloisons opaques portantes.
     binary, dashed_mask = extract_dashed_lines(binary)
 
+    # ── ÉTAPE 1.6 : EXTRACTION DES GARDE-CORPS / BALCONS ─────────────────────
+    binary, balcony_guardrail_mask = extract_balcony_guardrails(binary)
+
     # ── GARDE-FOU ADAPTATIF : remplacement du seuil fixe 40% ──────────────────
-    # validate_mask_quality() analyse la densité de contours (Canny) et le flou.
-    # On isole la zone active du dessin pour ne pas fausser les métriques avec le padding blanc.
     pts = cv2.findNonZero(binary)
     if pts is not None:
         x_pts, y_pts, bw_pts, bh_pts = cv2.boundingRect(pts)
@@ -593,7 +718,6 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     is_valid, quality_reason = validate_mask_quality(validation_target)
     if not is_valid:
         print(f"[Sketch] ⚠️ Masque invalide (raison: {quality_reason}). Fallback Lineart Canny propre.")
-        # Retourner un Canny propre plutôt qu'un masque corrompu
         fallback_canny = cv2.Canny(binary, 50, 150)
         binary = fallback_canny
 
@@ -602,8 +726,6 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
     binary_in_building = cv2.bitwise_and(binary, building_mask)
 
     # ── ÉTAPE 2 : FERMETURE MORPHOLOGIQUE ADAPTATIVE DES MURS ──
-    # Épaississement des traits de stylo pour boucher les micro-trous et éviter les fuites.
-    # Choix dynamique des noyaux selon l'épaisseur détectée pour s'adapter aux stylos fins ou marqueurs épais.
     dilate_size, close_size = get_adaptive_kernels(binary_in_building)
     kernel_dilate = cv2.getStructuringElement(cv2.MORPH_RECT, dilate_size)
     binary_thickened = cv2.dilate(binary_in_building, kernel_dilate, iterations=1)
@@ -622,12 +744,11 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
         if area >= 30 or comp_w >= 15 or comp_h >= 18:
             structural_walls[wall_labels == i] = 255
 
-    # ── ÉTAPE 4 : SÉPARATION DU TEXTE MANUSCRIT ET DU MOBILIER ─────────────────
+    # ── ÉTAPE 4 : SÉPARATION DU MOBILIER ───────────────────────────────────────
     non_wall_ink = cv2.bitwise_and(binary_in_building, cv2.bitwise_not(structural_walls))
     num_ink_comps, ink_labels, ink_stats, _ = cv2.connectedComponentsWithStats(non_wall_ink)
     
     furniture_mask = np.zeros_like(non_wall_ink, dtype=np.uint8)
-    clean_text_mask = np.zeros_like(non_wall_ink, dtype=np.uint8)
 
     for i in range(1, num_ink_comps):
         area = ink_stats[i, cv2.CC_STAT_AREA]
@@ -636,8 +757,6 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
 
         if area >= 120 or (w_c >= 25 and h_c >= 25):
             furniture_mask[ink_labels == i] = 255
-        elif area >= 6:
-            clean_text_mask[ink_labels == i] = 255
 
     text_rgba = np.zeros((height, width, 4), dtype=np.uint8)
     text_rgba[clean_text_mask > 0] = (15, 23, 42, 255)
@@ -649,6 +768,7 @@ def process_hand_drawn_notebook_sketch(bgr_img: np.ndarray) -> dict:
         "text_layer_rgba": Image.fromarray(text_rgba, "RGBA"),
         "building_mask": building_mask,
         "dashed_mask": dashed_mask,
+        "balcony_guardrail_mask": balcony_guardrail_mask,
         "width": width,
         "height": height
     }
@@ -850,19 +970,36 @@ def render_furniture_layer(canvas: Image.Image, furniture_mask: np.ndarray, widt
         outline_img = Image.fromarray(cv2.Canny(elem_mask, 100, 200))
         canvas.paste(Image.new("RGBA", (width, height), (71, 85, 105, 255)), (0, 0), mask=outline_img)
 
-def generate_controlnet_maps(structural_walls: np.ndarray, dashed_mask: np.ndarray, output_canny_path: str, output_depth_path: str):
+def generate_controlnet_maps(structural_walls: np.ndarray, dashed_mask: np.ndarray, output_canny_path: str, output_depth_path: str, balcony_guardrail_mask: np.ndarray = None):
     """
-    Génère les cartes ControlNet (Canny & Depth wireframe) depuis les murs structuraux et les pointillés.
+    Génère les cartes ControlNet (Canny & Depth wireframe) depuis les murs structuraux, les pointillés et les garde-corps.
     """
     try:
         if structural_walls is None or structural_walls.size == 0:
             print("⚠️ Notice ControlNet : Image de murs vide ou invalide.")
             return
 
-        # 1. Canny edge map (on combine les murs et les pointillés)
+        # 1. Canny edge map (on combine les murs, les pointillés et les garde-corps)
         canny_img = cv2.Canny(structural_walls, 100, 200)
+        kernel_3x3 = np.ones((3, 3), dtype=np.uint8)
+        canny_img = cv2.dilate(canny_img, kernel_3x3, iterations=1)
+        
+        # 1b. Simulation d'épaisseur des murs extérieurs (dilatation périphérique de 5px)
+        try:
+            cnts, _ = cv2.findContours(structural_walls, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            if cnts:
+                large_cnts = [c for c in cnts if cv2.contourArea(c) > 1000]
+                if large_cnts:
+                    all_pts = np.vstack(large_cnts)
+                    hull = cv2.convexHull(all_pts)
+                    cv2.drawContours(canny_img, [hull], -1, 255, 5)
+        except Exception as e:
+            print(f"  ⚠️ Warning wall thickness effect: {e}")
+            
         if dashed_mask is not None and dashed_mask.size > 0:
             canny_img = cv2.bitwise_or(canny_img, dashed_mask)
+        if balcony_guardrail_mask is not None and balcony_guardrail_mask.size > 0:
+            canny_img = cv2.bitwise_or(canny_img, balcony_guardrail_mask)
             
         os.makedirs(os.path.dirname(os.path.abspath(output_canny_path)), exist_ok=True)
         cv2.imwrite(output_canny_path, canny_img)
@@ -871,9 +1008,17 @@ def generate_controlnet_maps(structural_walls: np.ndarray, dashed_mask: np.ndarr
         combined_struct = structural_walls.copy()
         if dashed_mask is not None and dashed_mask.size > 0:
             combined_struct = cv2.bitwise_or(combined_struct, dashed_mask)
+        if balcony_guardrail_mask is not None and balcony_guardrail_mask.size > 0:
+            combined_struct = cv2.bitwise_or(combined_struct, balcony_guardrail_mask)
             
         dist_transform = cv2.distanceTransform(combined_struct, cv2.DIST_L2, 5)
         depth_normalized = cv2.normalize(dist_transform, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+        
+        # Rendre les garde-corps plus bas dans la depth map (max 120 sur 255)
+        if balcony_guardrail_mask is not None and balcony_guardrail_mask.size > 0:
+            mask_indices = balcony_guardrail_mask > 0
+            depth_normalized[mask_indices] = np.minimum(depth_normalized[mask_indices], 120)
+
         os.makedirs(os.path.dirname(os.path.abspath(output_depth_path)), exist_ok=True)
         cv2.imwrite(output_depth_path, depth_normalized)
         print(f"✨ Cartes ControlNet générées avec succès : Canny={output_canny_path}, Depth={output_depth_path}")
@@ -885,6 +1030,7 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
     sealed_walls = proc_result["structural_walls"]
     furniture_mask = proc_result["furniture_mask"]
     building_mask = proc_result.get("building_mask", np.ones((height, width), dtype=np.uint8) * 255)
+    balcony_guardrail_mask = proc_result.get("balcony_guardrail_mask", np.zeros_like(sealed_walls))
     img_area = width * height
 
     # 1. Canvas fond crème/béton ciré clair Nano Banana (#F4F0EA)
@@ -893,60 +1039,77 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
 
     cartouche_y_limit = int(height * 0.82)
 
-    # 2. Texturage intérieur pièce par pièce - PALETTE SOFT ARCHITECTURAL
+    # 2. Détection topologique des balcons/vérandas
+    # 2a. Masque de fond extérieur (sans les garde-corps)
     inv_sealed = cv2.bitwise_not(sealed_walls)
     inv_sealed[building_mask == 0] = 0
-    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(inv_sealed)
-    areas = stats[:, cv2.CC_STAT_AREA]
-    largest_label = np.argmax(areas)
+    num_labels_s, labels_s, stats_s, _ = cv2.connectedComponentsWithStats(inv_sealed)
+    largest_label_s = np.argmax(stats_s[:, cv2.CC_STAT_AREA])
+    bg_mask = (labels_s == largest_label_s)
+
+    # 2b. Partitionnement avec les garde-corps inclus
+    combined_walls = cv2.bitwise_or(sealed_walls, balcony_guardrail_mask)
+    inv_combined = cv2.bitwise_not(combined_walls)
+    inv_combined[building_mask == 0] = 0
+    num_labels_c, labels_c, stats_c, _ = cv2.connectedComponentsWithStats(inv_combined)
+    largest_label_c = np.argmax(stats_c[:, cv2.CC_STAT_AREA])
 
     valid_room_count = 0
 
-    for label_idx in range(1, num_labels):
-        if label_idx == largest_label:
+    for label_idx in range(1, num_labels_c):
+        if label_idx == largest_label_c:
             continue
 
-        area = stats[label_idx, cv2.CC_STAT_AREA]
+        area = stats_c[label_idx, cv2.CC_STAT_AREA]
         if area < 600 or area > 0.38 * img_area:
             continue
 
-        x = stats[label_idx, cv2.CC_STAT_LEFT]
-        y = stats[label_idx, cv2.CC_STAT_TOP]
-        w = stats[label_idx, cv2.CC_STAT_WIDTH]
-        h = stats[label_idx, cv2.CC_STAT_HEIGHT]
+        x = stats_c[label_idx, cv2.CC_STAT_LEFT]
+        y = stats_c[label_idx, cv2.CC_STAT_TOP]
+        w = stats_c[label_idx, cv2.CC_STAT_WIDTH]
+        h = stats_c[label_idx, cv2.CC_STAT_HEIGHT]
 
         if (y + h) >= cartouche_y_limit or y >= cartouche_y_limit:
             continue
         if x <= 2 or y <= 2 or (x + w) >= (width - 2):
             continue
 
-        valid_room_count += 1
-        room_mask = np.where(labels == label_idx, 255, 0).astype(np.uint8)
+        room_mask = np.where(labels_c == label_idx, 255, 0).astype(np.uint8)
         floor_only_mask = cv2.bitwise_and(room_mask, cv2.bitwise_not(furniture_mask))
         room_mask_pil = Image.fromarray(floor_only_mask)
 
-        # Sélection des textures Soft Pastel selon le type de pièce
-        if area < 3500:
-            # Cuisines / Sanitaires : Carrelage beige/mint (#E8F0E6)
-            tex_img = _CATALOG.get_texture("kitchen", width, height)
-            layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
-        elif area > 10000 or valid_room_count % 2 == 1:
-            # Salons / Séjours : Parquet chêne miel/clair (#D9AA72)
-            tex_img = _CATALOG.get_texture("parquet", width, height)
+        # Si le composant intersecte avec le fond extérieur (quand on retire les garde-corps)
+        # alors c'est topologiquement un balcon/véranda ouvert.
+        is_balcony = np.any(cv2.bitwise_and(room_mask, bg_mask.astype(np.uint8) * 255) > 0)
+
+        if is_balcony:
+            # Espace extérieur ouvert : Texture de véranda (béton ciré/deck)
+            print(f"[FloorTexture] Component {label_idx} (area={area}px) détecté comme ESPACE BALCON/VERANDE")
+            tex_img = _CATALOG.get_texture("veranda", width, height)
             layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
         else:
-            # Chambres : Carrelage mat bleu/gris pastel (#E3E8ED)
-            tex_img = _CATALOG.get_texture("bedroom", width, height)
-            layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
+            # Sélection des textures Soft Pastel selon le type de pièce
+            valid_room_count += 1
+            if area < 3500:
+                # Cuisines / Sanitaires : Carrelage beige/mint (#E8F0E6)
+                tex_img = _CATALOG.get_texture("kitchen", width, height)
+                layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
+            elif area > 10000 or valid_room_count % 2 == 1:
+                # Salons / Séjours : Parquet chêne miel/clair (#D9AA72)
+                tex_img = _CATALOG.get_texture("parquet", width, height)
+                layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
+            else:
+                # Chambres : Carrelage mat bleu/gris pastel (#E3E8ED)
+                tex_img = _CATALOG.get_texture("bedroom", width, height)
+                layer1_floors.paste(tex_img, (0, 0), mask=room_mask_pil)
 
-    # 5. Rendu du Mobilier et du Véhicule extraits ou superposés avec Ombres Portées Douces
+    # 5. Rendu du Mobilier avec Ombres Portées Douces
     render_furniture_layer(layer1_floors, furniture_mask, width, height)
 
     # 6. Ajout des plantes décoratives en pot
     add_plants_to_canvas(layer1_floors)
 
     # 7. HABILLAGE DOUX DES MURS — Contour Bois Sombre Warm (#3D2817) + Stroke 3px (#24170D)
-    # Ombre portée 3D ambiante sous les murs (opacity 60%, blur 5px)
     layer2_walls = apply_soft_shadow(layer1_floors, Image.fromarray(sealed_walls), opacity=60, offset=(3, 3))
     
     # Rendu des pointillés sur un calque séparé (comme des ouvertures/poutres en gris moyen #475569) SANS gros pochage massif
@@ -954,12 +1117,15 @@ def generate_clean_plan(bgr_img: np.ndarray, proc_result: dict, output_clean_pat
     if dashed_mask is not None and dashed_mask.size > 0:
         dashed_pil = Image.fromarray(dashed_mask)
         layer2_walls.paste(Image.new("RGBA", (width, height), (71, 85, 105, 255)), (0, 0), mask=dashed_pil)
+
+    # Rendu des garde-corps de balcons en gris acier (#475569)
+    if balcony_guardrail_mask is not None and balcony_guardrail_mask.size > 0:
+        balcony_pil = Image.fromarray(balcony_guardrail_mask)
+        layer2_walls.paste(Image.new("RGBA", (width, height), (71, 85, 105, 255)), (0, 0), mask=balcony_pil)
         
     wall_pil = Image.fromarray(sealed_walls)
-    # Pochage brun foncé / bois sombre (#3D2817 / 61, 40, 23)
     layer2_walls.paste(Image.new("RGBA", (width, height), (61, 40, 23, 255)), (0, 0), mask=wall_pil)
     
-    # Contour fin 3px brun foncé chaleureux (#24170D / 36, 23, 13)
     wall_outline = Image.fromarray(cv2.Canny(sealed_walls, 100, 200))
     layer2_walls.paste(Image.new("RGBA", (width, height), (36, 23, 13, 255)), (0, 0), mask=wall_outline)
 
@@ -1055,6 +1221,12 @@ def main():
                 top=pad_y, bottom=pad_y, left=pad_x, right=pad_x,
                 borderType=cv2.BORDER_CONSTANT, value=0
             )
+        if proc_result.get("balcony_guardrail_mask") is not None:
+            proc_result["balcony_guardrail_mask"] = cv2.copyMakeBorder(
+                proc_result["balcony_guardrail_mask"],
+                top=pad_y, bottom=pad_y, left=pad_x, right=pad_x,
+                borderType=cv2.BORDER_CONSTANT, value=0
+            )
 
         proc_result["clean_text_mask"] = cv2.copyMakeBorder(
             proc_result["clean_text_mask"],
@@ -1071,7 +1243,13 @@ def main():
         print("🎨 Génération du plan Nano Banana HD (textures soft, murs bois #3D2817, calque multiply)...")
         generate_clean_plan(bgr_img, proc_result, output_clean_plan)
         try:
-            generate_controlnet_maps(proc_result["structural_walls"], proc_result.get("dashed_mask"), output_canny, output_depth)
+            generate_controlnet_maps(
+                proc_result["structural_walls"],
+                proc_result.get("dashed_mask"),
+                output_canny,
+                output_depth,
+                proc_result.get("balcony_guardrail_mask")
+            )
         except Exception as e:
             print(f"⚠️ Notice ControlNet Maps generation : {e}")
 
@@ -1101,8 +1279,188 @@ def main():
         print("=" * 65)
 
     except Exception as err:
+        import traceback
+        traceback.print_exc()
         print(f"❌ ERREUR CRITIQUE lors du prétraitement OpenCV : {str(err)}", file=sys.stderr)
         sys.exit(1)
+
+def find_optimal_bed_wall(room_polygon, min_length_px=100):
+    """
+    Extrait les segments du polygone de la chambre et trouve le mur optimal pour placer le lit.
+    """
+    if len(room_polygon) < 3:
+        return None, "Polygon has too few vertices"
+        
+    segments = []
+    for j in range(len(room_polygon)):
+        p1 = room_polygon[j]
+        p2 = room_polygon[(j + 1) % len(room_polygon)]
+        dx = p2[0] - p1[0]
+        dy = p2[1] - p1[1]
+        length = np.sqrt(dx**2 + dy**2)
+        segments.append({
+            'start': p1,
+            'end': p2,
+            'length': length,
+            'dx': dx,
+            'dy': dy
+        })
+        
+    valid_segments = [s for s in segments if s['length'] >= min_length_px]
+    if not valid_segments:
+        return None, "No walls long enough (minimum effective length >= 220cm)"
+        
+    valid_segments.sort(key=lambda s: s['length'], reverse=True)
+    chosen_segment = valid_segments[0]
+    p1 = chosen_segment['start']
+    p2 = chosen_segment['end']
+    
+    mx = (p1[0] + p2[0]) / 2
+    my = (p1[1] + p2[1]) / 2
+    
+    length = chosen_segment['length']
+    nx = -chosen_segment['dy'] / length
+    ny = chosen_segment['dx'] / length
+    
+    contour = np.array(room_polygon, dtype=np.int32).reshape((-1, 1, 2))
+    test_pt = (float(mx + nx * 20), float(my + ny * 20))
+    dist = cv2.pointPolygonTest(contour, test_pt, False)
+    
+    if dist < 0:
+        nx, ny = -nx, -ny
+        
+    bed_length = 75
+    bed_width = 60
+    bx = mx + nx * (bed_length / 2)
+    by = my + ny * (bed_length / 2)
+    
+    angle_rad = np.arctan2(ny, nx)
+    angle_deg = np.degrees(angle_rad)
+    
+    return {
+        'chosen_wall': {
+            'start': [int(p1[0]), int(p1[1])],
+            'end': [int(p2[0]), int(p2[1])],
+            'length_cm': int(length * 2.5)
+        },
+        'bed_position': {
+            'center': [int(bx), int(by)],
+            'rotation_deg': int(angle_deg),
+            'size_cm': [160, 200]
+        }
+    }, None
+
+def draw_oriented_rect(img, center, size, angle_deg, val):
+    """
+    Dessine un rectangle orienté sur l'image
+    """
+    cx, cy = center
+    w_rect, h_rect = size
+    
+    corners = np.array([
+        [-w_rect/2, -h_rect/2],
+        [w_rect/2, -h_rect/2],
+        [w_rect/2, h_rect/2],
+        [-w_rect/2, h_rect/2]
+    ])
+    
+    theta = np.radians(angle_deg)
+    c, s = np.cos(theta), np.sin(theta)
+    R = np.array([[c, -s], [s, c]])
+    
+    rotated_corners = np.dot(corners, R.T) + [cx, cy]
+    rotated_corners = rotated_corners.astype(np.int32)
+    
+    cv2.fillPoly(img, [rotated_corners], val)
+
+def generate_furniture_anchors(cleaned_image, rooms_list, staircase_zones, storage_zones, outdoor_data, output_path):
+    """
+    Génère la Depth Map d'ancrage du mobilier (_furniture_anchors.png)
+    """
+    h, w = cleaned_image.shape[:2]
+    anchors = np.ones((h, w), dtype=np.uint8) * 255
+    
+    gray = cv2.cvtColor(cleaned_image, cv2.COLOR_BGR2GRAY)
+    _, thresh_walls = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
+    anchors[thresh_walls > 0] = 0
+    
+    outside_mask = np.ones((h, w), dtype=np.uint8) * 255
+    for r in rooms_list:
+        if r['type'] != 'OUTSIDE':
+            if len(r['polygon']) > 0:
+                cv2.fillPoly(outside_mask, [np.array(r['polygon'], dtype=np.int32)], 0)
+    anchors[outside_mask == 255] = 0
+    
+    placement_logic = {}
+    stair_detected = False
+    stair_zones_coords = []
+    for sz in staircase_zones:
+        stair_detected = True
+        sx1, sy1, sx2, sy2 = sz
+        stair_zones_coords.append([int(sx1), int(sy1), int(sx2), int(sy2)])
+        
+        stair_h = sy2 - sy1
+        if stair_h > 0:
+            for y in range(sy1, sy2):
+                if 0 <= y < h:
+                    val = int(50 + (y - sy1) / stair_h * 50)
+                    anchors[y, sx1:sx2] = val
+                    
+    placement_logic['stairwell_detected'] = stair_detected
+    if stair_detected:
+        placement_logic['stair_confinement_zone'] = stair_zones_coords
+        
+    for r in rooms_list:
+        if r['type'] == 'BEDROOM':
+            room_id_str = f"room_{r['id']}"
+            polygon = r['polygon']
+            res, err = find_optimal_bed_wall(polygon)
+            if res:
+                center = res['bed_position']['center']
+                size = (60, 75)
+                angle = res['bed_position']['rotation_deg']
+                draw_oriented_rect(anchors, center, size, angle, 180)
+                placement_logic[room_id_str] = {
+                    'chosen_wall': res['chosen_wall'],
+                    'bed_position': res['bed_position'],
+                    'rejected_reason': None
+                }
+            else:
+                placement_logic[room_id_str] = {
+                    'chosen_wall': None,
+                    'bed_position': None,
+                    'rejected_reason': err
+                }
+                
+    for z in outdoor_data['zones']:
+        bx1, by1, bx2, by2 = z['bbox']
+        balcony_crop = anchors[by1:by2, bx1:bx2]
+        if balcony_crop.size > 0:
+            _, crop_bin = cv2.threshold(balcony_crop, 220, 255, cv2.THRESH_BINARY)
+            num_labels, labels_im, stats, centroids = cv2.connectedComponentsWithStats(crop_bin)
+            
+            cleaned_crop = np.zeros_like(balcony_crop)
+            for i in range(1, num_labels):
+                area = stats[i, cv2.CC_STAT_AREA]
+                w_box = stats[i, cv2.CC_STAT_WIDTH]
+                h_box = stats[i, cv2.CC_STAT_HEIGHT]
+                if area >= 50 and w_box >= 3 and h_box >= 3:
+                    cleaned_crop[labels_im == i] = 255
+            anchors[by1:by2, bx1:bx2] = np.where(cleaned_crop == 255, 255, anchors[by1:by2, bx1:bx2])
+            
+    cv2.imwrite(output_path, anchors)
+    
+    debug_dir = os.path.join(os.path.dirname(output_path), 'debug')
+    os.makedirs(debug_dir, exist_ok=True)
+    
+    cv2.imwrite(os.path.join(debug_dir, 'source_inpainted.png'), cleaned_image)
+    cv2.imwrite(os.path.join(debug_dir, 'furniture_anchors_map.png'), anchors)
+    
+    import json
+    with open(os.path.join(debug_dir, 'placement_logic.json'), 'w', encoding='utf-8') as pf:
+        json.dump(placement_logic, pf, indent=2, ensure_ascii=False)
+        
+    print(f"✅ Depth Map d'ancrage mobilier générée : {output_path}")
 
 if __name__ == "__main__":
     main()

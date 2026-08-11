@@ -418,7 +418,7 @@ export async function runUnified10StepPipeline(req: UnifiedPipelineRequest) {
   let engineUsed = "opencv_local";
   try {
     const { generateArchitecturalRender } = await import("@/lib/bridges/openrouter-bridge");
-    const renderUrl = await generateArchitecturalRender("", enrichedPrompt);
+    const renderUrl = await generateArchitecturalRender("", null, enrichedPrompt);
     if (renderUrl) engineUsed = "openrouter_cloud";
   } catch {
     engineUsed = "opencv_local";

@@ -64,7 +64,7 @@ export class LumaDreamMachineClient {
   }
 
   private buildVideoPrompt(cameraPath: string): string {
-    const prompts = {
+    const prompts: Record<string, string> = {
       ORBIT: "Smooth cinematic drone orbit around the building, 360 degree rotation, golden hour lighting, 4K",
       FLYOVER: "Aerial drone flyover of architectural project, slowly descending and approaching the building",
       WALKTHROUGH: "First-person walkthrough tour inside the building, smooth camera movement, natural lighting"

@@ -10,7 +10,7 @@ export async function callOpenAIImageBridge(params: {
   models?: string[];
 }) {
   console.warn("[OpenAI Bridge] ⚠️ Bridge obsolète appelé — Redirection vers OpenRouter Bridge...");
-  const url = await generateArchitecturalRender("", params.prompt);
+  const url = await generateArchitecturalRender("", null, params.prompt);
   return {
     imageBuffer: url ? Buffer.from([]) : Buffer.from([]),
     modelUsed: "openrouter-fallback",

@@ -43,4 +43,4 @@ try {
   };
 }
 
-export const prisma = prismaInstance;
+export const prisma: any = prismaInstance;

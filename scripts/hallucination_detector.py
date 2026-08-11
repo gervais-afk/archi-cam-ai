@@ -95,8 +95,8 @@ def detect_hallucination(
     )
 
 def compare_room_count(
-    original_rooms : list,
-    generated_image: np.ndarray,
+    original_rooms : list[dict] = [],
+    generated_image: np.ndarray = None,
     tolerance      : int = 2
 ) -> dict:
     """

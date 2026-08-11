@@ -4,10 +4,10 @@ const fs = require("fs");
 const path = require("path");
 
 const payload = {
-  pdfFilePath: "c:/Users/HP/Desktop/Archi Cam AI/projet 270525 _ RDC.pdf",
-  renderMode: "RENDER_3D_FURNISHED_LUXE_TROPICAL",
-  stylePreset: "luxe_tropical_paysager",
-  style: "luxe_tropical"
+  pdfFilePath: "c:/Users/HP/Desktop/Archi Cam AI/projet  Emaleu 300525 _ ETAGE.pdf",
+  renderMode: "ARCHITECTURAL_2D_FIDEL",
+  stylePreset: "board_architecte_pro",
+  style: "architect_pro"
 };
 
 const body = JSON.stringify(payload);
@@ -15,7 +15,7 @@ const body = JSON.stringify(payload);
 const opts = {
   method: "POST",
   hostname: "127.0.0.1",
-  port: 3001,
+  port: 3000,
   path: "/api/render/image",
   headers: {
     "Content-Type": "application/json",

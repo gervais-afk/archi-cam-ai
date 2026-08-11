@@ -67,5 +67,11 @@ output_*.bcfzip
 *.tsbuildinfo
 next-env.d.ts
 
+# production environment config
+.env.production
 
-
+# temporary test and debug outputs
+/public/debug_*/
+/public/renders/
+/public/test_2d_rdc_run/
+Sharp

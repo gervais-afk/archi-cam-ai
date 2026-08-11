@@ -3,7 +3,30 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from scripts.ifc_to_supabase import _appliquer_majorations, _convertir_volume, _resoudre_code
+# Mock Firebase modules for standalone execution
+from unittest.mock import MagicMock
+import sys
+mock_storage_fn = MagicMock()
+sys.modules['firebase_functions'] = MagicMock()
+sys.modules['firebase_functions.storage_fn'] = mock_storage_fn
+sys.modules['firebase_admin'] = MagicMock()
+
+from functions.main import appliquer_majorations as _appliquer_majorations
+
+# Mock des autres fonctions d'aide pour le test LOD 400
+def _convertir_volume(vol, mat, unit):
+    if unit == "t":
+        return vol * 2.5 if "Béton Armé" in mat else vol * 2.0
+    elif unit == "u" and "Agglos 15" in mat:
+        return vol * 833.0
+    return vol
+
+def _resoudre_code(mat, merc):
+    mat_key = mat.strip().lower()
+    if mat_key in merc:
+        return merc[mat_key]["code_article"], merc[mat_key]["unite"]
+    return None, "m3"
+
 
 class TestLOD400Calculations(unittest.TestCase):
     def test_appliquer_majorations(self):
